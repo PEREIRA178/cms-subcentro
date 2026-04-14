@@ -212,88 +212,37 @@ textarea.form-input{resize:vertical;min-height:80px}
 
   <div class="content" id="main-content">
     <!-- ── STATS ROW ── -->
-    <div class="stats-row">
+    <div class="stats-row"
+         hx-get="/admin/dashboard/stats"
+         hx-trigger="load"
+         hx-swap="innerHTML">
       <div class="stat-card accent">
-        <div class="stat-card-label">Eventos activos</div>
-        <div class="stat-card-value">12</div>
-        <div class="stat-card-delta up">↑ 3 esta semana</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-label">Multimedia</div>
-        <div class="stat-card-value">48</div>
-        <div class="stat-card-delta up">↑ 5 nuevos</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-label">Dispositivos online</div>
-        <div class="stat-card-value">6</div>
-        <div class="stat-card-delta">de 8 registrados</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-label">WhatsApp enviados</div>
-        <div class="stat-card-value">234</div>
-        <div class="stat-card-delta up">↑ 18 hoy</div>
+        <div class="stat-card-label">Cargando...</div>
+        <div class="stat-card-value">—</div>
       </div>
     </div>
 
-    <!-- ── RECENT EVENTS ── -->
+    <!-- ── RECENT PROPIEDADES ── -->
     <div class="card">
       <div class="card-header">
-        <h2 class="card-title">Últimos eventos</h2>
-        <button class="topbar-btn topbar-btn-primary" onclick="window.location='/admin/events/new'">
-          <span class="material-symbols-outlined" style="font-size:16px">add</span> Nuevo evento
+        <h2 class="card-title">Últimas propiedades</h2>
+        <button class="topbar-btn topbar-btn-primary"
+          hx-get="/admin/propiedades/new" hx-target="#modal-container" hx-swap="innerHTML">
+          <span class="material-symbols-outlined" style="font-size:16px">add</span> Nueva propiedad
         </button>
       </div>
       <table>
         <thead>
-          <tr><th>Título</th><th>Categoría</th><th>Urgente</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr>
+          <tr><th>Título</th><th>Tipo</th><th>Operación</th><th>Comuna</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr>
         </thead>
-        <tbody id="dash-events-tbody"
-               hx-get="/admin/events?fragment=rows"
+        <tbody id="prop-tbody"
+               hx-get="/admin/propiedades?fragment=rows"
                hx-trigger="load"
                hx-swap="innerHTML">
-          <tr><td colspan="5" style="text-align:center;padding:16px;color:var(--md-outline)">
+          <tr><td colspan="7" style="text-align:center;padding:16px;color:var(--md-outline)">
             <div style="width:18px;height:18px;border:2px solid var(--md-primary);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px"></div>
             Cargando...
           </td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ── DEVICES STATUS ── -->
-    <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">Dispositivos</h2>
-        <button class="topbar-btn topbar-btn-outline" onclick="window.location='/admin/devices'">Ver todos</button>
-      </div>
-      <table>
-        <thead>
-          <tr><th>Nombre</th><th>Tipo</th><th>Código</th><th>Layout</th><th>Estado</th><th>Última conexión</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Hall Principal</td>
-            <td>Pantalla</td>
-            <td><code>4521</code></td>
-            <td>2col-50</td>
-            <td><span class="badge badge-success">Online</span></td>
-            <td>Hace 2 min</td>
-          </tr>
-          <tr>
-            <td>Entrada Sur</td>
-            <td>Totem</td>
-            <td><code>7890</code></td>
-            <td>1col</td>
-            <td><span class="badge badge-success">Online</span></td>
-            <td>Hace 1 min</td>
-          </tr>
-          <tr>
-            <td>Biblioteca</td>
-            <td>Pantalla</td>
-            <td><code>3344</code></td>
-            <td>3col-33</td>
-            <td><span class="badge badge-danger">Offline</span></td>
-            <td>Hace 3 hrs</td>
-          </tr>
         </tbody>
       </table>
     </div>
@@ -334,10 +283,12 @@ document.querySelectorAll('.sidebar-link').forEach(link => {
     ws.onmessage = function(e) {
       try {
         const msg = JSON.parse(e.data);
-        if (msg.type === 'refresh_all' || msg.type === 'refresh_web') {
-          // Refresh visible HTMX sections if they have a reload trigger
-          const wrap = document.getElementById('devices-table-wrap');
-          if (wrap) htmx.ajax('GET', '/admin/devices?fragment=table', {target:'#devices-table-wrap', swap:'innerHTML'});
+        if (msg.type === 'refresh_all' || msg.type === 'refresh_web' || msg.type === 'propUpdated') {
+          // Refresh propiedades table if visible
+          const tbody = document.getElementById('prop-tbody');
+          if (tbody) htmx.ajax('GET', '/admin/propiedades?fragment=rows', {target:'#prop-tbody', swap:'innerHTML'});
+          const stats = document.querySelector('.stats-row');
+          if (stats) htmx.ajax('GET', '/admin/dashboard/stats', {target:'.stats-row', swap:'innerHTML'});
         }
       } catch(_) {}
     };

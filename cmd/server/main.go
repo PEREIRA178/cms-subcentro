@@ -116,6 +116,7 @@ func main() {
 
 	adm.Get("/", admin.Dashboard(cfg))
 	adm.Get("/dashboard", admin.Dashboard(cfg))
+	adm.Get("/dashboard/stats", admin.DashboardStats(cfg, pb))
 
 	// Multimedia
 	adm.Get("/multimedia", admin.MultimediaList(cfg, pb))

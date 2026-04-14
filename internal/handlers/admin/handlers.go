@@ -84,6 +84,51 @@ func Dashboard(cfg *config.Config) fiber.Handler {
 	}
 }
 
+// DashboardStats renders the 4 stat cards for the dashboard (count of propiedades)
+func DashboardStats(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		all, _ := pb.FindRecordsByFilter("propiedades", "", "", 1000, 0)
+		total := len(all)
+		publicadas, destacadas, ventas, arriendos := 0, 0, 0, 0
+		for _, r := range all {
+			if r.GetString("status") == "publicado" {
+				publicadas++
+			}
+			if r.GetBool("destacada") {
+				destacadas++
+			}
+			switch r.GetString("operacion") {
+			case "VENTA":
+				ventas++
+			case "ARRIENDO":
+				arriendos++
+			}
+		}
+		html := fmt.Sprintf(`<div class="stat-card accent">
+  <div class="stat-card-label">Propiedades totales</div>
+  <div class="stat-card-value">%d</div>
+  <div class="stat-card-delta">%d publicadas · %d borradores</div>
+</div>
+<div class="stat-card">
+  <div class="stat-card-label">Destacadas</div>
+  <div class="stat-card-value">%d</div>
+  <div class="stat-card-delta">en portada</div>
+</div>
+<div class="stat-card">
+  <div class="stat-card-label">En venta</div>
+  <div class="stat-card-value">%d</div>
+  <div class="stat-card-delta">ventas activas</div>
+</div>
+<div class="stat-card">
+  <div class="stat-card-label">En arriendo</div>
+  <div class="stat-card-value">%d</div>
+  <div class="stat-card-delta">arriendos activos</div>
+</div>`, total, publicadas, total-publicadas, destacadas, ventas, arriendos)
+		c.Set("Content-Type", "text/html; charset=utf-8")
+		return c.SendString(html)
+	}
+}
+
 // ── MULTIMEDIA CRUD ──
 
 func MultimediaList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
@@ -1208,7 +1253,7 @@ func PropiedadesList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handle
 
 func PropiedadForm(cfg *config.Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		html := propiedadFormHTML("", "", "", "VENTA", "CASA", "", "", "", "", "", 0, 0, 0, 0, 0, 0, "usada", "borrador", false, false, "", "", "")
+		html := propiedadFormHTML("", "", "", "VENTA", "CASA", "", "", "", "", "", 0, 0, 0, 0, 0, 0, "usada", "publicado", false, false, "", "", "")
 		c.Set("Content-Type", "text/html; charset=utf-8")
 		return c.SendString(html)
 	}
@@ -1226,13 +1271,18 @@ func PropiedadCreate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handle
 		}
 		r := core.NewRecord(col)
 		setPropiedadFields(r, c)
+		// Always stamp publicado_en for new listings so they sort correctly
+		r.Set("publicado_en", time.Now().UTC())
 		if err := pb.Save(r); err != nil {
+			log.Printf("⚠️  PropiedadCreate save error: %v", err)
 			return c.SendString(`<div class="toast toast-error">Error guardando: ` + template.HTMLEscapeString(err.Error()) + `</div>`)
 		}
 		return c.SendString(`<div class="toast toast-success" id="toast-area">✅ Propiedad creada
 <script>
   document.getElementById('modal-container').innerHTML='';
   htmx.ajax('GET','/admin/propiedades?fragment=rows',{target:'#prop-tbody',swap:'innerHTML'});
+  var stats=document.querySelector('.stats-row');
+  if(stats)htmx.ajax('GET','/admin/dashboard/stats',{target:'.stats-row',swap:'innerHTML'});
   setTimeout(function(){var t=document.getElementById('toast-area');if(t)t.innerHTML=''},2000);
 </script></div>`)
 	}
