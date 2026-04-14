@@ -1,0 +1,36 @@
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Pantallas y Totems</h2>
+      <button class="topbar-btn topbar-btn-primary"
+              hx-get="/admin/devices/new"
+              hx-target="#modal-container"
+              hx-swap="innerHTML">
+        <span class="material-symbols-outlined" style="font-size:16px">add</span> Registrar dispositivo
+      </button>
+    </div>
+    <div id="devices-table-wrap"
+         hx-get="/admin/devices?fragment=table"
+         hx-trigger="load, deviceCreated from:body, deviceUpdated from:body, deviceDeleted from:body"
+         hx-swap="innerHTML">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Código</th>
+            <th>Layout</th>
+            <th>Playlist</th>
+            <th>Estado</th>
+            <th>Última conexión</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="8" style="text-align:center;padding:32px;color:var(--md-outline)">
+            <div style="width:24px;height:24px;border:2px solid var(--md-primary);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 8px"></div>
+            Cargando dispositivos...
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>

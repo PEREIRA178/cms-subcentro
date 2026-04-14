@@ -1,0 +1,193 @@
+<style>
+.pl-root{display:grid;grid-template-columns:250px minmax(0,1fr) 320px;gap:12px;height:calc(100vh - 120px);min-height:480px}
+.pl-col{background:var(--md-surface-bright);border-radius:var(--r-lg);border:1px solid var(--md-outline-variant);display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.pl-col-header{padding:12px 14px;border-bottom:1px solid var(--md-outline-variant);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0}
+.pl-col-header h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--md-on-surface-variant);margin:0;font-family:var(--font-body)}
+.pl-col-body{flex:1;overflow-y:auto;padding:8px}
+.pl-new-btn{padding:5px 11px;border-radius:var(--r-full);font-size:11px;font-weight:500;border:none;cursor:pointer;background:var(--md-primary);color:var(--md-on-primary);display:inline-flex;align-items:center;gap:4px;font-family:inherit}
+.pl-new-btn .material-symbols-outlined{font-size:14px}
+.pl-new-btn:hover{filter:brightness(1.05)}
+/* Playlists list (left column) */
+.pl-list-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;border:1px solid transparent;margin-bottom:2px;transition:background 120ms,border-color 120ms}
+.pl-list-item:hover{background:var(--md-surface-container)}
+.pl-list-item.active{background:color-mix(in srgb,var(--md-primary) 10%,transparent);border-color:color-mix(in srgb,var(--md-primary) 40%,transparent)}
+.pl-list-icon{color:var(--md-outline);display:flex;align-items:center;flex-shrink:0}
+.pl-list-icon .material-symbols-outlined{font-size:20px}
+.pl-list-body{flex:1;min-width:0}
+.pl-list-name{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl-list-meta{font-size:11px;color:var(--md-outline)}
+.pl-empty-small{padding:24px 12px;text-align:center;color:var(--md-outline);font-size:12px}
+/* Center placeholder */
+.pl-placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--md-outline);text-align:center;padding:40px;gap:10px}
+.pl-placeholder .material-symbols-outlined{font-size:64px;color:var(--md-outline-variant)}
+.pl-placeholder p{font-size:13px;margin:0;line-height:1.5}
+/* Center editor */
+.pl-main-header{padding:10px 14px;border-bottom:1px solid var(--md-outline-variant);display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0}
+.pl-name-input{flex:1;min-width:160px;background:transparent;border:none;outline:none;font-size:17px;font-weight:600;font-family:var(--font-display);color:var(--md-on-surface);padding:4px 2px}
+.pl-name-input:focus{box-shadow:inset 0 -2px 0 var(--md-primary)}
+.pl-btn-save{padding:7px 16px;border-radius:var(--r-full);font-size:12px;font-weight:500;border:none;cursor:pointer;background:var(--md-primary);color:var(--md-on-primary);font-family:inherit}
+.pl-btn-save:hover{filter:brightness(1.05)}
+.pl-btn-cancel{padding:7px 14px;border-radius:var(--r-full);font-size:12px;cursor:pointer;background:transparent;color:var(--md-on-surface-variant);border:1px solid var(--md-outline-variant);font-family:inherit}
+.pl-btn-delete{padding:7px 12px;border-radius:var(--r-full);font-size:12px;cursor:pointer;background:#FDECEA;color:#B71C1C;border:none;font-family:inherit}
+.pl-table-wrap{flex:1;overflow-y:auto;position:relative}
+.pl-items-tbl{width:100%;border-collapse:collapse}
+.pl-items-tbl thead th{text-align:left;padding:9px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--md-outline);border-bottom:1px solid var(--md-outline-variant);background:var(--md-surface-bright);position:sticky;top:0;z-index:1}
+.pl-items-tbl tbody tr{border-bottom:1px solid var(--md-outline-variant);transition:background 120ms}
+.pl-items-tbl tbody tr:hover{background:var(--md-surface-container)}
+.pl-items-tbl tbody tr.sortable-ghost{opacity:0.4}
+.pl-items-tbl td{padding:7px 12px;vertical-align:middle;font-size:12px;color:var(--md-on-surface)}
+.pl-row-idx{width:26px;color:var(--md-outline);font-size:11px}
+.pl-row-handle{width:20px;color:var(--md-outline);cursor:grab;user-select:none;text-align:center}
+.pl-row-thumb{width:54px}
+.pl-row-thumb-inner{width:46px;height:30px;border-radius:4px;background:var(--md-surface-container-high);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pl-row-thumb-inner img,.pl-row-thumb-inner video{width:100%;height:100%;object-fit:cover}
+.pl-row-thumb-inner .material-symbols-outlined{font-size:16px;color:var(--md-outline)}
+.pl-row-name{font-weight:500;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl-row-type{color:var(--md-outline);font-size:11px;text-transform:capitalize}
+.pl-row-dur-input{width:54px;padding:3px 5px;border:1px solid var(--md-outline-variant);border-radius:4px;font-size:11px;text-align:center;background:var(--md-surface);font-family:inherit}
+.pl-row-rm{background:none;border:none;cursor:pointer;color:var(--md-outline);padding:3px;border-radius:50%;line-height:0;display:inline-flex;align-items:center;justify-content:center}
+.pl-row-rm:hover{background:#FDECEA;color:#B71C1C}
+.pl-empty-state{padding:60px 20px;text-align:center;color:var(--md-outline);font-size:13px}
+.pl-empty-state .material-symbols-outlined{font-size:44px;color:var(--md-outline-variant);display:block;margin:0 auto 10px}
+/* Library (right column) */
+.pl-lib-search{padding:8px 10px;border-bottom:1px solid var(--md-outline-variant);position:relative;flex-shrink:0}
+.pl-lib-search .material-symbols-outlined{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--md-outline);pointer-events:none}
+.pl-search-input{width:100%;padding:6px 10px 6px 30px;border:1px solid var(--md-outline-variant);border-radius:var(--r-full);font-size:12px;background:var(--md-surface);font-family:inherit;outline:none}
+.pl-search-input:focus{border-color:var(--md-primary)}
+.pl-tabs{display:flex;gap:4px;padding:6px 8px;border-bottom:1px solid var(--md-outline-variant);overflow-x:auto;flex-shrink:0}
+.pl-tabs::-webkit-scrollbar{height:0}
+.content-tab{padding:4px 9px;border-radius:var(--r-full);font-size:10px;font-weight:500;border:1px solid var(--md-outline-variant);background:transparent;color:var(--md-on-surface-variant);cursor:pointer;font-family:var(--font-body);white-space:nowrap;flex-shrink:0}
+.content-tab.active{background:var(--md-primary);color:var(--md-on-primary);border-color:var(--md-primary)}
+.content-list{display:flex;flex-direction:column;gap:2px}
+.content-item{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:var(--r-sm);cursor:pointer;border:1px solid transparent;transition:background 120ms,border-color 120ms}
+.content-item:hover{background:var(--md-surface-container);border-color:var(--md-outline-variant)}
+.content-item-thumb{width:44px;height:30px;flex-shrink:0;border-radius:4px;background:var(--md-surface-container-high);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.content-item-thumb img,.content-item-thumb video{width:100%;height:100%;object-fit:cover;display:block}
+.content-item-thumb .material-symbols-outlined{font-size:16px;color:var(--md-outline)}
+.content-item-body{flex:1;min-width:0}
+.content-item-name{font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3}
+.content-item-meta{font-size:10px;color:var(--md-outline);text-transform:capitalize}
+@media(max-width:1020px){
+  .pl-root{grid-template-columns:1fr;height:auto;min-height:0}
+  .pl-col{max-height:460px}
+}
+</style>
+
+<div class="pl-root">
+  <aside class="pl-col pl-col-playlists">
+    <div class="pl-col-header">
+      <h3>Playlists</h3>
+      <button class="pl-new-btn"
+              hx-get="/admin/playlists/new"
+              hx-target="#pl-center"
+              hx-swap="innerHTML">
+        <span class="material-symbols-outlined">add</span> Nueva
+      </button>
+    </div>
+    <div class="pl-col-body" id="playlists-list"
+         hx-get="/admin/playlists?fragment=list"
+         hx-trigger="load, playlistCreated from:body, playlistUpdated from:body, playlistDeleted from:body"
+         hx-swap="innerHTML">
+      <p class="pl-empty-small">Cargando...</p>
+    </div>
+  </aside>
+
+  <section class="pl-col pl-col-items" id="pl-center">
+    <div class="pl-placeholder">
+      <span class="material-symbols-outlined">playlist_add</span>
+      <p>Selecciona una playlist para editar<br/>o crea una nueva</p>
+    </div>
+  </section>
+
+  <aside class="pl-col pl-col-library">
+    <div class="pl-col-header">
+      <h3>Contenido</h3>
+      <span id="pl-lib-count" style="font-size:11px;color:var(--md-outline)"></span>
+    </div>
+    <div class="pl-lib-search">
+      <span class="material-symbols-outlined">search</span>
+      <input type="search" class="pl-search-input" id="pl-search"
+             oninput="plFilter()" placeholder="Buscar contenido..."/>
+    </div>
+    <div class="pl-tabs">
+      <button type="button" class="content-tab active" onclick="plTab('all',this)">Todo</button>
+      <button type="button" class="content-tab" onclick="plTab('imagen',this)">Imágenes</button>
+      <button type="button" class="content-tab" onclick="plTab('video',this)">Videos</button>
+      <button type="button" class="content-tab" onclick="plTab('eventos',this)">Eventos</button>
+      <button type="button" class="content-tab" onclick="plTab('noticias',this)">Noticias</button>
+    </div>
+    <div class="pl-col-body" id="pl-content-grid"
+         hx-get="/admin/playlists?fragment=content"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+      <p class="pl-empty-small">Cargando...</p>
+    </div>
+  </aside>
+</div>
+
+<div id="toast-area"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+(function(){
+  window._plTabFilter = 'all';
+  window.plTab = function(type,btn){
+    document.querySelectorAll('.content-tab').forEach(function(t){ t.classList.remove('active'); });
+    if(btn) btn.classList.add('active');
+    window._plTabFilter = type;
+    window.plFilter();
+  };
+  window.plFilter = function(){
+    var qEl = document.getElementById('pl-search');
+    var q = qEl ? qEl.value.toLowerCase().trim() : '';
+    var type = window._plTabFilter||'all';
+    var grid = document.getElementById('pl-content-grid');
+    var count = 0, total = 0;
+    if(!grid) return;
+    grid.querySelectorAll('.content-item').forEach(function(c){
+      total++;
+      var matchType = (type==='all'||c.dataset.type===type);
+      var matchQ = !q || (c.dataset.name||'').toLowerCase().indexOf(q)>=0;
+      var show = matchType && matchQ;
+      c.style.display = show ? '' : 'none';
+      if(show) count++;
+    });
+    var cEl = document.getElementById('pl-lib-count');
+    if(cEl) cEl.textContent = total ? count+'/'+total : '';
+  };
+  window.addCardToPlaylist = function(card){
+    if(window._plCurrentEditor && typeof window._plCurrentEditor.add==='function'){
+      window._plCurrentEditor.add(card);
+    } else {
+      var t = document.getElementById('pl-floating-toast');
+      if(!t){
+        t = document.createElement('div');
+        t.id = 'pl-floating-toast';
+        t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#312F30;color:#fff;padding:10px 18px;border-radius:24px;font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2)';
+        document.body.appendChild(t);
+      }
+      t.textContent = 'Primero selecciona o crea una playlist';
+      clearTimeout(t._to);
+      t._to = setTimeout(function(){ if(t && t.parentNode) t.remove(); }, 2500);
+    }
+  };
+  window._plReset = function(){
+    var c = document.getElementById('pl-center');
+    if(c){
+      c.innerHTML = '<div class="pl-placeholder"><span class="material-symbols-outlined">playlist_add</span><p>Selecciona una playlist para editar<br/>o crea una nueva</p></div>';
+    }
+    window._plCurrentEditor = null;
+    document.querySelectorAll('.pl-list-item.active').forEach(function(e){ e.classList.remove('active'); });
+  };
+  window._plSetActive = function(id){
+    document.querySelectorAll('.pl-list-item.active').forEach(function(e){ e.classList.remove('active'); });
+    if(id){
+      var el = document.querySelector('.pl-list-item[data-plid="'+id+'"]');
+      if(el) el.classList.add('active');
+    }
+  };
+  document.body.addEventListener('htmx:afterSwap', function(ev){
+    if(ev.target && ev.target.id==='pl-content-grid'){ window.plFilter(); }
+  });
+})();
+</script>

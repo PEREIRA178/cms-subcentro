@@ -1,0 +1,27 @@
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Gestión de Noticias</h2>
+      <button class="topbar-btn topbar-btn-primary"
+              hx-get="/admin/news/new"
+              hx-target="#modal-container"
+              hx-swap="innerHTML">
+        <span class="material-symbols-outlined" style="font-size:16px">add</span> Nueva noticia
+      </button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Título</th><th>Fecha</th><th>Estado</th><th>Destacada</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="news-tbody"
+             hx-get="/admin/news?fragment=rows"
+             hx-trigger="load, eventCreated from:body, eventUpdated from:body, eventDeleted from:body"
+             hx-swap="innerHTML">
+        <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--md-outline)">
+          <div style="width:24px;height:24px;border:2px solid var(--md-primary);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 8px"></div>
+          Cargando noticias...
+        </td></tr>
+      </tbody>
+    </table>
+  </div>

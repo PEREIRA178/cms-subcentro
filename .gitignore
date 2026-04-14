@@ -1,0 +1,16 @@
+# PocketBase runtime files
+pb_data/*.db-shm
+pb_data/*.db-wal
+pb_data/logs/
+
+# Build output
+/jcp-gestioninmobiliaria
+/tmp/
+
+# Go build cache
+*.test
+*.out
+
+# Environment
+.env
+.env.local
