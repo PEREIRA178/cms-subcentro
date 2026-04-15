@@ -1182,7 +1182,7 @@ func PropiedadesList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handle
 			}
 			return c.SendFile("./internal/templates/admin/pages/propiedades.html")
 		}
-		records, err := pb.FindRecordsByFilter("propiedades", "id != ''", "-created", 200, 0)
+		records, err := pb.FindRecordsByFilter("propiedades", "id != ''", "-publicado_en", 200, 0)
 		var sb strings.Builder
 		if err != nil {
 			log.Printf("⚠️  PropiedadesList query error: %v", err)
