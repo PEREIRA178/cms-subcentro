@@ -4,18 +4,18 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Propiedades — JCP Gestión Inmobiliaria</title>
-<link rel="icon" href="/static/logo.webp" type="image/webp"/>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js" defer></script>
 <style>
 :root{
-  /* Realtor.com-inspired palette: red primary, navy secondary, warm neutrals */
-  --md-primary:#C41A2B;--md-on-primary:#fff;
-  --md-primary-container:#FCE3E5;--md-on-primary-container:#4E0511;
-  --md-primary-dark:#900F1F;--md-primary-accent:#F7931E;
-  --md-secondary:#324B6E;--md-secondary-container:#E5ECF5;
+  /* JCP Gestión Inmobiliaria — azul índigo */
+  --md-primary:#3D3DEF;--md-on-primary:#fff;
+  --md-primary-container:#E0E0FF;--md-on-primary-container:#0000AC;
+  --md-primary-dark:#2828CC;--md-primary-accent:#F7931E;
+  --md-secondary:#1E3A5F;--md-secondary-container:#D8E8F8;
   --md-surface:#FAFAF9;--md-surface-bright:#FFFFFF;--md-surface-container-low:#F5F5F3;
   --md-surface-container-high:#EEEEE9;
   --md-on-surface:#15191F;--md-on-surface-variant:#4B5462;
@@ -43,7 +43,7 @@ body{font-family:var(--font-body);background:var(--md-surface);color:var(--md-on
 .nav-links{display:flex;align-items:center;gap:2px}
 .nav-links a{font-size:13.5px;font-weight:500;color:var(--md-on-surface-variant);text-decoration:none;padding:8px 14px;border-radius:var(--r-full);transition:background 200ms,color 200ms}
 .nav-links a:hover,.nav-links a.active{background:var(--md-primary-container);color:var(--md-on-primary-container)}
-.nav-cta{font-size:13px;font-weight:600;color:#fff;background:var(--md-primary);padding:10px 22px;border-radius:var(--r-full);text-decoration:none;box-shadow:0 2px 8px rgba(196,26,43,.28);transition:all 200ms}
+.nav-cta{font-size:13px;font-weight:600;color:#fff;background:var(--md-primary);padding:10px 22px;border-radius:var(--r-full);text-decoration:none;box-shadow:0 2px 8px rgba(61,61,239,.28);transition:all 200ms}
 .nav-cta:hover{background:var(--md-primary-dark);transform:translateY(-1px)}
 
 /* PAGE HERO — realtor-style search bar */
@@ -51,7 +51,7 @@ body{font-family:var(--font-body);background:var(--md-surface);color:var(--md-on
   background:linear-gradient(135deg,#151B26 0%,#324B6E 100%);
   padding:56px 24px 40px;position:relative;overflow:hidden;color:#fff
 }
-.page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(196,26,43,.25),transparent 60%);pointer-events:none}
+.page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(61,61,239,.25),transparent 60%);pointer-events:none}
 .page-hero-inner{max-width:var(--max-w);margin:0 auto;position:relative;z-index:1}
 .page-hero h1{font-family:var(--font-display);font-size:clamp(28px,4vw,44px);line-height:1.1;margin-bottom:8px}
 .page-hero-desc{font-size:16px;color:rgba(255,255,255,.72);max-width:620px;margin-bottom:24px}

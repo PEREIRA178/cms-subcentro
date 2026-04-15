@@ -1182,10 +1182,13 @@ func PropiedadesList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handle
 			}
 			return c.SendFile("./internal/templates/admin/pages/propiedades.html")
 		}
-		records, err := pb.FindRecordsByFilter("propiedades", "", "-created", 200, 0)
+		records, err := pb.FindRecordsByFilter("propiedades", "id != ''", "-created", 200, 0)
 		var sb strings.Builder
-		if err != nil || len(records) == 0 {
-			sb.WriteString(`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--md-outline)">Sin propiedades — agrega una con el botón de arriba</td></tr>`)
+		if err != nil {
+			log.Printf("⚠️  PropiedadesList query error: %v", err)
+			sb.WriteString(fmt.Sprintf(`<tr><td colspan="7" style="text-align:center;padding:32px;color:#B71C1C">Error cargando propiedades: %s</td></tr>`, template.HTMLEscapeString(err.Error())))
+		} else if len(records) == 0 {
+			sb.WriteString(`<tr class="empty-row"><td colspan="7" style="text-align:center;padding:32px;color:var(--md-outline)">Sin propiedades — agrega una con el botón de arriba</td></tr>`)
 		} else {
 			for _, r := range records {
 				status := r.GetString("status")

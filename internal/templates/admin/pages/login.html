@@ -3,19 +3,20 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Iniciar Sesión — CSL Admin</title>
+<title>Iniciar Sesión — JCP Gestión Inmobiliaria</title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 <style>
 :root {
-  --md-primary:#9B1230; --md-on-primary:#fff;
-  --md-primary-container:#F5E0E4; --md-on-primary-container:#5C0A1E;
-  --md-primary-dark:#6E0C22; --md-primary-faint:#FDF0F2;
-  --md-surface:#FAF8F7; --md-surface-variant:#F2EFF0;
-  --md-on-surface:#1C1B1A; --md-on-surface-variant:#4D4B4C;
-  --md-outline:#7E7B7C; --md-outline-variant:#CEC9CA;
-  --glass-bg:rgba(250,248,247,0.72); --glass-blur:blur(20px) saturate(180%);
-  --glass-border:rgba(155,18,48,0.10); --glass-shadow:0 8px 32px rgba(155,18,48,0.08);
+  --md-primary:#3D3DEF; --md-on-primary:#fff;
+  --md-primary-container:#E0E0FF; --md-on-primary-container:#0000AC;
+  --md-primary-dark:#2828CC; --md-primary-faint:#F0F0FF;
+  --md-surface:#FAFAFA; --md-surface-variant:#F2F2FF;
+  --md-on-surface:#1C1B1F; --md-on-surface-variant:#49454F;
+  --md-outline:#7C7B7F; --md-outline-variant:#CAC4D0;
+  --glass-bg:rgba(250,250,255,0.72); --glass-blur:blur(20px) saturate(180%);
+  --glass-border:rgba(61,61,239,0.10); --glass-shadow:0 8px 32px rgba(61,61,239,0.08);
   --elev-3:0 4px 12px rgba(28,27,26,.10),0 2px 4px rgba(28,27,26,.06);
   --elev-4:0 8px 24px rgba(28,27,26,.12),0 2px 6px rgba(28,27,26,.06);
   --ease-express:cubic-bezier(0.05,0.7,0.1,1.0);
@@ -27,7 +28,7 @@
 html{height:100%}
 body{
   font-family:var(--font-body);
-  background:linear-gradient(135deg,#5C0A1E 0%,#9B1230 40%,#BE3356 100%);
+  background:linear-gradient(135deg,#1a1ab0 0%,#3D3DEF 40%,#6060F4 100%);
   min-height:100vh;display:flex;align-items:center;justify-content:center;
   padding:24px;
 }
@@ -55,7 +56,7 @@ body::before{
   width:48px;height:48px;border-radius:12px;
   background:var(--md-primary);display:flex;align-items:center;justify-content:center;
   color:#fff;font-family:var(--font-display);font-size:22px;font-weight:400;
-  box-shadow:0 2px 8px rgba(155,18,48,0.3);
+  box-shadow:0 2px 8px rgba(61,61,239,0.3);
 }
 .login-brand-text{display:flex;flex-direction:column}
 .login-brand-name{font-family:var(--font-display);font-size:18px;color:var(--md-on-surface);line-height:1.1}
@@ -72,7 +73,7 @@ h1{font-family:var(--font-display);font-size:28px;font-weight:400;color:var(--md
   border-radius:12px;color:var(--md-on-surface);outline:none;
   transition:border-color 200ms, box-shadow 200ms;
 }
-.field input:focus{border-color:var(--md-primary);box-shadow:0 0 0 3px rgba(155,18,48,0.12)}
+.field input:focus{border-color:var(--md-primary);box-shadow:0 0 0 3px rgba(61,61,239,0.12)}
 .field input::placeholder{color:var(--md-outline)}
 
 .remember-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
@@ -86,7 +87,7 @@ h1{font-family:var(--font-display);font-size:28px;font-weight:400;color:var(--md
   width:100%;padding:14px;font-family:var(--font-body);font-size:15px;font-weight:500;
   background:var(--md-primary);color:var(--md-on-primary);border:none;
   border-radius:var(--r-full);cursor:pointer;
-  box-shadow:0 2px 8px rgba(155,18,48,0.3);
+  box-shadow:0 2px 8px rgba(61,61,239,0.3);
   transition:background 200ms var(--ease-express),transform 200ms var(--ease-express);
 }
 .btn-login:hover{background:var(--md-primary-dark);transform:translateY(-2px)}
@@ -103,20 +104,20 @@ h1{font-family:var(--font-display);font-size:28px;font-weight:400;color:var(--md
 <body>
 <div class="login-card">
   <div class="login-brand">
-    <div class="login-brand-icon">SL</div>
+    <div class="login-brand-icon">JCP</div>
     <div class="login-brand-text">
-      <div class="login-brand-name">Colegio San Lorenzo</div>
-      <div class="login-brand-sub">Panel de administración</div>
+      <div class="login-brand-name">JCP Gestión</div>
+      <div class="login-brand-sub">Inmobiliaria · Admin</div>
     </div>
   </div>
 
   <h1>Iniciar sesión</h1>
-  <p class="login-subtitle">Ingresa tus credenciales para acceder al dashboard de gestión.</p>
+  <p class="login-subtitle">Ingresa tus credenciales para acceder al panel de administración.</p>
 
   <form hx-post="/admin/login" hx-target="#login-feedback" hx-swap="innerHTML">
     <div class="field">
       <label for="email">Correo electrónico</label>
-      <input type="email" id="email" name="email" placeholder="tu@colegiosanlorenzo.cl" required autocomplete="email"/>
+      <input type="email" id="email" name="email" placeholder="admin@jcp-gestioninmobiliaria.cl" required autocomplete="email"/>
     </div>
     <div class="field">
       <label for="password">Contraseña</label>
@@ -129,7 +130,7 @@ h1{font-family:var(--font-display);font-size:28px;font-weight:400;color:var(--md
     <div id="login-feedback"></div>
   </form>
 
-  <p class="login-footer">Colegio San Lorenzo · Copiapó, Atacama</p>
+  <p class="login-footer">JCP Gestión Inmobiliaria · Chile</p>
 </div>
 </body>
 </html>

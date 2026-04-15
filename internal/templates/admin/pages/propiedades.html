@@ -82,7 +82,7 @@ function filterPropRows() {
   var q = (document.getElementById('prop-search').value || '').toLowerCase();
   var op = (document.getElementById('prop-op').value || '').toLowerCase();
   var st = (document.getElementById('prop-status').value || '').toLowerCase();
-  var rows = document.querySelectorAll('#prop-tbody tr');
+  var rows = document.querySelectorAll('#prop-tbody tr:not(.empty-row)');
   var visible = 0;
   rows.forEach(function(row) {
     var text = row.textContent.toLowerCase();
@@ -94,7 +94,7 @@ function filterPropRows() {
     if (show) visible++;
   });
   var cnt = document.getElementById('prop-count');
-  if (cnt) cnt.textContent = visible + ' propiedad' + (visible !== 1 ? 'es' : '');
+  if (cnt) cnt.textContent = visible > 0 ? (visible + ' propiedad' + (visible !== 1 ? 'es' : '')) : '';
 }
 
 // Update count after HTMX loads rows
