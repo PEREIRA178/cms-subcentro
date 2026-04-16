@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Buscador de Tiendas — Subcentro Las Condes</title>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,700&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -224,10 +225,21 @@
   </div>
 </div>
 
+<!-- HIDDEN INPUTS for HTMX filters -->
+<input type="hidden" id="hx-cat" value="all">
+<input type="hidden" id="hx-gal" value="all">
+<input type="hidden" id="hx-q" value="">
+
 <!-- GRID -->
-<main id="grid" role="list" aria-label="Listado de tiendas"></main>
-<div id="empty"><div class="ei">🔍</div><h3>Sin resultados</h3><p>Intenta con otro término o quita los filtros.</p></div>
-<div class="lm-wrap"><button id="lmBtn" type="button"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>Cargar más</button></div>
+<main id="grid" role="list" aria-label="Listado de tiendas"
+  hx-get="/fragments/tiendas"
+  hx-trigger="load, tiendaFilter"
+  hx-include="#hx-cat,#hx-gal,#hx-q"
+  hx-vals='js:{"cat":document.getElementById("hx-cat").value,"gal":document.getElementById("hx-gal").value,"q":document.getElementById("hx-q").value}'
+  hx-swap="innerHTML">
+  <div style="grid-column:1/-1;text-align:center;padding:40px;color:#6B6B6B">Cargando tiendas...</div>
+</main>
+<div id="empty" style="display:none"><div class="ei">🔍</div><h3>Sin resultados</h3><p>Intenta con otro término o quita los filtros.</p></div>
 
 <!-- FOOTER -->
 <footer class="footer">
@@ -242,153 +254,85 @@
 <a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="wa"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
 
 <script>
-// ── STORE DATA ──
-const STORES=[
-  // TIENDAS
-  {id:'adidas-combat',name:'Adidas Combat Sports',cat:'tiendas',gal:'norte',logo:'https://subcentro.cl/wp-content/uploads/2026/03/Adidas-combat-100-1.jpg',emoji:'🥊',tags:'Deporte · Artes Marciales',featured:true},
-  {id:'tua',name:'TUA',cat:'tiendas',gal:'sur',logo:'https://subcentro.cl/wp-content/uploads/2025/08/TUA.png',emoji:'👒',tags:'Accesorios · Moda'},
-  {id:'la-fete',name:'La Fête',cat:'tiendas',gal:'norte',logo:'https://subcentro.cl/wp-content/uploads/2025/05/la-fete-100-1.jpg',emoji:'🎀',tags:'Moda femenina'},
-  {id:'rosa-menta',name:'Rosa y Menta',cat:'tiendas',gal:'norte',logo:'https://subcentro.cl/wp-content/uploads/2025/06/Logo-03.png',emoji:'🌸',tags:'Moda · Mujer'},
-  {id:'galacay',name:'Galacay',cat:'tiendas',gal:'sur',logo:'https://subcentro.cl/wp-content/uploads/2025/03/Square-Organic-Beauty-Cleanser-Logo.png',emoji:'💎',tags:'Joyería · Accesorios'},
-  {id:'casa-carcasas',name:'La Casa De Las Carcasas',cat:'tiendas',gal:'norte',logo:'https://subcentro.cl/wp-content/uploads/2024/02/LA-CASA-DE-LAS-CARCASAS-100-1.jpg',emoji:'📱',tags:'Accesorios · Tech'},
-  {id:'caffarena',name:'Caffarena',cat:'tiendas',gal:'sur',logo:'https://subcentro.cl/wp-content/uploads/2023/12/LOGOS_250px.png',emoji:'🧦',tags:'Ropa interior'},
-  {id:'intime',name:'Intime',cat:'tiendas',gal:'norte',logo:'https://subcentro.cl/wp-content/uploads/2023/12/LOGO-INTIME-250px.png',emoji:'✨',tags:'Lencería · Moda'},
-  {id:'flores',name:'Flores',cat:'tiendas',gal:'sur',logo:'https://subcentro.cl/wp-content/uploads/2023/12/LOGO_250px-1.png',emoji:'🌷',tags:'Flores · Regalos'},
-  {id:'monarch',name:'Monarch',cat:'tiendas',gal:'norte',logo:'',emoji:'👑',tags:'Moda femenina'},
-  {id:'lapiz-lopez',name:'Lápiz López',cat:'tiendas',gal:'sur',logo:'',emoji:'✏️',tags:'Librería · Papelería'},
-  {id:'libreria-nacional',name:'Librería Nacional',cat:'tiendas',gal:'norte',logo:'https://logo.clearbit.com/librerianacional.cl',emoji:'📚',tags:'Libros'},
-  {id:'abys',name:'Abys',cat:'tiendas',gal:'sur',logo:'',emoji:'💫',tags:'Moda alternativa'},
-  {id:'isadora',name:'Isadora',cat:'tiendas',gal:'norte',logo:'',emoji:'👡',tags:'Calzado · Moda'},
-  {id:'sami-sport',name:'Sami Sport',cat:'tiendas',gal:'sur',logo:'',emoji:'⚽',tags:'Artículos deportivos'},
-  {id:'todopiel',name:'Todopiel',cat:'tiendas',gal:'norte',logo:'',emoji:'👜',tags:'Marroquinería'},
-  {id:'todo-moda',name:'Todo Moda',cat:'tiendas',gal:'sur',logo:'',emoji:'💄',tags:'Accesorios · Bisutería'},
-  {id:'outlet-kaya',name:'Outlet Kaya Unite',cat:'tiendas',gal:'norte',logo:'',emoji:'🛍️',tags:'Outlet · Moda'},
-  {id:'marcela-gac',name:'Marcela Gac',cat:'tiendas',gal:'sur',logo:'',emoji:'👗',tags:'Diseño · Moda'},
-  {id:'mylutecno',name:'Mylutecno',cat:'tiendas',gal:'norte',logo:'',emoji:'🛒',tags:'Varios'},
-  // RESTAURANTES
-  {id:'starbucks',name:'Starbucks',cat:'restaurantes',gal:'norte',logo:'https://subcentro.cl/wp-content/uploads/2023/12/LOGOTIPOS-250px.png',emoji:'☕',tags:'Café · Frappuccino',featured:true},
-  {id:'falafel-republic',name:'Falafel Republic',cat:'restaurantes',gal:'sur',logo:'https://subcentro.cl/wp-content/uploads/2025/02/LOGO-FALAFEL-100.jpg',emoji:'🥙',tags:'Árabe · Vegano',featured:true},
-  {id:'pollo-rey',name:'Pollo Rey',cat:'restaurantes',gal:'norte',logo:'',emoji:'🍗',tags:'Pollo · Almuerzo'},
-  {id:'castano',name:'Castaño',cat:'restaurantes',gal:'sur',logo:'',emoji:'🫖',tags:'Café · Artesanal'},
-  {id:'da-dino',name:'Da Dino Express',cat:'restaurantes',gal:'norte',logo:'',emoji:'🍝',tags:'Italiana · Pasta'},
-  {id:'doggis',name:'Doggis',cat:'restaurantes',gal:'sur',logo:'https://logo.clearbit.com/doggis.cl',emoji:'🌭',tags:'Completos · Fast food'},
-  {id:'domino',name:'Dominó',cat:'restaurantes',gal:'norte',logo:'',emoji:'🌮',tags:'Sándwiches · Almuerzo'},
-  {id:'tia-sonia',name:'Donde la Tía Sonia',cat:'restaurantes',gal:'sur',logo:'',emoji:'🍲',tags:'Chilena · Casera'},
-  {id:'dunkin',name:"Dunkin'",cat:'restaurantes',gal:'norte',logo:'https://logo.clearbit.com/dunkindonuts.com',emoji:'🍩',tags:'Donuts · Café'},
-  {id:'la-mechada',name:'La Mechada Nacional',cat:'restaurantes',gal:'sur',logo:'',emoji:'🥩',tags:'Chilena · Sándwiches'},
-  {id:'maru',name:'Maru',cat:'restaurantes',gal:'norte',logo:'',emoji:'🍱',tags:'Japonesa · Sushi'},
-  {id:'subway',name:'Subway',cat:'restaurantes',gal:'sur',logo:'https://logo.clearbit.com/subway.com',emoji:'🥖',tags:'Sándwiches · Saludable',featured:true},
-  {id:'tommy-beans',name:'Tommy Beans',cat:'restaurantes',gal:'norte',logo:'',emoji:'☕',tags:'Café · Desayuno'},
-  {id:'hacienda',name:'Hacienda Huentelauquen',cat:'restaurantes',gal:'sur',logo:'',emoji:'🌊',tags:'Mariscos · Mar'},
-  {id:'oakberry',name:'OakBerry',cat:'restaurantes',gal:'norte',logo:'https://logo.clearbit.com/oakberry.com',emoji:'🫐',tags:'Saludable · Açaí',featured:true},
-  {id:'little-caesars',name:'Little Caesars',cat:'restaurantes',gal:'sur',logo:'https://logo.clearbit.com/littlecaesars.com',emoji:'🍕',tags:'Pizza · Fast food'},
-  {id:'krispy-kreme',name:'Krispy Kreme',cat:'restaurantes',gal:'norte',logo:'https://logo.clearbit.com/krispykreme.com',emoji:'🍩',tags:'Donas · Café',featured:true},
-  {id:'mcdonalds-postres',name:"Centro de Postres Mc Donald's",cat:'restaurantes',gal:'sur',logo:'https://logo.clearbit.com/mcdonalds.com',emoji:'🍦',tags:'Postres · Helados'},
-  {id:'burros-churros',name:'Burros Churros',cat:'restaurantes',gal:'norte',logo:'https://subcentro.cl/wp-content/uploads/2025/05/Imagen-de-WhatsApp-2025-08-13-a-las-17.00.15_9a49b180.jpg',emoji:'🥐',tags:'Churros · Dulce'},
-  {id:'super-sana',name:'Super Sana',cat:'restaurantes',gal:'sur',logo:'',emoji:'🥗',tags:'Saludable · Vegano'},
-  // FARMACIAS
-  {id:'ahumada',name:'Farmacias Ahumada',cat:'farmacias',gal:'norte',logo:'https://subcentro.cl/wp-content/uploads/2023/12/Farmacias-Ahumada_250px.png',emoji:'💊',tags:'Farmacia · Salud',featured:true},
-  {id:'cruz-verde',name:'Cruz Verde',cat:'farmacias',gal:'sur',logo:'https://subcentro.cl/wp-content/uploads/2023/12/Logo_Cruz_FondoBlanco_250px.png',emoji:'💊',tags:'Farmacia'},
-  {id:'salcobrand',name:'Salcobrand',cat:'farmacias',gal:'norte',logo:'https://subcentro.cl/wp-content/uploads/2023/12/LOGO-SB_250px.png',emoji:'💊',tags:'Farmacia'},
-  {id:'dr-simi',name:'Dr. Simi',cat:'farmacias',gal:'sur',logo:'',emoji:'🧸',tags:'Farmacia · Económico'},
-  {id:'knop',name:'KNOP',cat:'farmacias',gal:'norte',logo:'https://logo.clearbit.com/knop.cl',emoji:'🌿',tags:'Natural · Homeopatía'},
-  {id:'la-rebaja',name:'La Rebaja',cat:'farmacias',gal:'sur',logo:'',emoji:'💊',tags:'Farmacia · Descuentos'},
-  {id:'maicao',name:'Maicao',cat:'farmacias',gal:'norte',logo:'https://logo.clearbit.com/maicao.cl',emoji:'💅',tags:'Cosméticos · Belleza'},
-  // SALUD & BELLEZA
-  {id:'chascona',name:'La Chascona Cosmetic',cat:'salud',gal:'sur',logo:'',emoji:'💋',tags:'Cosméticos · Maquillaje'},
-  {id:'pink-lady',name:'Pink Lady Beauty Store',cat:'salud',gal:'norte',logo:'',emoji:'💄',tags:'Belleza · Maquillaje'},
-  {id:'natura',name:'Natura',cat:'salud',gal:'sur',logo:'https://logo.clearbit.com/natura.com',emoji:'🌺',tags:'Natural · Bienestar'},
-  // TECNOLOGÍA
-  {id:'french-tech',name:'French Tech',cat:'tecnologia',gal:'norte',logo:'',emoji:'🖥️',tags:'Tech · Gadgets'},
-  {id:'just-in-case',name:'Just in Case',cat:'tecnologia',gal:'sur',logo:'',emoji:'📱',tags:'Accesorios · Smartphones'},
-  {id:'power-tech',name:'Power Technology',cat:'tecnologia',gal:'norte',logo:'',emoji:'⚡',tags:'Cargadores · Tech'},
-  {id:'focus-store',name:'Focus Storecase SPA',cat:'tecnologia',gal:'sur',logo:'',emoji:'🔧',tags:'Reparación · Móviles'},
-  // SERVICIOS
-  {id:'correos',name:'Correos Chile',cat:'servicios',gal:'norte',logo:'https://logo.clearbit.com/correos.cl',emoji:'✉️',tags:'Correos · Envíos'},
-  {id:'chilexpress',name:'Chilexpress',cat:'servicios',gal:'sur',logo:'https://logo.clearbit.com/chilexpress.cl',emoji:'📦',tags:'Courier · Envíos'},
-  {id:'bip',name:'Bip!',cat:'servicios',gal:'norte',logo:'',emoji:'🚇',tags:'Metro · Transporte'},
-  {id:'lyon',name:'Tabaquería y Casa de Cambios Lyon',cat:'servicios',gal:'sur',logo:'',emoji:'💱',tags:'Cambio · Divisas'},
-  {id:'cerrajeria',name:'Cerrajería Fariña',cat:'servicios',gal:'norte',logo:'',emoji:'🔑',tags:'Llaves · Cerrajería'},
-  {id:'reparadora',name:'Reparadora de Calzado',cat:'servicios',gal:'sur',logo:'',emoji:'👠',tags:'Zapatos · Reparación'},
-];
-
-// ── STATE ──
-let cat='all',gal='all',q='',shown=24;
-const PG=24;
-
-function logoSrc(s){
-  if(s.logo) return s.logo;
-  return `https://picsum.photos/seed/${s.id}/320/148`;
+function triggerFilter(){
+  htmx.trigger(document.getElementById('grid'),'tiendaFilter');
+  var total=document.getElementById('grid').querySelectorAll('.s-card').length;
+  document.getElementById('cNum').textContent=total||'...';
+  document.getElementById('sCount').textContent=total||'...';
 }
 
-function filtered(){
-  return STORES.filter(s=>{
-    if(cat!=='all'&&s.cat!==cat)return false;
-    if(gal!=='all'&&s.gal!==gal)return false;
-    if(q){const lq=q.toLowerCase();return s.name.toLowerCase().includes(lq)||s.tags.toLowerCase().includes(lq)||s.cat.includes(lq)}
-    return true;
-  });
-}
-
-function render(){
-  const f=filtered();
-  const grid=document.getElementById('grid');
-  const empty=document.getElementById('empty');
-  const lm=document.getElementById('lmBtn');
-  document.getElementById('cNum').textContent=f.length;
-  document.getElementById('sCount').textContent=f.length;
-  if(!f.length){grid.innerHTML='';empty.style.display='block';lm.style.display='none';return}
-  empty.style.display='none';
-  const slice=f.slice(0,shown);
-  grid.innerHTML=slice.map((s,i)=>{
-    const delay=((i%PG)*35);
-    return `<a href="tienda-individual.html?tienda=${s.id}" class="s-card" role="listitem" aria-label="Ver ${s.name}" style="animation-delay:${delay}ms">
-      <div class="c-top">
-        <img src="${logoSrc(s)}" alt="Logo ${s.name}" loading="lazy" onerror="this.src='https://picsum.photos/seed/${s.id}/320/148'">
-        <span class="c-gal">${s.gal==='norte'?'🟦 Norte':'🟧 Sur'}</span>
-        ${s.featured?'<span class="c-badge">⭐ Destacado</span>':''}
-      </div>
-      <div class="c-body">
-        <div class="c-name">${s.name}</div>
-        <div class="c-cat">${s.tags}</div>
-        <div class="c-foot"><span class="c-tag">${s.cat.charAt(0).toUpperCase()+s.cat.slice(1)}</span><span class="c-arr">→</span></div>
-      </div>
-    </a>`;
-  }).join('');
-  lm.style.display=f.length>shown?'inline-flex':'none';
-}
+// Update count after HTMX swap
+document.getElementById('grid').addEventListener('htmx:afterSwap',function(){
+  var n=this.querySelectorAll('.s-card').length;
+  document.getElementById('cNum').textContent=n;
+  document.getElementById('sCount').textContent=n;
+});
 
 // Cat filter
-document.querySelectorAll('[data-cat]').forEach(b=>{
+document.querySelectorAll('[data-cat]').forEach(function(b){
   if(!b.classList.contains('fl')){
-    b.addEventListener('click',()=>{
-      document.querySelectorAll('[data-cat]').forEach(x=>{if(!x.classList.contains('fl'))x.classList.remove('active')});
-      b.classList.add('active');cat=b.dataset.cat;shown=PG;render();
+    b.addEventListener('click',function(){
+      document.querySelectorAll('[data-cat]').forEach(function(x){if(!x.classList.contains('fl'))x.classList.remove('active')});
+      b.classList.add('active');
+      document.getElementById('hx-cat').value=b.dataset.cat;
+      triggerFilter();
     });
   }
 });
 // Gallery filter
-document.querySelectorAll('[data-gal]').forEach(b=>{
-  b.addEventListener('click',()=>{document.querySelectorAll('[data-gal]').forEach(x=>x.classList.remove('active'));b.classList.add('active');gal=b.dataset.gal;shown=PG;render()});
+document.querySelectorAll('[data-gal]').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('[data-gal]').forEach(function(x){x.classList.remove('active')});
+    b.classList.add('active');
+    document.getElementById('hx-gal').value=b.dataset.gal;
+    triggerFilter();
+  });
 });
 // Search
-let st;document.getElementById('searchInput').addEventListener('input',e=>{clearTimeout(st);st=setTimeout(()=>{q=e.target.value.trim();shown=PG;render()},200)});
-// Load more
-document.getElementById('lmBtn').addEventListener('click',()=>{shown+=PG;render()});
+var st;
+document.getElementById('searchInput').addEventListener('input',function(e){
+  clearTimeout(st);
+  st=setTimeout(function(){
+    document.getElementById('hx-q').value=e.target.value.trim();
+    triggerFilter();
+  },300);
+});
 // View toggle
-document.getElementById('gvBtn').addEventListener('click',()=>{document.getElementById('grid').classList.remove('lv');document.getElementById('gvBtn').classList.add('active');document.getElementById('lvBtn').classList.remove('active')});
-document.getElementById('lvBtn').addEventListener('click',()=>{document.getElementById('grid').classList.add('lv');document.getElementById('lvBtn').classList.add('active');document.getElementById('gvBtn').classList.remove('active')});
+document.getElementById('gvBtn').addEventListener('click',function(){
+  document.getElementById('grid').classList.remove('lv');
+  document.getElementById('gvBtn').classList.add('active');
+  document.getElementById('lvBtn').classList.remove('active');
+});
+document.getElementById('lvBtn').addEventListener('click',function(){
+  document.getElementById('grid').classList.add('lv');
+  document.getElementById('lvBtn').classList.add('active');
+  document.getElementById('gvBtn').classList.remove('active');
+});
 // Footer links
-document.querySelectorAll('.fl').forEach(a=>{
-  a.addEventListener('click',e=>{e.preventDefault();cat=a.dataset.cat;document.querySelectorAll('[data-cat]').forEach(b=>{if(!b.classList.contains('fl')){b.classList.toggle('active',b.dataset.cat===cat)}});shown=PG;render();document.getElementById('grid').scrollIntoView({behavior:'smooth'})});
+document.querySelectorAll('.fl').forEach(function(a){
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    var cat=a.dataset.cat;
+    document.getElementById('hx-cat').value=cat;
+    document.querySelectorAll('[data-cat]').forEach(function(b){if(!b.classList.contains('fl'))b.classList.toggle('active',b.dataset.cat===cat)});
+    triggerFilter();
+    document.getElementById('grid').scrollIntoView({behavior:'smooth'});
+  });
 });
 // URL param
-const p=new URLSearchParams(window.location.search);
-if(p.get('cat')){cat=p.get('cat');document.querySelectorAll('[data-cat]').forEach(b=>{if(!b.classList.contains('fl'))b.classList.toggle('active',b.dataset.cat===cat)})}
+(function(){
+  var p=new URLSearchParams(window.location.search);
+  if(p.get('cat')){
+    var cat=p.get('cat');
+    document.getElementById('hx-cat').value=cat;
+    document.querySelectorAll('[data-cat]').forEach(function(b){if(!b.classList.contains('fl'))b.classList.toggle('active',b.dataset.cat===cat)});
+  }
+})();
 // Burger
-document.getElementById('burger').addEventListener('click',function(){const o=document.getElementById('mobMenu').classList.toggle('open');this.setAttribute('aria-expanded',o)});
-// Init
-render();
+document.getElementById('burger').addEventListener('click',function(){
+  var o=document.getElementById('mobMenu').classList.toggle('open');
+  this.setAttribute('aria-expanded',o);
+});
 </script>
 </body>
 </html>

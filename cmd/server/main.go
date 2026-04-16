@@ -82,6 +82,9 @@ func main() {
 	frag.Get("/comunicados", fragments.Comunicados(cfg, pb))
 	frag.Get("/blog", fragments.Blog(cfg, pb))
 	frag.Get("/noticias-page", fragments.NoticiasPage(cfg, pb))
+	// Tiendas fragments (Subcentro)
+	frag.Get("/tiendas", fragments.TiendasPage(cfg, pb))
+	frag.Get("/tienda/:key", fragments.TiendaDetail(cfg, pb))
 	// Real-estate fragments (JCP Gestión Inmobiliaria)
 	frag.Get("/propiedades-destacadas", fragments.PropiedadesDestacadas(cfg, pb))
 	frag.Get("/propiedades-page", fragments.PropiedadesPage(cfg, pb))
@@ -169,7 +172,16 @@ func main() {
 
 	adm.Get("/whatsapp-logs", admin.WhatsAppLogs(cfg))
 
-	// Propiedades
+	// Tiendas
+	adm.Get("/tiendas", admin.TiendasList(cfg, pb))
+	adm.Get("/tiendas/new", admin.TiendaForm(cfg))
+	adm.Post("/tiendas", admin.TiendaCreate(cfg, pb))
+	adm.Get("/tiendas/:id/edit", admin.TiendaEdit(cfg, pb))
+	adm.Put("/tiendas/:id", admin.TiendaUpdate(cfg, pb))
+	adm.Delete("/tiendas/:id", admin.TiendaDelete(cfg, pb))
+	adm.Post("/tiendas/:id/publish", admin.TiendaToggleStatus(cfg, pb))
+
+	// Propiedades (kept for backwards compat)
 	adm.Get("/propiedades", admin.PropiedadesList(cfg, pb))
 	adm.Get("/propiedades/new", admin.PropiedadForm(cfg))
 	adm.Post("/propiedades", admin.PropiedadCreate(cfg, pb))

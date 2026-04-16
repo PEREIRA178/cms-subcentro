@@ -184,7 +184,42 @@ func ensureCollections(app core.App) error {
 		log.Println("  ✅ Collection 'whatsapp_logs' created")
 	}
 
-	// ── 10. PROPIEDADES (real estate listings — JCP Gestión Inmobiliaria) ──
+	// ── 10. TIENDAS (store directory — Subcentro Las Condes) ──
+	if _, err := app.FindCollectionByNameOrId("tiendas"); err != nil {
+		col := core.NewBaseCollection("tiendas")
+		col.Fields.Add(
+			&core.TextField{Name: "nombre", Required: true},
+			&core.TextField{Name: "slug"},
+			// tiendas|restaurantes|farmacias|salud|tecnologia|servicios
+			&core.TextField{Name: "cat", Required: true},
+			// norte|sur
+			&core.TextField{Name: "gal"},
+			&core.TextField{Name: "local"},
+			&core.TextField{Name: "logo"},
+			&core.TextField{Name: "tags"},          // comma-separated
+			&core.TextField{Name: "desc"},           // short description (hero)
+			&core.EditorField{Name: "about"},        // about paragraph 1
+			&core.TextField{Name: "about2"},         // about paragraph 2
+			&core.TextField{Name: "pay"},            // medios de pago
+			&core.TextField{Name: "photos"},         // comma-separated URLs (min 4)
+			&core.TextField{Name: "similar"},        // comma-separated slugs
+			&core.TextField{Name: "whatsapp"},
+			&core.TextField{Name: "telefono"},
+			&core.TextField{Name: "rating"},         // e.g. "4.7"
+			&core.TextField{Name: "horario_lv"},     // Lun–Vie
+			&core.TextField{Name: "horario_sab"},    // Sábado
+			&core.TextField{Name: "horario_dom"},    // Domingo
+			// borrador|publicado
+			&core.TextField{Name: "status"},
+			&core.BoolField{Name: "destacada"},
+		)
+		if err := app.Save(col); err != nil {
+			return err
+		}
+		log.Println("  ✅ Collection 'tiendas' created")
+	}
+
+	// ── 11. PROPIEDADES (real estate listings — JCP Gestión Inmobiliaria) ──
 	if _, err := app.FindCollectionByNameOrId("propiedades"); err != nil {
 		col := core.NewBaseCollection("propiedades")
 		col.Fields.Add(
@@ -246,6 +281,11 @@ func ensureCollections(app core.App) error {
 				log.Println("  ✅ Default superadmin created")
 			}
 		}
+	}
+
+	// ── Seed tiendas demo ──
+	if err := seedTiendas(app); err != nil {
+		log.Printf("⚠️  Error seeding tiendas: %v", err)
 	}
 
 	// ── Seed propiedades demo ──
@@ -811,5 +851,224 @@ func seedPropiedades(app core.App) error {
 		}
 	}
 	log.Printf("  ✅ seedPropiedades: %d listings", len(seeds))
+	return nil
+}
+
+// seedTiendas inserts demo store listings if collection is empty.
+func seedTiendas(app core.App) error {
+	col, err := app.FindCollectionByNameOrId("tiendas")
+	if err != nil {
+		return err
+	}
+	existing, _ := app.FindRecordsByFilter(col, "status = 'publicado'", "", 1, 0)
+	if len(existing) > 0 {
+		return nil
+	}
+
+	type tiendaSeed struct {
+		nombre, slug, cat, gal, local, logo string
+		tags, desc, about, about2, pay      string
+		photos, similar                     string
+		whatsapp, telefono, rating          string
+		horarioLV, horarioSab, horarioDom   string
+		destacada                           bool
+	}
+
+	seeds := []tiendaSeed{
+		{
+			nombre: "Starbucks", slug: "starbucks",
+			cat: "restaurantes", gal: "norte", local: "Local 34",
+			logo:       "https://logo.clearbit.com/starbucks.com",
+			tags:       "Café,Frappuccino,WiFi,Snacks",
+			desc:       "Tu café favorito con las mejores bebidas frías, calientes y Frappuccino.",
+			about:      "Starbucks en Subcentro te ofrece la experiencia completa de la cadena más reconocida del mundo. Desde el icónico Frappuccino hasta bebidas de temporada y pastries artesanales.",
+			about2:     "Local con zona de asientos cómoda y WiFi gratuito. Aceptamos la app Starbucks para acumular Stars.",
+			pay:        "Efectivo · Tarjetas · App Starbucks · Mercado Pago",
+			photos:     "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&q=80,https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=400&q=80,https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80,https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400&q=80",
+			similar:    "oakberry,krispy-kreme,dunkin,falafel-republic",
+			whatsapp:   "56912345678", telefono: "+56 2 1234 5678",
+			rating: "4.8", horarioLV: "9:00 – 21:00", horarioSab: "10:00 – 20:00", horarioDom: "Cerrado",
+			destacada: true,
+		},
+		{
+			nombre: "Adidas Combat Sports", slug: "adidas-combat",
+			cat: "tiendas", gal: "norte", local: "Local 8",
+			logo:       "https://subcentro.cl/wp-content/uploads/2026/03/Adidas-combat-100-1.jpg",
+			tags:       "MMA,Boxeo,Judo,Equipamiento",
+			desc:       "Tienda especializada en equipamiento y ropa de combate de la marca más icónica del deporte.",
+			about:      "Adidas Combat Sports es la referencia para artes marciales en Las Condes. Guantes, protecciones, ropa técnica y calzado especializado de la línea Combat Sports.",
+			about2:     "Desde boxeo y MMA hasta judo y taekwondo. Nuestros asesores son deportistas con experiencia.",
+			pay:        "Efectivo · Tarjetas · Cuotas sin interés",
+			photos:     "https://images.unsplash.com/photo-1517438984742-1262db08379e?w=600&q=80,https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&q=80,https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80,https://images.unsplash.com/photo-1584466977773-e625c37cdd50?w=400&q=80",
+			similar:    "starbucks,la-fete,tua,oakberry",
+			whatsapp:   "56912345678", telefono: "+56 2 1234 5678",
+			rating: "4.6", horarioLV: "9:00 – 21:00", horarioSab: "10:00 – 20:00", horarioDom: "Cerrado",
+			destacada: true,
+		},
+		{
+			nombre: "La Fête", slug: "la-fete",
+			cat: "tiendas", gal: "norte", local: "Local 15",
+			logo:       "https://subcentro.cl/wp-content/uploads/2025/05/la-fete-100-1.jpg",
+			tags:       "Moda femenina,Accesorios,Francés",
+			desc:       "Moda y accesorios con estilo francés. Elegancia y tendencia en cada colección.",
+			about:      "La Fête trae el espíritu de la moda parisina con diseños únicos y materiales de calidad para la mujer moderna.",
+			about2:     "Nueva colección de temporada disponible. Embalaje especial para regalos.",
+			pay:        "Efectivo · Tarjetas · Débito",
+			photos:     "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80,https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80,https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80,https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80",
+			similar:    "tua,starbucks,oakberry,adidas-combat",
+			whatsapp:   "56912345678", telefono: "+56 2 1234 5678",
+			rating: "4.6", horarioLV: "9:00 – 21:00", horarioSab: "10:00 – 20:00", horarioDom: "Cerrado",
+			destacada: false,
+		},
+		{
+			nombre: "TUA", slug: "tua",
+			cat: "tiendas", gal: "sur", local: "Local 22",
+			logo:       "https://subcentro.cl/wp-content/uploads/2025/08/TUA.png",
+			tags:       "Accesorios,Moda,Mujer",
+			desc:       "Accesorios y complementos de moda para la mujer contemporánea.",
+			about:      "TUA es tu destino de moda en la Galería Sur. Bolsos, cinturones, joyería de fantasía y los complementos perfectos para cualquier look.",
+			about2:     "Nuevas colecciones cada temporada. Atención personalizada y precios accesibles.",
+			pay:        "Efectivo · Tarjetas · Débito",
+			photos:     "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80,https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&q=80,https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&q=80,https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80",
+			similar:    "la-fete,starbucks,oakberry,adidas-combat",
+			whatsapp:   "56912345678", telefono: "+56 2 1234 5678",
+			rating: "4.5", horarioLV: "9:00 – 21:00", horarioSab: "10:00 – 20:00", horarioDom: "Cerrado",
+			destacada: false,
+		},
+		{
+			nombre: "OakBerry", slug: "oakberry",
+			cat: "restaurantes", gal: "norte", local: "Local 27",
+			logo:       "https://logo.clearbit.com/oakberry.com",
+			tags:       "Açaí,Saludable,Vegano,Sin gluten",
+			desc:       "Los mejores açaí bowls energizantes, personalizados con tus toppings favoritos.",
+			about:      "OakBerry ofrece açaí premium sin azúcar añadida, personalizable con más de 30 toppings. Perfecto para desayuno o snack post-entrenamiento.",
+			about2:     "100% sin gluten y apto para veganos. También contamos con smoothies y jugos naturales.",
+			pay:        "Efectivo · Tarjetas · App OakBerry · Mercado Pago",
+			photos:     "https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?w=600&q=80,https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=400&q=80,https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?w=400&q=80,https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=400&q=80",
+			similar:    "starbucks,krispy-kreme,falafel-republic,la-fete",
+			whatsapp:   "56912345678", telefono: "+56 2 1234 5678",
+			rating: "4.9", horarioLV: "9:00 – 21:00", horarioSab: "10:00 – 20:00", horarioDom: "Cerrado",
+			destacada: true,
+		},
+		{
+			nombre: "Falafel Republic", slug: "falafel-republic",
+			cat: "restaurantes", gal: "sur", local: "Local 12",
+			logo:       "https://subcentro.cl/wp-content/uploads/2025/02/LOGO-FALAFEL-100.jpg",
+			tags:       "Árabe,Vegetariano,Vegano",
+			desc:       "Auténtica cocina árabe: falafel crujiente, shawarma, hummus y mucho más.",
+			about:      "Todo preparado con ingredientes frescos y recetas tradicionales. El falafel se hace diariamente con garbanzos seleccionados.",
+			about2:     "Opciones vegetarianas y veganas. Menú incluye tabule, hummus artesanal y postres árabes.",
+			pay:        "Efectivo · Tarjetas · Transbank",
+			photos:     "https://images.unsplash.com/photo-1555626906-fcf10d6851b4?w=600&q=80,https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80,https://images.unsplash.com/photo-1565299715199-866c917206bb?w=400&q=80,https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400&q=80",
+			similar:    "starbucks,oakberry,krispy-kreme,starbucks",
+			whatsapp:   "56912345678", telefono: "+56 2 1234 5678",
+			rating: "4.8", horarioLV: "9:00 – 21:00", horarioSab: "10:00 – 20:00", horarioDom: "Cerrado",
+			destacada: true,
+		},
+		{
+			nombre: "Krispy Kreme", slug: "krispy-kreme",
+			cat: "restaurantes", gal: "sur", local: "Local 19",
+			logo:       "https://logo.clearbit.com/krispykreme.com",
+			tags:       "Donas,Café,Postres",
+			desc:       "Las donas más famosas del mundo, recién horneadas. El letrero rojo lo dice todo.",
+			about:      "Krispy Kreme en Subcentro trae la icónica Original Glazed junto a una completa carta de cafés y bebidas frías.",
+			about2:     "Docenas disponibles para llevar y opciones de regalo. Cuando el letrero rojo está encendido, las donas acaban de salir del horno.",
+			pay:        "Efectivo · Tarjetas · App Krispy Kreme",
+			photos:     "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&q=80,https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400&q=80,https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&q=80,https://images.unsplash.com/photo-1629975913069-609d3fd9f6e2?w=400&q=80",
+			similar:    "starbucks,oakberry,falafel-republic,la-fete",
+			whatsapp:   "56912345678", telefono: "+56 2 1234 5678",
+			rating: "4.7", horarioLV: "9:00 – 21:00", horarioSab: "10:00 – 20:00", horarioDom: "Cerrado",
+			destacada: true,
+		},
+		{
+			nombre: "Farmacias Ahumada", slug: "ahumada",
+			cat: "farmacias", gal: "norte", local: "Local 5",
+			logo:       "https://subcentro.cl/wp-content/uploads/2023/12/Farmacias-Ahumada_250px.png",
+			tags:       "Farmacia,Salud,Medicamentos",
+			desc:       "Tu farmacia de confianza con amplio stock de medicamentos y productos de salud.",
+			about:      "Farmacias Ahumada ofrece atención farmacéutica profesional con la mayor variedad de medicamentos de venta libre y recetados.",
+			about2:     "Programa de fidelidad con descuentos exclusivos. Entrega a domicilio disponible.",
+			pay:        "Efectivo · Tarjetas · Débito · Web pay",
+			photos:     "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&q=80,https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&q=80,https://images.unsplash.com/photo-1585435557343-3b092031a831?w=400&q=80,https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=400&q=80",
+			similar:    "cruz-verde,salcobrand,starbucks,oakberry",
+			whatsapp:   "56912345678", telefono: "+56 2 1234 5678",
+			rating: "4.4", horarioLV: "8:30 – 21:30", horarioSab: "9:00 – 21:00", horarioDom: "10:00 – 19:00",
+			destacada: true,
+		},
+		{
+			nombre: "Cruz Verde", slug: "cruz-verde",
+			cat: "farmacias", gal: "sur", local: "Local 6",
+			logo:       "https://subcentro.cl/wp-content/uploads/2023/12/Logo_Cruz_FondoBlanco_250px.png",
+			tags:       "Farmacia,Salud,Dermocosméticos",
+			desc:       "Farmacia Cruz Verde con atención personalizada y los mejores precios en salud.",
+			about:      "Cruz Verde en Subcentro cuenta con todo lo que necesitas en medicamentos, dermocosméticos y productos de cuidado personal.",
+			about2:     "Club Cruz Verde con beneficios exclusivos. Despacho rápido y seguro.",
+			pay:        "Efectivo · Tarjetas · Débito",
+			photos:     "https://images.unsplash.com/photo-1576671081837-49000212a370?w=600&q=80,https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&q=80,https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&q=80,https://images.unsplash.com/photo-1576671081837-49000212a370?w=400&q=80",
+			similar:    "ahumada,salcobrand,starbucks,oakberry",
+			whatsapp:   "56912345678", telefono: "+56 2 1234 5678",
+			rating: "4.3", horarioLV: "8:30 – 21:30", horarioSab: "9:00 – 21:00", horarioDom: "10:00 – 19:00",
+			destacada: false,
+		},
+		{
+			nombre: "Salcobrand", slug: "salcobrand",
+			cat: "farmacias", gal: "norte", local: "Local 7",
+			logo:       "https://subcentro.cl/wp-content/uploads/2023/12/LOGO-SB_250px.png",
+			tags:       "Farmacia,Salud,Belleza",
+			desc:       "La farmacia con los mejores precios en medicamentos, belleza y cuidado personal.",
+			about:      "Salcobrand combina farmacia tradicional con dermocosméticos de alta gama. Atención de químicos farmacéuticos en horario extendido.",
+			about2:     "Programa SalcoBrand con puntos y descuentos. Más de 10.000 productos disponibles.",
+			pay:        "Efectivo · Tarjetas · Débito · Transferencia",
+			photos:     "https://images.unsplash.com/photo-1563213126-a4273aed2016?w=600&q=80,https://images.unsplash.com/photo-1576671081837-49000212a370?w=400&q=80,https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&q=80,https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=400&q=80",
+			similar:    "ahumada,cruz-verde,starbucks,oakberry",
+			whatsapp:   "56912345678", telefono: "+56 2 1234 5678",
+			rating: "4.5", horarioLV: "8:30 – 21:30", horarioSab: "9:00 – 21:00", horarioDom: "10:00 – 19:00",
+			destacada: false,
+		},
+		{
+			nombre: "Subway", slug: "subway",
+			cat: "restaurantes", gal: "sur", local: "Local 31",
+			logo:       "https://logo.clearbit.com/subway.com",
+			tags:       "Sándwiches,Saludable,Personalizado",
+			desc:       "Sándwiches frescos y saludables hechos a tu gusto en el momento.",
+			about:      "Subway te permite personalizar cada sándwich con ingredientes frescos. Elige tu pan, proteína, vegetales y salsas.",
+			about2:     "Menús especiales del día y combos familiares. Opciones vegetarianas disponibles.",
+			pay:        "Efectivo · Tarjetas · Débito · App Subway",
+			photos:     "https://images.unsplash.com/photo-1509722747041-616f39b57569?w=600&q=80,https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=80,https://images.unsplash.com/photo-1553909489-cd47e0907980?w=400&q=80,https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=80",
+			similar:    "falafel-republic,starbucks,oakberry,krispy-kreme",
+			whatsapp:   "56912345678", telefono: "+56 2 1234 5678",
+			rating: "4.3", horarioLV: "9:00 – 21:00", horarioSab: "10:00 – 20:00", horarioDom: "Cerrado",
+			destacada: true,
+		},
+	}
+
+	for _, s := range seeds {
+		r := core.NewRecord(col)
+		r.Set("nombre", s.nombre)
+		r.Set("slug", s.slug)
+		r.Set("cat", s.cat)
+		r.Set("gal", s.gal)
+		r.Set("local", s.local)
+		r.Set("logo", s.logo)
+		r.Set("tags", s.tags)
+		r.Set("desc", s.desc)
+		r.Set("about", s.about)
+		r.Set("about2", s.about2)
+		r.Set("pay", s.pay)
+		r.Set("photos", s.photos)
+		r.Set("similar", s.similar)
+		r.Set("whatsapp", s.whatsapp)
+		r.Set("telefono", s.telefono)
+		r.Set("rating", s.rating)
+		r.Set("horario_lv", s.horarioLV)
+		r.Set("horario_sab", s.horarioSab)
+		r.Set("horario_dom", s.horarioDom)
+		r.Set("status", "publicado")
+		r.Set("destacada", s.destacada)
+		if err := app.Save(r); err != nil {
+			log.Printf("⚠️  seed tienda %s: %v", s.nombre, err)
+		}
+	}
+	log.Printf("  ✅ seedTiendas: %d stores", len(seeds))
 	return nil
 }

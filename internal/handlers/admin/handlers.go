@@ -1588,6 +1588,341 @@ func propiedadFormHTML(id, titulo, slug, operacion, tipo, descripcion, direccion
 	)
 }
 
+// ── TIENDAS CRUD ──
+
+func TiendasList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		if c.Query("fragment") != "rows" {
+			if c.Get("HX-Request") != "true" {
+				return c.SendFile("./internal/templates/admin/pages/dashboard.html")
+			}
+			return c.SendFile("./internal/templates/admin/pages/tiendas.html")
+		}
+		records, err := pb.FindRecordsByFilter("tiendas", "id != ''", "nombre", 200, 0)
+		var sb strings.Builder
+		if err != nil {
+			sb.WriteString(fmt.Sprintf(`<tr><td colspan="6" style="text-align:center;padding:32px;color:#B71C1C">Error: %s</td></tr>`, template.HTMLEscapeString(err.Error())))
+		} else if len(records) == 0 {
+			sb.WriteString(`<tr class="empty-row"><td colspan="6" style="text-align:center;padding:32px;color:var(--md-outline)">Sin tiendas — agrega una con el botón de arriba</td></tr>`)
+		} else {
+			for _, r := range records {
+				status := r.GetString("status")
+				badgeClass := "badge-warning"
+				if status == "publicado" {
+					badgeClass = "badge-success"
+				}
+				dest := ""
+				if r.GetBool("destacada") {
+					dest = `<span class="badge badge-info" style="font-size:10px">⭐</span>`
+				}
+				sb.WriteString(fmt.Sprintf(`<tr>
+          <td>%s %s</td>
+          <td>%s</td>
+          <td>%s</td>
+          <td>%s</td>
+          <td><span class="badge %s">%s</span></td>
+          <td style="white-space:nowrap">
+            <button class="topbar-btn topbar-btn-outline" style="padding:4px 10px;font-size:12px"
+              hx-get="/admin/tiendas/%s/edit" hx-target="#modal-container" hx-swap="innerHTML">Editar</button>
+            <button class="topbar-btn" style="padding:4px 10px;font-size:12px;background:#E8F5E9;color:#1B5E20;border:none;cursor:pointer"
+              hx-post="/admin/tiendas/%s/publish" hx-target="#toast-area" hx-swap="innerHTML">%s</button>
+            <button class="topbar-btn" style="padding:4px 10px;font-size:12px;background:#FDECEA;color:#B71C1C;border:none;cursor:pointer"
+              hx-delete="/admin/tiendas/%s" hx-confirm="¿Eliminar esta tienda?" hx-target="closest tr" hx-swap="outerHTML swap:300ms">Eliminar</button>
+          </td></tr>`,
+					template.HTMLEscapeString(r.GetString("nombre")), dest,
+					template.HTMLEscapeString(r.GetString("cat")),
+					template.HTMLEscapeString(r.GetString("gal")),
+					template.HTMLEscapeString(r.GetString("local")),
+					badgeClass, template.HTMLEscapeString(status),
+					r.Id, r.Id,
+					map[bool]string{true: "Despublicar", false: "Publicar"}[status == "publicado"],
+					r.Id,
+				))
+			}
+		}
+		c.Set("Content-Type", "text/html; charset=utf-8")
+		return c.SendString(sb.String())
+	}
+}
+
+func TiendaForm(cfg *config.Config) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		html := tiendaFormHTML("", "", "", "tiendas", "norte", "", "", "", "", "", "", "", "", "", "", "", "4.5", "9:00 – 21:00", "10:00 – 20:00", "Cerrado", "publicado", false)
+		c.Set("Content-Type", "text/html; charset=utf-8")
+		return c.SendString(html)
+	}
+}
+
+func TiendaCreate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		nombre := strings.TrimSpace(c.FormValue("nombre"))
+		if nombre == "" {
+			return c.SendString(`<div class="toast toast-error">El nombre es requerido</div>`)
+		}
+		col, err := pb.FindCollectionByNameOrId("tiendas")
+		if err != nil {
+			return c.Status(500).SendString(`<div class="toast toast-error">Error de BD</div>`)
+		}
+		r := core.NewRecord(col)
+		setTiendaFields(r, c)
+		if err := pb.Save(r); err != nil {
+			return c.SendString(`<div class="toast toast-error">Error: ` + template.HTMLEscapeString(err.Error()) + `</div>`)
+		}
+		return c.SendString(`<div class="toast toast-success" id="toast-area">✅ Tienda creada
+<script>
+  document.getElementById('modal-container').innerHTML='';
+  htmx.ajax('GET','/admin/tiendas?fragment=rows',{target:'#tiendas-tbody',swap:'innerHTML'});
+  setTimeout(function(){var t=document.getElementById('toast-area');if(t)t.innerHTML=''},2000);
+</script></div>`)
+	}
+}
+
+func TiendaEdit(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r, err := pb.FindRecordById("tiendas", id)
+		if err != nil {
+			return c.Status(404).SendString(`<div class="toast toast-error">No encontrado</div>`)
+		}
+		html := tiendaFormHTML(
+			r.Id,
+			r.GetString("nombre"),
+			r.GetString("slug"),
+			r.GetString("cat"),
+			r.GetString("gal"),
+			r.GetString("local"),
+			r.GetString("logo"),
+			r.GetString("tags"),
+			r.GetString("desc"),
+			r.GetString("about"),
+			r.GetString("about2"),
+			r.GetString("pay"),
+			r.GetString("photos"),
+			r.GetString("similar"),
+			r.GetString("whatsapp"),
+			r.GetString("telefono"),
+			r.GetString("rating"),
+			r.GetString("horario_lv"),
+			r.GetString("horario_sab"),
+			r.GetString("horario_dom"),
+			r.GetString("status"),
+			r.GetBool("destacada"),
+		)
+		c.Set("Content-Type", "text/html; charset=utf-8")
+		return c.SendString(html)
+	}
+}
+
+func TiendaUpdate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r, err := pb.FindRecordById("tiendas", id)
+		if err != nil {
+			return c.SendString(`<div class="toast toast-error">No encontrado</div>`)
+		}
+		setTiendaFields(r, c)
+		if err := pb.Save(r); err != nil {
+			return c.SendString(`<div class="toast toast-error">Error actualizando</div>`)
+		}
+		return c.SendString(`<div class="toast toast-success" id="toast-area">✅ Tienda actualizada
+<script>
+  document.getElementById('modal-container').innerHTML='';
+  htmx.ajax('GET','/admin/tiendas?fragment=rows',{target:'#tiendas-tbody',swap:'innerHTML'});
+  setTimeout(function(){var t=document.getElementById('toast-area');if(t)t.innerHTML=''},2000);
+</script></div>`)
+	}
+}
+
+func TiendaDelete(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r, err := pb.FindRecordById("tiendas", id)
+		if err != nil {
+			return c.Status(404).SendString("")
+		}
+		if err := pb.Delete(r); err != nil {
+			return c.SendString(`<div class="toast toast-error">Error eliminando</div>`)
+		}
+		return c.SendString("")
+	}
+}
+
+func TiendaToggleStatus(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r, err := pb.FindRecordById("tiendas", id)
+		if err != nil {
+			return c.Status(404).SendString("")
+		}
+		newStatus := "publicado"
+		if r.GetString("status") == "publicado" {
+			newStatus = "borrador"
+		}
+		r.Set("status", newStatus)
+		if err := pb.Save(r); err != nil {
+			return c.SendString(`<div class="toast toast-error">Error</div>`)
+		}
+		label := map[string]string{"publicado": "✅ Publicada", "borrador": "📝 Borrador"}[newStatus]
+		return c.SendString(fmt.Sprintf(`<div class="toast toast-success" id="toast-area">%s
+<script>
+  htmx.ajax('GET','/admin/tiendas?fragment=rows',{target:'#tiendas-tbody',swap:'innerHTML'});
+  setTimeout(function(){var t=document.getElementById('toast-area');if(t)t.innerHTML=''},2000);
+</script></div>`, label))
+	}
+}
+
+func setTiendaFields(r *core.Record, c *fiber.Ctx) {
+	r.Set("nombre", strings.TrimSpace(c.FormValue("nombre")))
+	r.Set("slug", strings.TrimSpace(c.FormValue("slug")))
+	r.Set("cat", c.FormValue("cat"))
+	r.Set("gal", c.FormValue("gal"))
+	r.Set("local", c.FormValue("local"))
+	r.Set("logo", c.FormValue("logo"))
+	r.Set("tags", c.FormValue("tags"))
+	r.Set("desc", c.FormValue("desc"))
+	r.Set("about", c.FormValue("about"))
+	r.Set("about2", c.FormValue("about2"))
+	r.Set("pay", c.FormValue("pay"))
+	r.Set("photos", c.FormValue("photos"))
+	r.Set("similar", c.FormValue("similar"))
+	r.Set("whatsapp", c.FormValue("whatsapp"))
+	r.Set("telefono", c.FormValue("telefono"))
+	r.Set("rating", c.FormValue("rating"))
+	r.Set("horario_lv", c.FormValue("horario_lv"))
+	r.Set("horario_sab", c.FormValue("horario_sab"))
+	r.Set("horario_dom", c.FormValue("horario_dom"))
+	r.Set("status", c.FormValue("status"))
+	r.Set("destacada", c.FormValue("destacada") == "on")
+}
+
+func tiendaFormHTML(id, nombre, slug, cat, gal, local, logo, tags, desc, about, about2, pay, photos, similar, whatsapp, telefono, rating, horarioLV, horarioSab, horarioDom, status string, destacada bool) string {
+	method := `hx-post="/admin/tiendas"`
+	if id != "" {
+		method = fmt.Sprintf(`hx-put="/admin/tiendas/%s"`, id)
+	}
+	title := map[bool]string{true: "Editar Tienda", false: "Nueva Tienda"}[id != ""]
+
+	chk := func(b bool) string {
+		if b {
+			return " checked"
+		}
+		return ""
+	}
+
+	cats := []struct{ v, l string }{
+		{"tiendas", "Tiendas & Moda"}, {"restaurantes", "Restaurantes & Café"},
+		{"farmacias", "Farmacias"}, {"salud", "Salud & Belleza"},
+		{"tecnologia", "Tecnología"}, {"servicios", "Servicios"},
+	}
+	var catOpts strings.Builder
+	for _, o := range cats {
+		s := ""
+		if o.v == cat {
+			s = " selected"
+		}
+		catOpts.WriteString(fmt.Sprintf(`<option value="%s"%s>%s</option>`, o.v, s, o.l))
+	}
+
+	gals := []struct{ v, l string }{{"norte", "Galería Norte"}, {"sur", "Galería Sur"}}
+	var galOpts strings.Builder
+	for _, o := range gals {
+		s := ""
+		if o.v == gal {
+			s = " selected"
+		}
+		galOpts.WriteString(fmt.Sprintf(`<option value="%s"%s>%s</option>`, o.v, s, o.l))
+	}
+
+	statuses := []struct{ v, l string }{{"borrador", "Borrador"}, {"publicado", "Publicado"}}
+	var statusOpts strings.Builder
+	for _, st := range statuses {
+		s := ""
+		if st.v == status {
+			s = " selected"
+		}
+		statusOpts.WriteString(fmt.Sprintf(`<option value="%s"%s>%s</option>`, st.v, s, st.l))
+	}
+
+	return fmt.Sprintf(`<div class="modal-overlay" onclick="this.remove()">
+  <div class="modal-card" onclick="event.stopPropagation()" style="max-width:700px;max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <h3>%s</h3>
+      <button onclick="document.getElementById('modal-container').innerHTML=''" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--md-outline)">✕</button>
+    </div>
+    <form %s hx-target="#toast-area" hx-swap="innerHTML">
+      <div class="form-row">
+        <div class="form-field" style="grid-column:span 2">
+          <label>Nombre *</label>
+          <input type="text" name="nombre" value="%s" required class="form-input" placeholder="Nombre de la tienda"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Slug (URL)</label><input type="text" name="slug" value="%s" class="form-input" placeholder="nombre-tienda"/></div>
+        <div class="form-field"><label>Local (ej: Local 8)</label><input type="text" name="local" value="%s" class="form-input" placeholder="Local 8"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Categoría</label><select name="cat" class="form-input">%s</select></div>
+        <div class="form-field"><label>Galería</label><select name="gal" class="form-input">%s</select></div>
+      </div>
+      <div class="form-field"><label>URL Logo</label><input type="url" name="logo" value="%s" class="form-input" placeholder="https://..."/></div>
+      <div class="form-field"><label>Tags (separados por coma)</label><input type="text" name="tags" value="%s" class="form-input" placeholder="Café,Frappuccino,WiFi"/></div>
+      <div class="form-field"><label>Descripción corta (hero)</label><input type="text" name="desc" value="%s" class="form-input" placeholder="Descripción breve visible en la página de la tienda"/></div>
+      <div class="form-field"><label>Sobre la tienda (párrafo 1)</label><textarea name="about" class="form-input" rows="3">%s</textarea></div>
+      <div class="form-field"><label>Sobre la tienda (párrafo 2)</label><textarea name="about2" class="form-input" rows="2">%s</textarea></div>
+      <div class="form-field"><label>Medios de pago</label><input type="text" name="pay" value="%s" class="form-input" placeholder="Efectivo · Tarjetas · Débito"/></div>
+      <div class="form-field"><label>Fotos galería (URLs separadas por coma, mín 4)</label><textarea name="photos" class="form-input" rows="3" placeholder="https://img1.jpg,https://img2.jpg,...">%s</textarea></div>
+      <div class="form-field"><label>Tiendas similares (slugs separados por coma)</label><input type="text" name="similar" value="%s" class="form-input" placeholder="starbucks,oakberry,krispy-kreme"/></div>
+      <div class="form-row">
+        <div class="form-field"><label>WhatsApp</label><input type="text" name="whatsapp" value="%s" class="form-input" placeholder="56912345678"/></div>
+        <div class="form-field"><label>Teléfono</label><input type="text" name="telefono" value="%s" class="form-input" placeholder="+56 2 1234 5678"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Rating</label><input type="text" name="rating" value="%s" class="form-input" placeholder="4.7"/></div>
+        <div class="form-field"><label>Estado</label><select name="status" class="form-input">%s</select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Horario Lun–Vie</label><input type="text" name="horario_lv" value="%s" class="form-input" placeholder="9:00 – 21:00"/></div>
+        <div class="form-field"><label>Horario Sábado</label><input type="text" name="horario_sab" value="%s" class="form-input" placeholder="10:00 – 20:00"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Horario Domingo</label><input type="text" name="horario_dom" value="%s" class="form-input" placeholder="Cerrado"/></div>
+        <div class="form-field" style="display:flex;align-items:center;padding-top:22px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer">
+            <input type="checkbox" name="destacada"%s style="width:16px;height:16px;accent-color:var(--md-primary)"/> Destacada
+          </label>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" onclick="document.getElementById('modal-container').innerHTML=''" class="topbar-btn topbar-btn-outline">Cancelar</button>
+        <button type="submit" class="topbar-btn topbar-btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>`,
+		title, method,
+		template.HTMLEscapeString(nombre),
+		template.HTMLEscapeString(slug),
+		template.HTMLEscapeString(local),
+		catOpts.String(), galOpts.String(),
+		template.HTMLEscapeString(logo),
+		template.HTMLEscapeString(tags),
+		template.HTMLEscapeString(desc),
+		template.HTMLEscapeString(about),
+		template.HTMLEscapeString(about2),
+		template.HTMLEscapeString(pay),
+		template.HTMLEscapeString(photos),
+		template.HTMLEscapeString(similar),
+		template.HTMLEscapeString(whatsapp),
+		template.HTMLEscapeString(telefono),
+		template.HTMLEscapeString(rating),
+		statusOpts.String(),
+		template.HTMLEscapeString(horarioLV),
+		template.HTMLEscapeString(horarioSab),
+		template.HTMLEscapeString(horarioDom),
+		chk(destacada),
+	)
+}
+
 // sel returns " selected" if val == target
 func sel(val, target string) string {
 	if val == target {

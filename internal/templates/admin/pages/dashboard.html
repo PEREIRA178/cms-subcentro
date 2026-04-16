@@ -173,9 +173,9 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 
   <div class="sidebar-section">
-    <div class="sidebar-section-title">Inmobiliaria</div>
-    <a href="/admin/propiedades" class="sidebar-link" hx-get="/admin/propiedades" hx-target="#main-content" hx-push-url="true">
-      <span class="material-symbols-outlined">home_work</span> Propiedades
+    <div class="sidebar-section-title">Subcentro</div>
+    <a href="/admin/tiendas" class="sidebar-link" hx-get="/admin/tiendas" hx-target="#main-content" hx-push-url="true">
+      <span class="material-symbols-outlined">storefront</span> Tiendas
     </a>
   </div>
 
@@ -223,24 +223,24 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
     </div>
 
-    <!-- ── RECENT PROPIEDADES ── -->
+    <!-- ── RECENT TIENDAS ── -->
     <div class="card">
       <div class="card-header">
-        <h2 class="card-title">Últimas propiedades</h2>
+        <h2 class="card-title">Tiendas</h2>
         <button class="topbar-btn topbar-btn-primary"
-          hx-get="/admin/propiedades/new" hx-target="#modal-container" hx-swap="innerHTML">
-          <span class="material-symbols-outlined" style="font-size:16px">add</span> Nueva propiedad
+          hx-get="/admin/tiendas/new" hx-target="#modal-container" hx-swap="innerHTML">
+          <span class="material-symbols-outlined" style="font-size:16px">add</span> Nueva tienda
         </button>
       </div>
       <table>
         <thead>
-          <tr><th>Título</th><th>Tipo</th><th>Operación</th><th>Comuna</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr>
+          <tr><th>Nombre</th><th>Categoría</th><th>Galería</th><th>Local</th><th>Estado</th><th>Acciones</th></tr>
         </thead>
-        <tbody id="prop-tbody"
-               hx-get="/admin/propiedades?fragment=rows"
+        <tbody id="tiendas-tbody"
+               hx-get="/admin/tiendas?fragment=rows"
                hx-trigger="load"
                hx-swap="innerHTML">
-          <tr><td colspan="7" style="text-align:center;padding:16px;color:var(--md-outline)">
+          <tr><td colspan="6" style="text-align:center;padding:16px;color:var(--md-outline)">
             <div style="width:18px;height:18px;border:2px solid var(--md-primary);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px"></div>
             Cargando...
           </td></tr>
@@ -265,7 +265,7 @@ document.querySelectorAll('.sidebar-link').forEach(link => {
 // Auto-load section on direct navigation (F5 / bookmark / deep link)
 (function(){
   var path = window.location.pathname;
-  var sections = ['/admin/propiedades','/admin/users'];
+  var sections = ['/admin/tiendas','/admin/users'];
   if(sections.indexOf(path) !== -1){
     htmx.ajax('GET', path, {target:'#main-content', swap:'innerHTML'});
     document.querySelectorAll('.sidebar-link').forEach(function(l){
@@ -284,10 +284,9 @@ document.querySelectorAll('.sidebar-link').forEach(link => {
     ws.onmessage = function(e) {
       try {
         const msg = JSON.parse(e.data);
-        if (msg.type === 'refresh_all' || msg.type === 'refresh_web' || msg.type === 'propUpdated') {
-          // Refresh propiedades table if visible
-          const tbody = document.getElementById('prop-tbody');
-          if (tbody) htmx.ajax('GET', '/admin/propiedades?fragment=rows', {target:'#prop-tbody', swap:'innerHTML'});
+        if (msg.type === 'refresh_all' || msg.type === 'refresh_web' || msg.type === 'tiendasUpdated') {
+          const tbody = document.getElementById('tiendas-tbody');
+          if (tbody) htmx.ajax('GET', '/admin/tiendas?fragment=rows', {target:'#tiendas-tbody', swap:'innerHTML'});
           const stats = document.querySelector('.stats-row');
           if (stats) htmx.ajax('GET', '/admin/dashboard/stats', {target:'.stats-row', swap:'innerHTML'});
         }

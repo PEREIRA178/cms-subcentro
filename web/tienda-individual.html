@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="pgTitle">Tienda — Subcentro Las Condes</title>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -142,87 +143,13 @@
   <a href="index.html#footer">Contacto</a>
 </div>
 
-<div class="bc">
-  <nav class="bc-inner">
-    <a href="index.html">Inicio</a><span class="sep">›</span>
-    <a href="buscador-tiendas.html">Tiendas</a><span class="sep">›</span>
-    <span class="cur" id="bcCur">Tienda</span>
-  </nav>
-</div>
-
-<section class="s-hero">
-  <div class="s-hero-inner">
-    <div class="logo-zone">
-      <img id="storeLogoImg" src="" alt="Logo">
-    </div>
-    <div class="s-hero-info">
-      <div class="s-cat-badge" id="sCatBadge"></div>
-      <h1 class="s-hero-name" id="sName"></h1>
-      <p class="s-hero-desc" id="sDesc"></p>
-      <div class="s-tags" id="sTags"></div>
-    </div>
-  </div>
-</section>
-
-<div class="main">
-  <div>
-    <div class="card fi" style="padding:20px">
-      <h2>📸 Galería</h2>
-      <div class="gal-grid">
-        <div class="gal-item"><img id="g1" src="" alt="Foto 1"><div class="gal-over"></div></div>
-        <div class="gal-item"><img id="g2" src="" alt="Foto 2"><div class="gal-over"></div></div>
-        <div class="gal-item"><img id="g3" src="" alt="Foto 3"><div class="gal-over"></div></div>
-        <div class="gal-item"><img id="g4" src="" alt="Más"><div class="gal-over"><span class="gal-more">+4 fotos</span></div></div>
-      </div>
-    </div>
-    <div class="card fi">
-      <h2 id="aboutTitle">🌟 Sobre la tienda</h2>
-      <p id="aboutP" style="font-size:.93rem;line-height:1.75;color:var(--muted);font-weight:300"></p>
-      <p id="aboutP2" style="font-size:.93rem;line-height:1.75;color:var(--muted);font-weight:300;margin-top:12px"></p>
-    </div>
-    <div class="card fi">
-      <h2>🕐 Horarios</h2>
-      <div id="schTable"></div>
-    </div>
-    <div class="card fi" style="padding:20px">
-      <h2>📍 Ubicación en Subcentro</h2>
-      <div class="map-mini">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3329.534!2d-70.5787!3d-33.4182!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662cf0f3b3a6d5f%3A0x5f8e3a3a3a3a3a3a!2sAv.+Apoquindo+4411%2C+Las+Condes!5e0!3m2!1ses!2scl!4v1700000000000" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación"></iframe>
-      </div>
-      <div style="margin-top:13px;display:flex;align-items:center;gap:9px;flex-wrap:wrap">
-        <span id="locBadge" style="background:var(--surface2);border-radius:9px;padding:7px 13px;font-size:.83rem;font-weight:600"></span>
-        <span style="background:var(--surface2);border-radius:9px;padding:7px 13px;font-size:.83rem;font-weight:600;color:var(--muted)">🚇 Acceso Metro</span>
-      </div>
-    </div>
-  </div>
-
-  <div>
-    <div class="card fi">
-      <div class="rating-strip">
-        <div><div class="r-big" id="ratingNum">4.7</div></div>
-        <div><div class="stars">★★★★★</div><div class="r-count">+340 valoraciones</div></div>
-      </div>
-      <div class="i-row"><div class="i-icon r">📍</div><div class="i-txt"><h4>Dirección</h4><p>Av. Apoquindo 4411, Las Condes</p><a href="https://maps.google.com/?q=Av+Apoquindo+4411+Las+Condes" target="_blank" rel="noopener">Ver en Google Maps →</a></div></div>
-      <div class="i-row"><div class="i-icon y">🏬</div><div class="i-txt"><h4>Galería & Local</h4><p id="galLocal"></p></div></div>
-      <div class="i-row"><div class="i-icon g">🕐</div><div class="i-txt"><h4>Horario hoy</h4><p id="todayHrs"></p></div></div>
-      <div class="i-row"><div class="i-icon b">💳</div><div class="i-txt"><h4>Medios de pago</h4><p id="payMethods"></p></div></div>
-    </div>
-    <div class="act-card fi">
-      <h2>Contactar &amp; Llegar</h2>
-      <a href="tel:+56212345678" class="a-btn red"><span class="ai">📞</span><span class="al">Llamar al local</span><span class="ar">→</span></a>
-      <a id="waBtn" href="#" target="_blank" rel="noopener" class="a-btn wa">
-        <span class="ai"><svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span>
-        <span class="al">WhatsApp</span><span class="ar">→</span>
-      </a>
-      <a href="https://maps.google.com/?q=Av+Apoquindo+4411+Las+Condes" target="_blank" rel="noopener" class="a-btn"><span class="ai">🗺️</span><span class="al">Cómo llegar</span><span class="ar">→</span></a>
-      <a href="buscador-tiendas.html" class="a-btn"><span class="ai">🔍</span><span class="al">Ver todas las tiendas</span><span class="ar">→</span></a>
-    </div>
-    <div class="card fi">
-      <h2>🏬 También te puede gustar</h2>
-      <div class="sim-grid" id="simGrid"></div>
-    </div>
+<div id="store-content" style="min-height:60vh">
+  <div style="display:flex;align-items:center;justify-content:center;padding:80px 24px;color:#6B6B6B">
+    <div style="width:24px;height:24px;border:3px solid #E8242A;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin-right:12px"></div>
+    Cargando tienda...
   </div>
 </div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
 <footer class="footer" id="footer">
   <div class="f-top">
@@ -247,10 +174,28 @@
 </a>
 
 <script>
-// ── STORE DATA ──
-// Para cambiar el logo: edita el campo `logo` con la URL de la imagen del local.
-// Ejemplo: logo: 'https://subcentro.cl/wp-content/uploads/2026/03/mi-logo.jpg'
-var STORES = {
+// Load store data via HTMX from backend
+(function(){
+  var sid = new URLSearchParams(window.location.search).get('tienda') || 'starbucks';
+  htmx.ajax('GET', '/fragments/tienda/' + encodeURIComponent(sid), {
+    target: '#store-content',
+    swap: 'innerHTML'
+  });
+  // Update page title after content loads
+  document.getElementById('store-content').addEventListener('htmx:afterSwap', function(){
+    var h1 = this.querySelector('.s-hero-name');
+    if (h1) document.getElementById('pgTitle').textContent = h1.textContent + ' — Subcentro Las Condes';
+  });
+})();
+
+// Burger
+document.getElementById('burger').addEventListener('click', function(){
+  var o = document.getElementById('mobMenu').classList.toggle('open');
+  this.setAttribute('aria-expanded', o);
+});
+
+// ── LEGACY STORE DATA (kept for fallback only) ──
+var STORES_LEGACY = {
   'starbucks': {
     name:'Starbucks', cat:'restaurantes', catLabel:'Restaurantes & Café', catEmoji:'☕',
     gal:'Norte', local:'Local 34', rating:'4.8',
@@ -369,103 +314,7 @@ var SCH = [
 var DAYS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 var todayDay = DAYS[new Date().getDay()];
 
-// ── GET STORE ──
-var params = new URLSearchParams(window.location.search);
-var sid = params.get('tienda') || 'starbucks';
-var s = STORES[sid];
-
-// Fallback for stores not in STORES object
-if (!s) {
-  var nm = sid.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1)}).join(' ');
-  s = {
-    name: nm, cat:'tiendas', catLabel:'Tiendas', catEmoji:'🛍️',
-    gal:'Norte', local:'Consultar', rating:'4.5',
-    logo: '', // ← Reemplaza con URL real del logo
-    tags:['Subcentro','Las Condes'],
-    desc:'Local disponible en Subcentro Las Condes.',
-    about:'Visítanos en Subcentro Las Condes para conocer nuestros productos y servicios.',
-    about2:'',
-    pay:'Efectivo · Tarjetas',
-    photos:[
-      'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80',
-      'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&q=80',
-      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80',
-      'https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=400&q=80'
-    ],
-    similar:['starbucks','oakberry','krispy-kreme','falafel-republic']
-  };
-}
-
-// ── RENDER ──
-document.getElementById('pgTitle').textContent = s.name + ' — Subcentro Las Condes';
-document.getElementById('bcCur').textContent = s.name;
-document.getElementById('sCatBadge').textContent = s.catEmoji + ' ' + s.catLabel;
-document.getElementById('sName').textContent = s.name;
-document.getElementById('sDesc').textContent = s.desc;
-document.getElementById('aboutTitle').textContent = '🌟 Sobre ' + s.name;
-document.getElementById('aboutP').textContent = s.about;
-document.getElementById('aboutP2').textContent = s.about2;
-if (!s.about2) document.getElementById('aboutP2').style.display = 'none';
-document.getElementById('ratingNum').textContent = s.rating;
-document.getElementById('galLocal').textContent = 'Galería ' + s.gal + ' · ' + s.local;
-document.getElementById('locBadge').textContent = '📍 Galería ' + s.gal + ' · ' + s.local;
-document.getElementById('payMethods').textContent = s.pay;
-
-// Tags
-var tagsEl = document.getElementById('sTags');
-tagsEl.innerHTML = s.tags.map(function(t){return '<span class="s-tag">'+t+'</span>'}).join('') +
-  '<span class="s-open"><span class="live-dot"></span>Abierto ahora</span>';
-
-// Logo
-var logoImg = document.getElementById('storeLogoImg');
-logoImg.alt = 'Logo ' + s.name;
-if (s.logo) {
-  logoImg.src = s.logo;
-  logoImg.onerror = function(){ this.src = 'https://picsum.photos/seed/'+sid+'/148/148'; this.style.objectFit='cover'; this.style.padding='0'; };
-} else {
-  logoImg.src = 'https://picsum.photos/seed/'+sid+'/148/148';
-  logoImg.style.objectFit = 'cover';
-  logoImg.style.padding = '0';
-}
-
-// Gallery
-['g1','g2','g3','g4'].forEach(function(id, i){
-  var el = document.getElementById(id);
-  el.src = s.photos[i] || ('https://picsum.photos/seed/'+sid+i+'/400/300');
-});
-
-// Today hours
-var todayEntry = SCH.find(function(x){ return x.day === todayDay; });
-document.getElementById('todayHrs').textContent = todayDay + ': ' + (todayEntry ? todayEntry.hrs : 'Consultar');
-
-// Schedule
-document.getElementById('schTable').innerHTML = SCH.map(function(x){
-  var isToday = x.day === todayDay;
-  return '<div class="sch-row'+(isToday?' today':'')+'">'+
-    '<span class="sch-day">'+x.day+(isToday?'<span class="today-pill">hoy</span>':'')+'</span>'+
-    '<span class="sch-hrs">'+x.hrs+'</span>'+
-  '</div>';
-}).join('');
-
-// WhatsApp
-document.getElementById('waBtn').href = 'https://wa.me/56912345678?text=Hola,%20quiero%20informaci%C3%B3n%20de%20'+encodeURIComponent(s.name)+'%20en%20Subcentro';
-
-// Similar stores
-document.getElementById('simGrid').innerHTML = (s.similar||[]).slice(0,4).map(function(id){
-  var sim = SIM[id] || {name:id, tags:'Subcentro', logo:''};
-  var lsrc = sim.logo || ('https://picsum.photos/seed/'+id+'/46/46');
-  return '<a href="tienda-individual.html?tienda='+id+'" class="sim-card">'+
-    '<div class="sim-logo"><img src="'+lsrc+'" alt="'+sim.name+'" onerror="this.src=\'https://picsum.photos/seed/'+id+'/46/46\'"></div>'+
-    '<div><div class="sim-name">'+sim.name+'</div><div class="sim-sub">'+sim.tags+'</div></div>'+
-    '<span class="sim-arr">→</span>'+
-  '</a>';
-}).join('');
-
-// Burger
-document.getElementById('burger').addEventListener('click', function(){
-  var o = document.getElementById('mobMenu').classList.toggle('open');
-  this.setAttribute('aria-expanded', o);
-});
+// (legacy data kept for reference only — rendering now done server-side via HTMX)
 </script>
 </body>
 </html>
