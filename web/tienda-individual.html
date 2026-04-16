@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pgTitle">Tienda — Subcentro Las Condes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--red:#E8242A;--red-d:#B91A1F;--yellow:#F5C800;--green:#2DB37A;--dark:#0E0E0E;--dark2:#181818;--surface:#F5F4F1;--surface2:#EBEBEA;--white:#FFF;--text:#0E0E0E;--muted:#6B6B6B;--border:#E0DFDC}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Geist',system-ui,sans-serif;background:var(--surface);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(14,14,14,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);padding:0 32px;height:68px;display:flex;align-items:center;justify-content:space-between}
+    .logo{font-family:'Fraunces',serif;font-weight:900;font-size:1.5rem;color:#fff;text-decoration:none;display:flex;align-items:baseline;gap:1px;letter-spacing:-.5px}
+    .logo .dot{color:var(--red);font-size:2rem;line-height:0;position:relative;top:5px}
+    .nav-links{display:flex;gap:36px;align-items:center}
+    .nav-links a{color:rgba(255,255,255,.65);text-decoration:none;font-size:.87rem;font-weight:500;transition:color .18s}
+    .nav-links a:hover{color:#fff}
+    .nav-cta{background:var(--red)!important;color:#fff!important;padding:9px 22px;border-radius:100px;font-weight:700!important}
+    .burger{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:4px}
+    .burger span{display:block;width:24px;height:2px;background:#fff;border-radius:2px}
+    .mob-menu{display:none;position:fixed;top:68px;left:0;right:0;background:var(--dark2);z-index:199;padding:16px 24px 24px;flex-direction:column;gap:2px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .mob-menu a{color:rgba(255,255,255,.78);text-decoration:none;font-size:1rem;font-weight:500;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06);display:block}
+    .mob-menu.open{display:flex}
+    .bc{background:var(--dark);padding:84px 24px 0}
+    .bc-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:7px;padding-bottom:18px}
+    .bc a{color:rgba(255,255,255,.52);text-decoration:none;font-size:.82rem;transition:color .18s}
+    .bc a:hover{color:#fff}
+    .bc .sep{color:rgba(255,255,255,.25);font-size:.76rem}
+    .bc .cur{color:rgba(255,255,255,.85);font-size:.82rem;font-weight:500}
+    .s-hero{background:var(--dark);padding:0 24px 48px;position:relative;overflow:hidden}
+    .s-hero::before{content:'';position:absolute;width:460px;height:460px;background:var(--red);border-radius:50%;top:-230px;right:-140px;opacity:.09;filter:blur(60px)}
+    .s-hero::after{content:'';position:absolute;width:300px;height:300px;background:var(--yellow);border-radius:50%;bottom:-150px;left:-80px;opacity:.07;filter:blur(60px)}
+    .s-hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;display:flex;align-items:flex-end;gap:36px;flex-wrap:wrap}
+    .logo-zone{flex-shrink:0;width:148px;height:148px;background:#fff;border-radius:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 14px 44px rgba(0,0,0,.28);margin-top:-36px;overflow:hidden}
+    #storeLogoImg{width:100%;height:100%;object-fit:contain;padding:18px}
+    .s-hero-info{flex:1;padding-bottom:4px;min-width:240px}
+    .s-cat-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.88);padding:5px 14px;border-radius:100px;font-size:.76rem;font-weight:600;margin-bottom:12px}
+    .s-hero-name{font-family:'Fraunces',serif;font-size:clamp(1.9rem,5vw,3rem);font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.05;margin-bottom:9px}
+    .s-hero-desc{color:rgba(255,255,255,.65);font-size:.97rem;line-height:1.6;max-width:480px;margin-bottom:18px;font-weight:300}
+    .s-tags{display:flex;flex-wrap:wrap;gap:7px}
+    .s-tag{background:rgba(255,255,255,.10);color:rgba(255,255,255,.82);padding:4px 13px;border-radius:100px;font-size:.77rem;font-weight:500;border:1px solid rgba(255,255,255,.12)}
+    .s-open{display:inline-flex;align-items:center;gap:6px;background:rgba(45,179,122,.14);border:1px solid rgba(45,179,122,.28);color:var(--green);padding:4px 13px;border-radius:100px;font-size:.77rem;font-weight:600}
+    .live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:lp 2s ease infinite;flex-shrink:0}
+    @keyframes lp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+    .main{max-width:1100px;margin:0 auto;padding:44px 24px 72px;display:grid;grid-template-columns:1fr 320px;gap:32px;align-items:start}
+    .card{background:#fff;border-radius:18px;padding:28px;box-shadow:0 1px 12px rgba(0,0,0,.07);margin-bottom:20px}
+    .card h2{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:900;margin-bottom:18px;color:var(--text);display:flex;align-items:center;gap:8px;letter-spacing:-.3px}
+    .i-row{display:flex;align-items:flex-start;gap:13px;margin-bottom:16px}
+    .i-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem}
+    .i-icon.r{background:#FEF0F0}.i-icon.y{background:#FFFAE0}.i-icon.g{background:#EDFFF5}.i-icon.b{background:#EFF4FF}
+    .i-txt h4{font-weight:700;font-size:.87rem;color:var(--text);margin-bottom:1px}
+    .i-txt p{font-size:.83rem;color:var(--muted);line-height:1.55}
+    .i-txt a{color:var(--red);text-decoration:none;font-size:.83rem}
+    .i-txt a:hover{text-decoration:underline}
+    .rating-strip{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:11px;padding:13px 15px;margin-bottom:18px}
+    .r-big{font-family:'Fraunces',serif;font-size:2rem;font-weight:900;color:var(--text);line-height:1}
+    .stars{color:var(--yellow);font-size:.87rem}
+    .r-count{font-size:.78rem;color:var(--muted);margin-top:2px}
+    .act-card{background:#fff;border-radius:18px;padding:24px;box-shadow:0 1px 12px rgba(0,0,0,.07);margin-bottom:20px}
+    .act-card h2{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.8px;margin-bottom:14px;font-family:'Geist',sans-serif}
+    .a-btn{width:100%;display:flex;align-items:center;gap:13px;padding:13px 16px;border-radius:12px;margin-bottom:8px;border:1.5px solid var(--border);background:#fff;font-family:'Geist',sans-serif;font-size:.92rem;font-weight:500;cursor:pointer;text-decoration:none;color:var(--text);transition:all .18s}
+    .a-btn:hover{border-color:var(--red);color:var(--red);transform:translateX(2px)}
+    .a-btn:last-child{margin-bottom:0}
+    .a-btn .ai{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem}
+    .a-btn .al{flex:1;text-align:left}
+    .a-btn .ar{font-size:.8rem;opacity:.5}
+    .a-btn.red{background:var(--red);border-color:var(--red);color:#fff}
+    .a-btn.red:hover{background:var(--red-d);border-color:var(--red-d);color:#fff;transform:none}
+    .a-btn.red .ai{background:rgba(255,255,255,.15)}
+    .a-btn.wa{background:#25D366;border-color:#25D366;color:#fff}
+    .a-btn.wa:hover{background:#1DA851;border-color:#1DA851;color:#fff;transform:translateX(2px)}
+    .gal-grid{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:auto auto;gap:10px}
+    .gal-item{border-radius:12px;overflow:hidden;cursor:pointer;position:relative}
+    .gal-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+    .gal-item:hover img{transform:scale(1.05)}
+    .gal-item:first-child{grid-row:span 2;min-height:300px}
+    .gal-item:not(:first-child){min-height:142px}
+    .gal-over{position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .3s;display:flex;align-items:center;justify-content:center}
+    .gal-item:hover .gal-over{background:rgba(232,36,42,.18)}
+    .gal-item:last-child .gal-over{background:rgba(0,0,0,.42)}
+    .gal-more{color:#fff;font-family:'Fraunces',serif;font-size:1.1rem;font-weight:900}
+    .sch-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #F0EEE9}
+    .sch-row:last-child{border-bottom:none}
+    .sch-day{font-size:.87rem;color:var(--muted)}
+    .sch-hrs{font-size:.87rem;font-weight:600;color:var(--text)}
+    .sch-row.today .sch-day{color:var(--red);font-weight:700}
+    .sch-row.today .sch-hrs{color:var(--red)}
+    .today-pill{font-size:.65rem;background:var(--red);color:#fff;padding:2px 8px;border-radius:100px;margin-left:6px;vertical-align:middle}
+    .map-mini{border-radius:12px;overflow:hidden;height:210px}
+    .map-mini iframe{width:100%;height:100%;border:none}
+    .sim-grid{display:grid;gap:11px}
+    .sim-card{background:var(--surface);border-radius:13px;padding:14px 16px;display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;border:1.5px solid transparent;transition:all .2s}
+    .sim-card:hover{border-color:var(--red);background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    .sim-logo{width:46px;height:46px;border-radius:10px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--border)}
+    .sim-logo img{width:100%;height:100%;object-fit:contain;padding:6px}
+    .sim-name{font-family:'Fraunces',serif;font-weight:700;font-size:.9rem;margin-bottom:1px}
+    .sim-sub{font-size:.75rem;color:var(--muted)}
+    .sim-arr{margin-left:auto;color:var(--muted);font-size:.85rem}
+    .sim-card:hover .sim-arr{color:var(--red)}
+    .footer{background:#080808;color:rgba(255,255,255,.52)}
+    .f-top{padding:56px 24px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;max-width:1200px;margin:0 auto}
+    .f-logo{font-family:'Fraunces',serif;font-weight:900;font-size:1.45rem;color:#fff;margin-bottom:10px;display:block}
+    .f-logo span{color:var(--red)}
+    .f-p{font-size:.82rem;line-height:1.7;max-width:250px;margin-bottom:20px}
+    .f-socs{display:flex;gap:8px}
+    .f-soc{width:34px;height:34px;background:rgba(255,255,255,.07);border-radius:9px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.55);text-decoration:none;transition:background .2s}
+    .f-soc:hover{background:var(--red);color:#fff}
+    .f-col h4{font-family:'Fraunces',serif;font-weight:700;color:#fff;font-size:.88rem;margin-bottom:12px}
+    .f-col a{display:block;color:rgba(255,255,255,.4);text-decoration:none;font-size:.8rem;margin-bottom:8px;transition:color .18s}
+    .f-col a:hover{color:#fff}
+    .f-bot{border-top:1px solid rgba(255,255,255,.07);padding:15px 24px;max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;font-size:.74rem}
+    .wa{position:fixed;bottom:26px;right:26px;z-index:300;width:52px;height:52px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.42);text-decoration:none}
+    .wa:hover{transform:scale(1.1)}
+    .wa svg{width:25px;height:25px;fill:#fff}
+    .fi{animation:fadeUp .45s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+    @media(max-width:1024px){.main{grid-template-columns:1fr}.f-top{grid-template-columns:1fr 1fr;gap:28px}.s-hero-inner{flex-direction:column;align-items:flex-start;gap:20px}.logo-zone{margin-top:0}}
+    @media(max-width:768px){.nav-links{display:none}.burger{display:flex}.gal-grid{grid-template-columns:1fr 1fr}.gal-item:first-child{grid-column:span 2;grid-row:auto;min-height:200px}.f-top{grid-template-columns:1fr;gap:22px}.f-bot{flex-direction:column;gap:6px;text-align:center}}
+    @media(max-width:480px){.gal-grid{grid-template-columns:1fr}.gal-item:first-child{grid-column:auto}}
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">Sub<span class="dot">·</span>centro</a>
+  <div class="nav-links">
+    <a href="index.html">Inicio</a>
+    <a href="buscador-tiendas.html">Tiendas</a>
+    <a href="index.html#mapa">Cómo llegar</a>
+    <a href="index.html#footer">Contacto</a>
+    <a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="nav-cta">WhatsApp →</a>
+  </div>
+  <button class="burger" id="burger" aria-label="Abrir menú"><span></span><span></span><span></span></button>
+</nav>
+<div class="mob-menu" id="mobMenu">
+  <a href="index.html">Inicio</a>
+  <a href="buscador-tiendas.html">Tiendas</a>
+  <a href="index.html#mapa">Cómo llegar</a>
+  <a href="index.html#footer">Contacto</a>
+</div>
+
+<div class="bc">
+  <nav class="bc-inner">
+    <a href="index.html">Inicio</a><span class="sep">›</span>
+    <a href="buscador-tiendas.html">Tiendas</a><span class="sep">›</span>
+    <span class="cur" id="bcCur">Tienda</span>
+  </nav>
+</div>
+
+<section class="s-hero">
+  <div class="s-hero-inner">
+    <div class="logo-zone">
+      <img id="storeLogoImg" src="" alt="Logo">
+    </div>
+    <div class="s-hero-info">
+      <div class="s-cat-badge" id="sCatBadge"></div>
+      <h1 class="s-hero-name" id="sName"></h1>
+      <p class="s-hero-desc" id="sDesc"></p>
+      <div class="s-tags" id="sTags"></div>
+    </div>
+  </div>
+</section>
+
+<div class="main">
+  <div>
+    <div class="card fi" style="padding:20px">
+      <h2>📸 Galería</h2>
+      <div class="gal-grid">
+        <div class="gal-item"><img id="g1" src="" alt="Foto 1"><div class="gal-over"></div></div>
+        <div class="gal-item"><img id="g2" src="" alt="Foto 2"><div class="gal-over"></div></div>
+        <div class="gal-item"><img id="g3" src="" alt="Foto 3"><div class="gal-over"></div></div>
+        <div class="gal-item"><img id="g4" src="" alt="Más"><div class="gal-over"><span class="gal-more">+4 fotos</span></div></div>
+      </div>
+    </div>
+    <div class="card fi">
+      <h2 id="aboutTitle">🌟 Sobre la tienda</h2>
+      <p id="aboutP" style="font-size:.93rem;line-height:1.75;color:var(--muted);font-weight:300"></p>
+      <p id="aboutP2" style="font-size:.93rem;line-height:1.75;color:var(--muted);font-weight:300;margin-top:12px"></p>
+    </div>
+    <div class="card fi">
+      <h2>🕐 Horarios</h2>
+      <div id="schTable"></div>
+    </div>
+    <div class="card fi" style="padding:20px">
+      <h2>📍 Ubicación en Subcentro</h2>
+      <div class="map-mini">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3329.534!2d-70.5787!3d-33.4182!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662cf0f3b3a6d5f%3A0x5f8e3a3a3a3a3a3a!2sAv.+Apoquindo+4411%2C+Las+Condes!5e0!3m2!1ses!2scl!4v1700000000000" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación"></iframe>
+      </div>
+      <div style="margin-top:13px;display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+        <span id="locBadge" style="background:var(--surface2);border-radius:9px;padding:7px 13px;font-size:.83rem;font-weight:600"></span>
+        <span style="background:var(--surface2);border-radius:9px;padding:7px 13px;font-size:.83rem;font-weight:600;color:var(--muted)">🚇 Acceso Metro</span>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card fi">
+      <div class="rating-strip">
+        <div><div class="r-big" id="ratingNum">4.7</div></div>
+        <div><div class="stars">★★★★★</div><div class="r-count">+340 valoraciones</div></div>
+      </div>
+      <div class="i-row"><div class="i-icon r">📍</div><div class="i-txt"><h4>Dirección</h4><p>Av. Apoquindo 4411, Las Condes</p><a href="https://maps.google.com/?q=Av+Apoquindo+4411+Las+Condes" target="_blank" rel="noopener">Ver en Google Maps →</a></div></div>
+      <div class="i-row"><div class="i-icon y">🏬</div><div class="i-txt"><h4>Galería & Local</h4><p id="galLocal"></p></div></div>
+      <div class="i-row"><div class="i-icon g">🕐</div><div class="i-txt"><h4>Horario hoy</h4><p id="todayHrs"></p></div></div>
+      <div class="i-row"><div class="i-icon b">💳</div><div class="i-txt"><h4>Medios de pago</h4><p id="payMethods"></p></div></div>
+    </div>
+    <div class="act-card fi">
+      <h2>Contactar &amp; Llegar</h2>
+      <a href="tel:+56212345678" class="a-btn red"><span class="ai">📞</span><span class="al">Llamar al local</span><span class="ar">→</span></a>
+      <a id="waBtn" href="#" target="_blank" rel="noopener" class="a-btn wa">
+        <span class="ai"><svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span>
+        <span class="al">WhatsApp</span><span class="ar">→</span>
+      </a>
+      <a href="https://maps.google.com/?q=Av+Apoquindo+4411+Las+Condes" target="_blank" rel="noopener" class="a-btn"><span class="ai">🗺️</span><span class="al">Cómo llegar</span><span class="ar">→</span></a>
+      <a href="buscador-tiendas.html" class="a-btn"><span class="ai">🔍</span><span class="al">Ver todas las tiendas</span><span class="ar">→</span></a>
+    </div>
+    <div class="card fi">
+      <h2>🏬 También te puede gustar</h2>
+      <div class="sim-grid" id="simGrid"></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer" id="footer">
+  <div class="f-top">
+    <div>
+      <span class="f-logo">Sub<span>·</span>centro</span>
+      <p class="f-p">El centro comercial subterráneo de Las Condes, conectado con Metro Escuela Militar.</p>
+      <div class="f-socs">
+        <a href="https://instagram.com/subcentro.cl" target="_blank" rel="noopener" class="f-soc">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="f-col"><h4>Categorías</h4><a href="buscador-tiendas.html?cat=tiendas">Tiendas & Moda</a><a href="buscador-tiendas.html?cat=restaurantes">Restaurantes</a><a href="buscador-tiendas.html?cat=farmacias">Farmacias</a></div>
+    <div class="f-col"><h4>Información</h4><a href="index.html#mapa">Cómo llegar</a><a href="#">Horarios</a><a href="#">Arriendos</a></div>
+    <div class="f-col"><h4>Contacto</h4><a href="tel:+56212345678">+56 2 1234 5678</a><a href="mailto:contacto@subcentro.cl">contacto@subcentro.cl</a><a href="index.html#mapa">Av. Apoquindo 4411</a></div>
+  </div>
+  <div class="f-bot"><span>© 2025 Subcentro Las Condes.</span><span style="color:rgba(255,255,255,.25)">Diseñado con ♥ en Santiago</span></div>
+</footer>
+
+<a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="wa">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<script>
+// ── STORE DATA ──
+// Para cambiar el logo: edita el campo `logo` con la URL de la imagen del local.
+// Ejemplo: logo: 'https://subcentro.cl/wp-content/uploads/2026/03/mi-logo.jpg'
+var STORES = {
+  'starbucks': {
+    name:'Starbucks', cat:'restaurantes', catLabel:'Restaurantes & Café', catEmoji:'☕',
+    gal:'Norte', local:'Local 34', rating:'4.8',
+    logo:'https://logo.clearbit.com/starbucks.com',
+    tags:['Café','Frappuccino','WiFi','Snacks'],
+    desc:'Tu café favorito con las mejores bebidas frías, calientes y Frappuccino.',
+    about:'Starbucks en Subcentro te ofrece la experiencia completa de la cadena más reconocida del mundo. Desde el icónico Frappuccino hasta bebidas de temporada y pastries artesanales.',
+    about2:'Local con zona de asientos cómoda y WiFi gratuito. Aceptamos la app Starbucks para acumular Stars.',
+    pay:'Efectivo · Tarjetas · App Starbucks · Mercado Pago',
+    photos:['https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&q=80','https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=400&q=80','https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80','https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400&q=80'],
+    similar:['oakberry','krispy-kreme','dunkin','tommy-beans']
+  },
+  'adidas-combat': {
+    name:'Adidas Combat Sports', cat:'tiendas', catLabel:'Deportes & Artes Marciales', catEmoji:'🥊',
+    gal:'Norte', local:'Local 8', rating:'4.6',
+    logo:'https://subcentro.cl/wp-content/uploads/2026/03/Adidas-combat-100-1.jpg',
+    tags:['MMA','Boxeo','Judo','Equipamiento'],
+    desc:'Tienda especializada en equipamiento y ropa de combate de la marca más icónica del deporte.',
+    about:'Adidas Combat Sports es la referencia para artes marciales en Las Condes. Guantes, protecciones, ropa técnica y calzado especializado de la línea Combat Sports.',
+    about2:'Desde boxeo y MMA hasta judo y taekwondo. Nuestros asesores son deportistas con experiencia.',
+    pay:'Efectivo · Tarjetas · Cuotas sin interés',
+    photos:['https://images.unsplash.com/photo-1517438984742-1262db08379e?w=600&q=80','https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&q=80','https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80','https://images.unsplash.com/photo-1584466977773-e625c37cdd50?w=400&q=80'],
+    similar:['sami-sport','la-fete','tua','outlet-kaya']
+  },
+  'tua': {
+    name:'TUA', cat:'tiendas', catLabel:'Tiendas & Moda', catEmoji:'👒',
+    gal:'Sur', local:'Local 22', rating:'4.5',
+    logo:'https://subcentro.cl/wp-content/uploads/2025/08/TUA.png',
+    tags:['Accesorios','Moda','Mujer'],
+    desc:'Accesorios y complementos de moda para la mujer contemporánea.',
+    about:'TUA es tu destino de moda en la Galería Sur. Bolsos, cinturones, joyería de fantasía y los complementos perfectos para cualquier look.',
+    about2:'Nuevas colecciones cada temporada. Atención personalizada y precios accesibles.',
+    pay:'Efectivo · Tarjetas · Débito',
+    photos:['https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80','https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&q=80','https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&q=80','https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80'],
+    similar:['la-fete','rosa-menta','isadora','todo-moda']
+  },
+  'la-fete': {
+    name:'La Fête', cat:'tiendas', catLabel:'Tiendas & Moda', catEmoji:'🎀',
+    gal:'Norte', local:'Local 15', rating:'4.6',
+    logo:'https://subcentro.cl/wp-content/uploads/2025/05/la-fete-100-1.jpg',
+    tags:['Moda femenina','Accesorios','Francés'],
+    desc:'Moda y accesorios con estilo francés. Elegancia y tendencia en cada colección.',
+    about:'La Fête trae el espíritu de la moda parisina con diseños únicos y materiales de calidad para la mujer moderna.',
+    about2:'Nueva colección de temporada disponible. Embalaje especial para regalos.',
+    pay:'Efectivo · Tarjetas · Débito',
+    photos:['https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80','https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80','https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80','https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80'],
+    similar:['tua','rosa-menta','monarch','isadora']
+  },
+  'oakberry': {
+    name:'OakBerry', cat:'restaurantes', catLabel:'Restaurantes & Café', catEmoji:'🫐',
+    gal:'Norte', local:'Local 27', rating:'4.9',
+    logo:'https://logo.clearbit.com/oakberry.com',
+    tags:['Açaí','Saludable','Vegano','Sin gluten'],
+    desc:'Los mejores açaí bowls energizantes, personalizados con tus toppings favoritos.',
+    about:'OakBerry ofrece açaí premium sin azúcar añadida, personalizable con más de 30 toppings. Perfecto para desayuno o snack post-entrenamiento.',
+    about2:'100% sin gluten y apto para veganos. También contamos con smoothies y jugos naturales.',
+    pay:'Efectivo · Tarjetas · App OakBerry · Mercado Pago',
+    photos:['https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?w=600&q=80','https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=400&q=80','https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?w=400&q=80','https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=400&q=80'],
+    similar:['starbucks','super-sana','castano','tommy-beans']
+  },
+  'falafel-republic': {
+    name:'Falafel Republic', cat:'restaurantes', catLabel:'Restaurantes & Café', catEmoji:'🥙',
+    gal:'Sur', local:'Local 12', rating:'4.8',
+    logo:'',
+    tags:['Árabe','Vegetariano','Vegano'],
+    desc:'Auténtica cocina árabe: falafel crujiente, shawarma, hummus y mucho más.',
+    about:'Todo preparado con ingredientes frescos y recetas tradicionales. El falafel se hace diariamente con garbanzos seleccionados.',
+    about2:'Opciones vegetarianas y veganas. Menú incluye tabule, hummus artesanal y postres árabes.',
+    pay:'Efectivo · Tarjetas · Transbank',
+    photos:['https://images.unsplash.com/photo-1555626906-fcf10d6851b4?w=600&q=80','https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80','https://images.unsplash.com/photo-1565299715199-866c917206bb?w=400&q=80','https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400&q=80'],
+    similar:['starbucks','super-sana','maru','pollo-rey']
+  },
+  'krispy-kreme': {
+    name:'Krispy Kreme', cat:'restaurantes', catLabel:'Restaurantes & Café', catEmoji:'🍩',
+    gal:'Sur', local:'Local 19', rating:'4.7',
+    logo:'https://logo.clearbit.com/krispykreme.com',
+    tags:['Donas','Café','Postres'],
+    desc:'Las donas más famosas del mundo, recién horneadas. El letrero rojo lo dice todo.',
+    about:'Krispy Kreme en Subcentro trae la icónica Original Glazed junto a una completa carta de cafés y bebidas frías.',
+    about2:'Docenas disponibles para llevar y opciones de regalo. Cuando el letrero rojo está encendido, las donas acaban de salir del horno.',
+    pay:'Efectivo · Tarjetas · App Krispy Kreme',
+    photos:['https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&q=80','https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400&q=80','https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&q=80','https://images.unsplash.com/photo-1629975913069-609d3fd9f6e2?w=400&q=80'],
+    similar:['starbucks','dunkin','oakberry','tommy-beans']
+  }
+};
+
+// Similar stores lookup (para el sidebar)
+var SIM = {
+  'starbucks':      {name:'Starbucks',       tags:'Café · Bebidas',      logo:'https://logo.clearbit.com/starbucks.com'},
+  'oakberry':       {name:'OakBerry',         tags:'Açaí · Saludable',    logo:'https://logo.clearbit.com/oakberry.com'},
+  'krispy-kreme':   {name:'Krispy Kreme',     tags:'Donas · Café',        logo:'https://logo.clearbit.com/krispykreme.com'},
+  'dunkin':         {name:"Dunkin'",           tags:'Donuts · Café',       logo:'https://logo.clearbit.com/dunkindonuts.com'},
+  'tommy-beans':    {name:'Tommy Beans',      tags:'Café · Desayuno',     logo:''},
+  'super-sana':     {name:'Super Sana',       tags:'Saludable · Vegano',  logo:''},
+  'castano':        {name:'Castaño',          tags:'Café artesanal',      logo:''},
+  'maru':           {name:'Maru',             tags:'Japonesa · Sushi',    logo:''},
+  'pollo-rey':      {name:'Pollo Rey',        tags:'Pollo · Almuerzo',    logo:''},
+  'falafel-republic':{name:'Falafel Republic',tags:'Árabe · Vegano',      logo:''},
+  'sami-sport':     {name:'Sami Sport',       tags:'Deportes',            logo:''},
+  'outlet-kaya':    {name:'Outlet Kaya Unite',tags:'Outlet · Moda',       logo:''},
+  'la-fete':        {name:'La Fête',          tags:'Moda femenina',       logo:'https://subcentro.cl/wp-content/uploads/2025/05/la-fete-100-1.jpg'},
+  'tua':            {name:'TUA',              tags:'Accesorios · Moda',   logo:'https://subcentro.cl/wp-content/uploads/2025/08/TUA.png'},
+  'rosa-menta':     {name:'Rosa y Menta',     tags:'Moda · Mujer',        logo:''},
+  'isadora':        {name:'Isadora',          tags:'Calzado · Moda',      logo:''},
+  'monarch':        {name:'Monarch',          tags:'Moda femenina',       logo:''},
+  'todo-moda':      {name:'Todo Moda',        tags:'Accesorios',          logo:''},
+  'adidas-combat':  {name:'Adidas Combat',    tags:'Deporte · MMA',       logo:'https://subcentro.cl/wp-content/uploads/2026/03/Adidas-combat-100-1.jpg'}
+};
+
+var SCH = [
+  {day:'Lunes',hrs:'9:00 – 21:00'},{day:'Martes',hrs:'9:00 – 21:00'},
+  {day:'Miércoles',hrs:'9:00 – 21:00'},{day:'Jueves',hrs:'9:00 – 21:00'},
+  {day:'Viernes',hrs:'9:00 – 21:30'},{day:'Sábado',hrs:'10:00 – 20:00'},
+  {day:'Domingo',hrs:'Cerrado'}
+];
+var DAYS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+var todayDay = DAYS[new Date().getDay()];
+
+// ── GET STORE ──
+var params = new URLSearchParams(window.location.search);
+var sid = params.get('tienda') || 'starbucks';
+var s = STORES[sid];
+
+// Fallback for stores not in STORES object
+if (!s) {
+  var nm = sid.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1)}).join(' ');
+  s = {
+    name: nm, cat:'tiendas', catLabel:'Tiendas', catEmoji:'🛍️',
+    gal:'Norte', local:'Consultar', rating:'4.5',
+    logo: '', // ← Reemplaza con URL real del logo
+    tags:['Subcentro','Las Condes'],
+    desc:'Local disponible en Subcentro Las Condes.',
+    about:'Visítanos en Subcentro Las Condes para conocer nuestros productos y servicios.',
+    about2:'',
+    pay:'Efectivo · Tarjetas',
+    photos:[
+      'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80',
+      'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&q=80',
+      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80',
+      'https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=400&q=80'
+    ],
+    similar:['starbucks','oakberry','krispy-kreme','falafel-republic']
+  };
+}
+
+// ── RENDER ──
+document.getElementById('pgTitle').textContent = s.name + ' — Subcentro Las Condes';
+document.getElementById('bcCur').textContent = s.name;
+document.getElementById('sCatBadge').textContent = s.catEmoji + ' ' + s.catLabel;
+document.getElementById('sName').textContent = s.name;
+document.getElementById('sDesc').textContent = s.desc;
+document.getElementById('aboutTitle').textContent = '🌟 Sobre ' + s.name;
+document.getElementById('aboutP').textContent = s.about;
+document.getElementById('aboutP2').textContent = s.about2;
+if (!s.about2) document.getElementById('aboutP2').style.display = 'none';
+document.getElementById('ratingNum').textContent = s.rating;
+document.getElementById('galLocal').textContent = 'Galería ' + s.gal + ' · ' + s.local;
+document.getElementById('locBadge').textContent = '📍 Galería ' + s.gal + ' · ' + s.local;
+document.getElementById('payMethods').textContent = s.pay;
+
+// Tags
+var tagsEl = document.getElementById('sTags');
+tagsEl.innerHTML = s.tags.map(function(t){return '<span class="s-tag">'+t+'</span>'}).join('') +
+  '<span class="s-open"><span class="live-dot"></span>Abierto ahora</span>';
+
+// Logo
+var logoImg = document.getElementById('storeLogoImg');
+logoImg.alt = 'Logo ' + s.name;
+if (s.logo) {
+  logoImg.src = s.logo;
+  logoImg.onerror = function(){ this.src = 'https://picsum.photos/seed/'+sid+'/148/148'; this.style.objectFit='cover'; this.style.padding='0'; };
+} else {
+  logoImg.src = 'https://picsum.photos/seed/'+sid+'/148/148';
+  logoImg.style.objectFit = 'cover';
+  logoImg.style.padding = '0';
+}
+
+// Gallery
+['g1','g2','g3','g4'].forEach(function(id, i){
+  var el = document.getElementById(id);
+  el.src = s.photos[i] || ('https://picsum.photos/seed/'+sid+i+'/400/300');
+});
+
+// Today hours
+var todayEntry = SCH.find(function(x){ return x.day === todayDay; });
+document.getElementById('todayHrs').textContent = todayDay + ': ' + (todayEntry ? todayEntry.hrs : 'Consultar');
+
+// Schedule
+document.getElementById('schTable').innerHTML = SCH.map(function(x){
+  var isToday = x.day === todayDay;
+  return '<div class="sch-row'+(isToday?' today':'')+'">'+
+    '<span class="sch-day">'+x.day+(isToday?'<span class="today-pill">hoy</span>':'')+'</span>'+
+    '<span class="sch-hrs">'+x.hrs+'</span>'+
+  '</div>';
+}).join('');
+
+// WhatsApp
+document.getElementById('waBtn').href = 'https://wa.me/56912345678?text=Hola,%20quiero%20informaci%C3%B3n%20de%20'+encodeURIComponent(s.name)+'%20en%20Subcentro';
+
+// Similar stores
+document.getElementById('simGrid').innerHTML = (s.similar||[]).slice(0,4).map(function(id){
+  var sim = SIM[id] || {name:id, tags:'Subcentro', logo:''};
+  var lsrc = sim.logo || ('https://picsum.photos/seed/'+id+'/46/46');
+  return '<a href="tienda-individual.html?tienda='+id+'" class="sim-card">'+
+    '<div class="sim-logo"><img src="'+lsrc+'" alt="'+sim.name+'" onerror="this.src=\'https://picsum.photos/seed/'+id+'/46/46\'"></div>'+
+    '<div><div class="sim-name">'+sim.name+'</div><div class="sim-sub">'+sim.tags+'</div></div>'+
+    '<span class="sim-arr">→</span>'+
+  '</a>';
+}).join('');
+
+// Burger
+document.getElementById('burger').addEventListener('click', function(){
+  var o = document.getElementById('mobMenu').classList.toggle('open');
+  this.setAttribute('aria-expanded', o);
+});
+</script>
+</body>
+</html>

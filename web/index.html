@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subcentro — El corazón comercial de Las Condes</title>
+  <meta name="description" content="Subcentro, el centro comercial subterráneo ubicado en Metro Escuela Militar, Las Condes.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,700;1,9..144,900&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --red:#E8242A; --red-d:#B91A1F;
+      --yellow:#F5C800;
+      --green:#2DB37A;
+      --magenta:#D4175A;
+      --orange:#F4722B;
+      --dark:#0E0E0E; --dark2:#181818; --dark3:#242424;
+      --mid:#555; --surface:#F5F4F1; --surface2:#EBEBEA;
+      --white:#FFFFFF; --text:#0E0E0E; --muted:#6B6B6B; --border:#E0DFDC;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Geist',system-ui,sans-serif;background:var(--surface);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+    /* NAVBAR */
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(14,14,14,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);padding:0 32px;height:68px;display:flex;align-items:center;justify-content:space-between}
+    .logo{font-family:'Fraunces',serif;font-weight:900;font-size:1.5rem;color:#fff;text-decoration:none;display:flex;align-items:baseline;gap:1px;letter-spacing:-.5px}
+    .logo .dot{color:var(--red);font-size:2rem;line-height:0;position:relative;top:5px}
+    .nav-links{display:flex;gap:36px;align-items:center}
+    .nav-links a{color:rgba(255,255,255,.65);text-decoration:none;font-size:.87rem;font-weight:500;transition:color .18s}
+    .nav-links a:hover,.nav-links a.active{color:#fff}
+    .nav-cta{background:var(--red)!important;color:#fff!important;padding:9px 22px;border-radius:100px;font-weight:700!important;font-size:.87rem!important}
+    .nav-cta:hover{opacity:.88}
+    .burger{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:4px}
+    .burger span{display:block;width:24px;height:2px;background:#fff;border-radius:2px}
+    .mob-menu{display:none;position:fixed;top:68px;left:0;right:0;background:var(--dark2);z-index:199;padding:16px 24px 24px;flex-direction:column;gap:2px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .mob-menu a{color:rgba(255,255,255,.78);text-decoration:none;font-size:1rem;font-weight:500;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06);display:block}
+    .mob-menu.open{display:flex}
+
+    /* HERO — flex column: buttons always ABOVE stats, no z-index overlap */
+    .hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background:var(--dark);position:relative}
+    .hero-bg{position:absolute;inset:0;background:url('https://subcentro.cl/wp-content/uploads/2024/01/panoramica-d.jpg') center/cover no-repeat;opacity:.42;transform:scale(1.04);animation:heroZoom 24s ease-in-out infinite alternate}
+    @keyframes heroZoom{from{transform:scale(1.04)}to{transform:scale(1.10)}}
+    .hero-grad{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(232,36,42,.20) 0%,transparent 70%),linear-gradient(180deg,rgba(14,14,14,.74) 0%,rgba(14,14,14,.44) 45%,rgba(14,14,14,.90) 100%)}
+    .blob{position:absolute;border-radius:50%;filter:blur(110px);opacity:.15;animation:blobF 11s ease-in-out infinite;pointer-events:none}
+    @keyframes blobF{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(22px,-30px) scale(1.08)}66%{transform:translate(-14px,20px) scale(.94)}}
+    .b1{width:500px;height:500px;background:var(--red);top:-180px;right:-160px}
+    .b2{width:360px;height:360px;background:var(--yellow);bottom:-100px;left:-120px;animation-delay:4s}
+    .b3{width:250px;height:250px;background:var(--magenta);top:40%;left:60%;animation-delay:7s}
+
+    /* All hero content in normal flow — no absolute positioning for buttons or stats */
+    .hero-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%;max-width:900px;padding:108px 24px 60px;text-align:center}
+    .hero-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(8px);color:rgba(255,255,255,.90);padding:7px 18px;border-radius:100px;font-size:.74rem;font-weight:600;letter-spacing:.9px;text-transform:uppercase;margin-bottom:28px;animation:fadeUp .5s ease both}
+    .live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:lp 2s ease infinite;flex-shrink:0}
+    @keyframes lp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+    .hero-h1{font-family:'Fraunces',serif;font-size:clamp(2.9rem,8vw,6rem);font-weight:900;color:#fff;line-height:1.0;letter-spacing:-2px;margin-bottom:22px;animation:fadeUp .5s .08s ease both}
+    .hero-h1 em{font-style:italic;color:var(--yellow)}
+    .hero-sub{font-size:clamp(.93rem,2vw,1.12rem);color:rgba(255,255,255,.68);max-width:520px;line-height:1.65;font-weight:300;margin-bottom:40px;animation:fadeUp .5s .16s ease both}
+    /* Buttons — in flow, above stats */
+    .hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp .5s .24s ease both;margin-bottom:60px}
+    /* Stats — in flow, below buttons. No overlap ever. */
+    .hero-stats{display:flex;gap:0;border-top:1px solid rgba(255,255,255,.12);padding-top:30px;animation:fadeUp .5s .32s ease both;width:100%;max-width:460px;justify-content:space-around}
+    .stat{text-align:center}
+    .stat-n{font-family:'Fraunces',serif;font-size:2.1rem;font-weight:900;color:var(--yellow);line-height:1}
+    .stat-l{font-size:.72rem;color:rgba(255,255,255,.5);letter-spacing:.4px;margin-top:4px}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+    /* BUTTONS */
+    .btn-red{background:var(--red);color:#fff;font-family:'Geist',sans-serif;font-weight:700;font-size:.96rem;padding:15px 32px;border-radius:100px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .2s,box-shadow .2s}
+    .btn-red:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(232,36,42,.38)}
+    .btn-ghost{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.28);color:#fff;font-family:'Geist',sans-serif;font-weight:600;font-size:.96rem;padding:14px 32px;border-radius:100px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .2s,border-color .2s}
+    .btn-ghost:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.52)}
+
+    /* MARQUEE */
+    .mq-wrap{background:var(--red);padding:13px 0;overflow:hidden}
+    .mq-track{display:flex;animation:mq 28s linear infinite;white-space:nowrap}
+    .mq-track:hover{animation-play-state:paused}
+    @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    .mq-item{display:inline-flex;align-items:center;gap:9px;padding:0 22px;color:rgba(255,255,255,.9);font-size:.87rem;font-weight:600;letter-spacing:.1px}
+    .mq-dot{width:4px;height:4px;background:rgba(255,255,255,.5);border-radius:50%;flex-shrink:0}
+
+    /* SECTION */
+    .eyebrow{font-size:.7rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+    .s-title{font-family:'Fraunces',serif;font-size:clamp(2rem,4vw,3rem);font-weight:900;color:var(--text);line-height:1.05;letter-spacing:-1px}
+    .s-title em{font-style:italic;color:var(--red)}
+    .container{max-width:1200px;margin:0 auto;padding:0 24px}
+
+    /* CATEGORIES */
+    .cats{padding:96px 0;background:var(--white)}
+    .cats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:14px;margin-top:52px}
+    .cat-card{border-radius:18px;padding:26px 18px;text-align:center;cursor:pointer;transition:transform .22s,box-shadow .22s;text-decoration:none;display:block;border:1.5px solid transparent}
+    .cat-card:hover{transform:translateY(-5px);box-shadow:0 18px 44px rgba(0,0,0,.11)}
+    .cat-icon{font-size:2.1rem;margin-bottom:11px;display:block}
+    .cat-name{font-family:'Fraunces',serif;font-weight:700;font-size:.93rem;line-height:1.2}
+    .cat-count{font-size:.75rem;margin-top:4px;opacity:.62}
+    .c1{background:#FEF0F0;color:#8B1A1A;border-color:#F5CECE}
+    .c2{background:#FFFAE0;color:#7A5F00;border-color:#F0DE90}
+    .c3{background:#EDFFF5;color:#0D6B3E;border-color:#B5E8CC}
+    .c4{background:#F3F0FF;color:#4B1D8E;border-color:#D0C2F5}
+    .c5{background:#FFF0F8;color:#8B0044;border-color:#F5C2DF}
+    .c6{background:#EFF4FF;color:#1A2E8B;border-color:#C2CEF5}
+
+    /* FEATURED */
+    .featured{padding:96px 0;background:var(--surface)}
+    .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:18px;margin-top:52px}
+
+    /* STORE CARD — logo fills entire top zone, NO colored bg block behind it */
+    .s-card{background:var(--white);border-radius:18px;overflow:hidden;box-shadow:0 1px 12px rgba(0,0,0,.07);transition:transform .22s,box-shadow .22s;text-decoration:none;color:inherit;display:flex;flex-direction:column}
+    .s-card:hover{transform:translateY(-5px);box-shadow:0 18px 48px rgba(0,0,0,.12)}
+    /* Full-bleed logo area: neutral light bg, logo centered with padding */
+    .s-card-top{height:156px;overflow:hidden;position:relative;background:#F2F1EE}
+    .s-card-top img{width:100%;height:100%;object-fit:cover;padding:0;transition:transform .3s}
+    .s-card:hover .s-card-top img{transform:scale(1.05)}
+    .s-gallery{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);color:var(--text);padding:3px 10px;border-radius:100px;font-size:.65rem;font-weight:700;letter-spacing:.2px}
+    .s-badge{position:absolute;top:10px;right:10px;background:var(--yellow);color:var(--dark);padding:3px 10px;border-radius:100px;font-size:.65rem;font-weight:700}
+    .s-card-body{padding:17px 20px 20px;flex:1;display:flex;flex-direction:column}
+    .s-card-name{font-family:'Fraunces',serif;font-weight:700;font-size:1.02rem;margin-bottom:3px}
+    .s-card-cat{font-size:.78rem;color:var(--muted);margin-bottom:13px;flex:1}
+    .s-card-foot{display:flex;justify-content:space-between;align-items:center}
+    .s-card-tag{background:var(--surface2);color:var(--mid);padding:4px 12px;border-radius:100px;font-size:.71rem;font-weight:600}
+    .s-card-arr{width:30px;height:30px;background:var(--dark);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.85rem;transition:background .2s,transform .2s}
+    .s-card:hover .s-card-arr{background:var(--red);transform:translateX(2px)}
+
+    /* ABOUT */
+    /* CAROUSEL */
+    .carousel-section{background:var(--dark);padding:72px 0}
+    .carousel-wrap{position:relative;max-width:1200px;margin:0 auto;padding:0 24px}
+    .carousel-track-outer{overflow:hidden;border-radius:20px}
+    .carousel-track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+    .carousel-slide{min-width:100%;height:420px;flex-shrink:0;position:relative;overflow:hidden;border-radius:20px;background:#222}
+    .carousel-slide img{width:100%;height:100%;object-fit:cover;display:block;user-select:none;pointer-events:none}
+    .carousel-caption{position:absolute;bottom:0;left:0;right:0;padding:32px 36px;background:linear-gradient(0deg,rgba(0,0,0,.7) 0%,transparent 100%)}
+    .carousel-caption h3{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:900;color:#fff;letter-spacing:-.5px;margin-bottom:4px}
+    .carousel-caption p{color:rgba(255,255,255,.72);font-size:.9rem;font-weight:300}
+    .carousel-btn{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);backdrop-filter:blur(8px);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:1.1rem;transition:background .2s;z-index:10}
+    .carousel-btn:hover{background:var(--red);border-color:var(--red)}
+    .carousel-prev{left:36px}.carousel-next{right:36px}
+    .carousel-dots{display:flex;justify-content:center;gap:8px;margin-top:18px}
+    .carousel-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;transition:background .2s,width .2s;padding:0}
+    .carousel-dot.active{background:var(--red);width:24px;border-radius:100px}
+    @media(max-width:768px){.carousel-slide{height:240px}.carousel-btn{width:36px;height:36px;font-size:.9rem}.carousel-prev{left:16px}.carousel-next{right:16px}}
+
+    /* TESTI */
+    .testi{padding:96px 0;background:var(--white)}
+    .testi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:18px;margin-top:52px}
+    .t-card{background:var(--surface);border-radius:18px;padding:28px;position:relative}
+    .t-card::before{content:'\201C';font-size:4.5rem;line-height:1;color:var(--red);opacity:.14;position:absolute;top:8px;left:16px;font-family:Georgia,serif}
+    .stars{color:var(--yellow);font-size:.85rem;margin-bottom:9px}
+    .t-text{font-size:.91rem;line-height:1.7;color:var(--text);margin-bottom:18px;position:relative;z-index:1}
+    .t-auth{display:flex;align-items:center;gap:11px}
+    .t-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover}
+    .t-name{font-weight:700;font-size:.87rem}
+    .t-role{font-size:.74rem;color:var(--muted)}
+
+    /* MAP */
+    .map-s{padding:96px 0;background:var(--dark2)}
+    .map-card{display:grid;grid-template-columns:1fr 1fr;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:22px;overflow:hidden;margin-top:52px}
+    .map-info{padding:44px 40px}
+    .map-info h3{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:22px;letter-spacing:-.5px}
+    .map-row{display:flex;align-items:flex-start;gap:13px;margin-bottom:18px}
+    .m-icon{width:38px;height:38px;background:rgba(255,255,255,.08);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+    .m-txt h4{font-weight:700;font-size:.85rem;color:#fff;margin-bottom:1px}
+    .m-txt p{font-size:.8rem;color:rgba(255,255,255,.52);line-height:1.55}
+    .map-iframe{height:380px}
+    .map-iframe iframe{width:100%;height:100%;border:none;filter:saturate(.8) contrast(1.1)}
+
+    /* CTA */
+    .cta-s{padding:96px 0;background:var(--surface)}
+    .cta-card{max-width:860px;margin:0 auto;background:var(--dark);border-radius:26px;padding:68px 52px;text-align:center;position:relative;overflow:hidden}
+    .cta-card::before{content:'';position:absolute;width:380px;height:380px;background:var(--red);border-radius:50%;top:-190px;right:-100px;opacity:.11;filter:blur(40px)}
+    .cta-card::after{content:'';position:absolute;width:280px;height:280px;background:var(--yellow);border-radius:50%;bottom:-140px;left:-70px;opacity:.09;filter:blur(40px)}
+    .cta-h{font-family:'Fraunces',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;color:#fff;letter-spacing:-1px;margin-bottom:12px;position:relative;z-index:1}
+    .cta-h em{font-style:italic;color:var(--yellow)}
+    .cta-p{color:rgba(255,255,255,.6);font-size:.97rem;margin-bottom:34px;position:relative;z-index:1;font-weight:300}
+    .cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+
+    /* FOOTER */
+    .footer{background:#080808;color:rgba(255,255,255,.52)}
+    .f-top{padding:58px 24px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;max-width:1200px;margin:0 auto}
+    .f-logo{font-family:'Fraunces',serif;font-weight:900;font-size:1.45rem;color:#fff;margin-bottom:10px;letter-spacing:-.4px;display:block}
+    .f-logo span{color:var(--red)}
+    .f-p{font-size:.83rem;line-height:1.7;max-width:252px;margin-bottom:20px}
+    .f-socs{display:flex;gap:9px}
+    .f-soc{width:34px;height:34px;background:rgba(255,255,255,.07);border-radius:9px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.55);text-decoration:none;transition:background .2s,color .2s}
+    .f-soc:hover{background:var(--red);color:#fff}
+    .f-col h4{font-family:'Fraunces',serif;font-weight:700;color:#fff;font-size:.9rem;margin-bottom:13px;letter-spacing:-.2px}
+    .f-col a{display:block;color:rgba(255,255,255,.42);text-decoration:none;font-size:.81rem;margin-bottom:8px;transition:color .18s}
+    .f-col a:hover{color:#fff}
+    .f-bot{border-top:1px solid rgba(255,255,255,.07);padding:16px 24px;max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;font-size:.76rem}
+
+    /* WA */
+    .wa{position:fixed;bottom:26px;right:26px;z-index:300;width:52px;height:52px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.42);text-decoration:none;animation:waBounce 4s ease-in-out infinite}
+    .wa:hover{animation:none;transform:scale(1.1)}
+    @keyframes waBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    .wa svg{width:25px;height:25px;fill:#fff}
+
+    /* REVEAL */
+    .reveal{opacity:0;transform:translateY(26px);transition:opacity .6s ease,transform .6s ease}
+    .reveal.visible{opacity:1;transform:none}
+
+    /* RESPONSIVE */
+    @media(max-width:1024px){.about-grid{grid-template-columns:1fr}.about-img-wrap{display:none}.map-card{grid-template-columns:1fr}.map-iframe{height:280px}.f-top{grid-template-columns:1fr 1fr;gap:28px}}
+    @media(max-width:768px){.nav-links{display:none}.burger{display:flex}.hero-stats{max-width:100%}.map-info{padding:28px 22px}.cta-card{padding:44px 24px}.f-top{grid-template-columns:1fr;gap:24px}.f-bot{flex-direction:column;gap:6px;text-align:center}}
+    @media(max-width:480px){.hero-btns{gap:10px}.hero-stats{flex-wrap:wrap;gap:18px 0;justify-content:space-evenly}.cats-grid{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" role="navigation" aria-label="Navegación principal">
+  <a href="index.html" class="logo" aria-label="Subcentro inicio">Sub<span class="dot">·</span>centro</a>
+  <div class="nav-links">
+    <a href="index.html" class="active">Inicio</a>
+    <a href="buscador-tiendas.html">Tiendas</a>
+    <a href="#mapa">Cómo llegar</a>
+    <a href="#footer">Contacto</a>
+    <a href="buscador-tiendas.html" class="nav-cta">Explorar →</a>
+  </div>
+  <button class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
+</nav>
+<div class="mob-menu" id="mobMenu">
+  <a href="index.html">Inicio</a>
+  <a href="buscador-tiendas.html">Tiendas</a>
+  <a href="#mapa">Cómo llegar</a>
+  <a href="#footer">Contacto</a>
+  <a href="buscador-tiendas.html" style="color:var(--yellow);font-weight:700">Explorar tiendas →</a>
+</div>
+
+<!-- HERO — all content in normal flex column flow, zero absolute positioning for interactive elements -->
+<section class="hero" aria-label="Portada Subcentro">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="hero-grad" aria-hidden="true"></div>
+  <div class="blob b1" aria-hidden="true"></div>
+  <div class="blob b2" aria-hidden="true"></div>
+  <div class="blob b3" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div class="hero-pill"><span class="live-dot" aria-hidden="true"></span>Abierto hoy · Lun–Sáb 9:00–21:00</div>
+    <h1 class="hero-h1">El corazón<br><em>comercial</em><br>de Las Condes</h1>
+    <p class="hero-sub">Más de 80 tiendas, restaurantes y servicios bajo el Metro Escuela Militar. Todo lo que necesitas, en un solo lugar.</p>
+    <!-- BUTTONS: rendered before stats — never obscured -->
+    <div class="hero-btns">
+      <a href="buscador-tiendas.html" class="btn-red">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Explorar tiendas
+      </a>
+      <a href="#mapa" class="btn-ghost">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Cómo llegar
+      </a>
+    </div>
+    <!-- STATS: rendered after buttons — always below, never overlapping -->
+    <div class="hero-stats" aria-label="Datos clave">
+      <div class="stat"><div class="stat-n">80+</div><div class="stat-l">Locales</div></div>
+      <div class="stat"><div class="stat-n">2</div><div class="stat-l">Galerías</div></div>
+      <div class="stat"><div class="stat-n">15+</div><div class="stat-l">Restaurantes</div></div>
+      <div class="stat"><div class="stat-n">L1</div><div class="stat-l">Metro</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="mq-wrap" aria-hidden="true">
+  <div class="mq-track">
+    <span class="mq-item">Starbucks<span class="mq-dot"></span></span><span class="mq-item">Adidas Combat Sports<span class="mq-dot"></span></span><span class="mq-item">Falafel Republic<span class="mq-dot"></span></span><span class="mq-item">Krispy Kreme<span class="mq-dot"></span></span><span class="mq-item">Farmacias Ahumada<span class="mq-dot"></span></span><span class="mq-item">OakBerry<span class="mq-dot"></span></span><span class="mq-item">Subway<span class="mq-dot"></span></span><span class="mq-item">Cruz Verde<span class="mq-dot"></span></span><span class="mq-item">Chilexpress<span class="mq-dot"></span></span><span class="mq-item">Dunkin'<span class="mq-dot"></span></span><span class="mq-item">Librería Nacional<span class="mq-dot"></span></span><span class="mq-item">Natura<span class="mq-dot"></span></span><span class="mq-item">Little Caesars<span class="mq-dot"></span></span><span class="mq-item">Doggis<span class="mq-dot"></span></span><span class="mq-item">TUA<span class="mq-dot"></span></span>
+    <span class="mq-item">Starbucks<span class="mq-dot"></span></span><span class="mq-item">Adidas Combat Sports<span class="mq-dot"></span></span><span class="mq-item">Falafel Republic<span class="mq-dot"></span></span><span class="mq-item">Krispy Kreme<span class="mq-dot"></span></span><span class="mq-item">Farmacias Ahumada<span class="mq-dot"></span></span><span class="mq-item">OakBerry<span class="mq-dot"></span></span><span class="mq-item">Subway<span class="mq-dot"></span></span><span class="mq-item">Cruz Verde<span class="mq-dot"></span></span><span class="mq-item">Chilexpress<span class="mq-dot"></span></span><span class="mq-item">Dunkin'<span class="mq-dot"></span></span><span class="mq-item">Librería Nacional<span class="mq-dot"></span></span><span class="mq-item">Natura<span class="mq-dot"></span></span><span class="mq-item">Little Caesars<span class="mq-dot"></span></span><span class="mq-item">Doggis<span class="mq-dot"></span></span><span class="mq-item">TUA<span class="mq-dot"></span></span>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<section class="cats" aria-labelledby="cats-h">
+  <div class="container">
+    <div class="reveal"><p class="eyebrow">Descubre Subcentro</p><h2 class="s-title" id="cats-h">Todo lo que <em>necesitas</em>,<br>en un solo lugar</h2></div>
+    <div class="cats-grid reveal">
+      <a href="buscador-tiendas.html?cat=tiendas" class="cat-card c1"><span class="cat-icon">👗</span><div class="cat-name">Tiendas & Moda</div><div class="cat-count">23 locales</div></a>
+      <a href="buscador-tiendas.html?cat=restaurantes" class="cat-card c2"><span class="cat-icon">🍽️</span><div class="cat-name">Restaurantes & Café</div><div class="cat-count">19 locales</div></a>
+      <a href="buscador-tiendas.html?cat=farmacias" class="cat-card c3"><span class="cat-icon">💊</span><div class="cat-name">Farmacias</div><div class="cat-count">7 locales</div></a>
+      <a href="buscador-tiendas.html?cat=salud" class="cat-card c4"><span class="cat-icon">✨</span><div class="cat-name">Salud & Belleza</div><div class="cat-count">8 locales</div></a>
+      <a href="buscador-tiendas.html?cat=tecnologia" class="cat-card c5"><span class="cat-icon">📱</span><div class="cat-name">Tecnología</div><div class="cat-count">6 locales</div></a>
+      <a href="buscador-tiendas.html?cat=servicios" class="cat-card c6"><span class="cat-icon">🛎️</span><div class="cat-name">Servicios</div><div class="cat-count">6 locales</div></a>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED -->
+<section class="featured" aria-labelledby="feat-h">
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px" class="reveal">
+      <div><p class="eyebrow">Nuestras tiendas</p><h2 class="s-title" id="feat-h">Locales <em>destacados</em></h2></div>
+      <a href="buscador-tiendas.html" class="btn-red">Ver todas →</a>
+    </div>
+    <div class="feat-grid">
+
+      <a href="tienda-individual.html?tienda=starbucks" class="s-card reveal">
+        <div class="s-card-top">
+          <!-- Logo fills full top area — object-fit:contain keeps proportions, no colored bg block -->
+          <img src="https://subcentro.cl/wp-content/uploads/2023/12/LOGOTIPOS-250px.png" alt="Logo Starbucks" loading="lazy" onerror="this.src='https://picsum.photos/seed/starbucks/320/160'">
+          <span class="s-gallery">🟦 Norte</span><span class="s-badge">⭐ Destacado</span>
+        </div>
+        <div class="s-card-body">
+          <div class="s-card-name">Starbucks</div>
+          <div class="s-card-cat">Café & Bebidas</div>
+          <div class="s-card-foot"><span class="s-card-tag">Restaurantes</span><span class="s-card-arr">→</span></div>
+        </div>
+      </a>
+
+      <a href="tienda-individual.html?tienda=adidas-combat" class="s-card reveal">
+        <div class="s-card-top">
+          <img src="https://subcentro.cl/wp-content/uploads/2026/03/Adidas-combat-100-1.jpg" alt="Logo Adidas Combat Sports" loading="lazy" onerror="this.src='https://picsum.photos/seed/adidas/320/160'">
+          <span class="s-gallery">🟦 Norte</span><span class="s-badge">⭐ Destacado</span>
+        </div>
+        <div class="s-card-body">
+          <div class="s-card-name">Adidas Combat Sports</div>
+          <div class="s-card-cat">Deportes & Artes Marciales</div>
+          <div class="s-card-foot"><span class="s-card-tag">Tiendas</span><span class="s-card-arr">→</span></div>
+        </div>
+      </a>
+
+      <a href="tienda-individual.html?tienda=la-fete" class="s-card reveal">
+        <div class="s-card-top">
+          <img src="https://subcentro.cl/wp-content/uploads/2025/05/la-fete-100-1.jpg" alt="Logo La Fête" loading="lazy" onerror="this.src='https://picsum.photos/seed/lafete/320/160'">
+          <span class="s-gallery">🟦 Norte</span>
+        </div>
+        <div class="s-card-body">
+          <div class="s-card-name">La Fête</div>
+          <div class="s-card-cat">Moda femenina</div>
+          <div class="s-card-foot"><span class="s-card-tag">Tiendas</span><span class="s-card-arr">→</span></div>
+        </div>
+      </a>
+
+      <a href="tienda-individual.html?tienda=tua" class="s-card reveal">
+        <div class="s-card-top">
+          <img src="https://subcentro.cl/wp-content/uploads/2025/08/TUA.png" alt="Logo TUA" loading="lazy" onerror="this.src='https://picsum.photos/seed/tua/320/160'">
+          <span class="s-gallery">🟧 Sur</span>
+        </div>
+        <div class="s-card-body">
+          <div class="s-card-name">TUA</div>
+          <div class="s-card-cat">Accesorios & Moda</div>
+          <div class="s-card-foot"><span class="s-card-tag">Tiendas</span><span class="s-card-arr">→</span></div>
+        </div>
+      </a>
+
+      <a href="tienda-individual.html?tienda=oakberry" class="s-card reveal">
+        <div class="s-card-top">
+          <img src="https://subcentro.cl/wp-content/uploads/2023/12/Logo_Primary_Macaw_Purple-1-1-700x700.png" alt="Logo OakBerry" loading="lazy" onerror="this.src='https://picsum.photos/seed/oakberry/320/160'">
+          <span class="s-gallery">🟦 Norte</span><span class="s-badge">⭐ Destacado</span>
+        </div>
+        <div class="s-card-body">
+          <div class="s-card-name">OakBerry</div>
+          <div class="s-card-cat">Açaí Bowls · Saludable</div>
+          <div class="s-card-foot"><span class="s-card-tag">Restaurantes</span><span class="s-card-arr">→</span></div>
+        </div>
+      </a>
+
+      <a href="tienda-individual.html?tienda=krispy-kreme" class="s-card reveal">
+        <div class="s-card-top">
+          <img src="https://subcentro.cl/wp-content/uploads/2023/12/krispy-kreme_250px.png" alt="Logo Krispy Kreme" loading="lazy" onerror="this.src='https://picsum.photos/seed/krispy/320/160'">
+          <span class="s-gallery">🟧 Sur</span>
+        </div>
+        <div class="s-card-body">
+          <div class="s-card-name">Krispy Kreme</div>
+          <div class="s-card-cat">Donas & Postres</div>
+          <div class="s-card-foot"><span class="s-card-tag">Restaurantes</span><span class="s-card-arr">→</span></div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="carousel-section" aria-label="Banners Subcentro">
+  <div class="carousel-wrap">
+    <div class="carousel-track-outer">
+      <div class="carousel-track" id="cTrack">
+        <!-- BANNER 1 — reemplaza src con tu imagen -->
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1400&q=85" alt="Banner 1">
+          <div class="carousel-caption"><h3>Bienvenido a Subcentro</h3><p>Más de 80 tiendas bajo el Metro Escuela Militar</p></div>
+        </div>
+        <!-- BANNER 2 — reemplaza src con tu imagen -->
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1400&q=85" alt="Banner 2">
+          <div class="carousel-caption"><h3>Moda & Tendencias</h3><p>Descubre las últimas colecciones en nuestras tiendas</p></div>
+        </div>
+        <!-- BANNER 3 — reemplaza src con tu imagen -->
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=85" alt="Banner 3">
+          <div class="carousel-caption"><h3>Gastronomía para todos</h3><p>19 restaurantes y cafés esperan por ti</p></div>
+        </div>
+        <!-- BANNER 4 — reemplaza src con tu imagen -->
+        <div class="carousel-slide">
+          <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1400&q=85" alt="Banner 4">
+          <div class="carousel-caption"><h3>Galerías Norte y Sur</h3><p>Todo lo que necesitas en un mismo lugar</p></div>
+        </div>
+      </div>
+    </div>
+    <button class="carousel-btn carousel-prev" id="cPrev" aria-label="Anterior">&#8592;</button>
+    <button class="carousel-btn carousel-next" id="cNext" aria-label="Siguiente">&#8594;</button>
+    <div class="carousel-dots" id="cDots"></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testi" aria-labelledby="testi-h">
+  <div class="container">
+    <div class="reveal" style="text-align:center"><p class="eyebrow">Lo que dicen</p><h2 class="s-title" id="testi-h">Nuestros <em>clientes</em> hablan</h2></div>
+    <div class="testi-grid">
+      <div class="t-card reveal"><div class="stars">★★★★★</div><p class="t-text">Paso aquí casi todos los días al salir del metro. Tienen de todo: Starbucks para empezar el día, Falafel Republic para almorzar y la farmacia para lo que necesite. ¡Perfecto!</p><div class="t-auth"><img src="https://picsum.photos/seed/caro/40/40" alt="Carolina M." class="t-avatar"><div><div class="t-name">Carolina M.</div><div class="t-role">Profesional, Las Condes</div></div></div></div>
+      <div class="t-card reveal"><div class="stars">★★★★★</div><p class="t-text">La ubicación es insuperable. Entro desde el metro directamente y puedo hacer todas mis compras sin sol ni frío. Los precios son buenos y la variedad increíble.</p><div class="t-auth"><img src="https://picsum.photos/seed/andres/40/40" alt="Andrés T." class="t-avatar"><div><div class="t-name">Andrés T.</div><div class="t-role">Estudiante universitario</div></div></div></div>
+      <div class="t-card reveal"><div class="stars">★★★★☆</div><p class="t-text">El Dunkin' y el OakBerry son mis favoritos. Me encanta la mezcla de locales: comida rápida, ropa y farmacias. Todo en un solo lugar, sin salir a la calle.</p><div class="t-auth"><img src="https://picsum.photos/seed/val/40/40" alt="Valentina R." class="t-avatar"><div><div class="t-name">Valentina R.</div><div class="t-role">Sector financiero</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section class="map-s" id="mapa" aria-labelledby="map-h">
+  <div class="container">
+    <div class="reveal" style="text-align:center"><p class="eyebrow" style="color:var(--red)">Encuéntranos</p><h2 class="s-title" id="map-h" style="color:#fff">¿Cómo <em style="color:var(--yellow)">llegar</em>?</h2></div>
+    <div class="map-card reveal">
+      <div class="map-info">
+        <h3>Subcentro Las Condes</h3>
+        <div class="map-row"><div class="m-icon">📍</div><div class="m-txt"><h4>Dirección</h4><p>Av. Apoquindo 4411, Las Condes, Santiago</p></div></div>
+        <div class="map-row"><div class="m-icon">🚇</div><div class="m-txt"><h4>Metro</h4><p>Estación Escuela Militar, Línea 1 — acceso directo</p></div></div>
+        <div class="map-row"><div class="m-icon">🕐</div><div class="m-txt"><h4>Horario</h4><p>Lunes a Sábado: 9:00 – 21:00 hrs</p></div></div>
+        <div class="map-row"><div class="m-icon">🅿️</div><div class="m-txt"><h4>Estacionamiento</h4><p>Disponible en edificio adyacente</p></div></div>
+        <a href="https://maps.google.com/?q=Av+Apoquindo+4411+Las+Condes+Santiago" target="_blank" rel="noopener" class="btn-red" style="margin-top:22px;display:inline-flex">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Abrir en Google Maps
+        </a>
+      </div>
+      <div class="map-iframe">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3329.534!2d-70.5787!3d-33.4182!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662cf0f3b3a6d5f%3A0x5f8e3a3a3a3a3a3a!2sAv.+Apoquindo+4411%2C+Las+Condes!5e0!3m2!1ses!2scl!4v1700000000000" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa Subcentro Las Condes"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-s" aria-labelledby="cta-h">
+  <div class="container">
+    <div class="cta-card reveal">
+      <h2 class="cta-h">¿Listo para explorar<br><em>Subcentro</em>?</h2>
+      <p class="cta-p">Más de 80 locales a tu disposición. Moda, comida, tecnología, farmacias y mucho más.</p>
+      <div class="cta-btns">
+        <a href="buscador-tiendas.html" class="btn-red">Explorar todas las tiendas</a>
+        <a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="btn-ghost">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" id="footer">
+  <div class="f-top">
+    <div>
+      <span class="f-logo">Sub<span>·</span>centro</span>
+      <p class="f-p">El centro comercial subterráneo de Las Condes, conectado directamente con Metro Escuela Militar.</p>
+      <div class="f-socs">
+        <a href="https://instagram.com/subcentro.cl" target="_blank" rel="noopener" class="f-soc" aria-label="Instagram"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+        <a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="f-soc" aria-label="WhatsApp"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+      </div>
+    </div>
+    <div class="f-col"><h4>Tiendas</h4><a href="buscador-tiendas.html?cat=tiendas">Moda & Ropa</a><a href="buscador-tiendas.html?cat=restaurantes">Restaurantes</a><a href="buscador-tiendas.html?cat=farmacias">Farmacias</a><a href="buscador-tiendas.html?cat=tecnologia">Tecnología</a><a href="buscador-tiendas.html?cat=servicios">Servicios</a></div>
+    <div class="f-col"><h4>Información</h4><a href="#mapa">Cómo llegar</a><a href="#">Horarios</a><a href="#">Arriendos</a><a href="#">Trabaja con nosotros</a></div>
+    <div class="f-col"><h4>Contacto</h4><a href="tel:+56212345678">+56 2 1234 5678</a><a href="mailto:contacto@subcentro.cl">contacto@subcentro.cl</a><a href="#mapa">Av. Apoquindo 4411, Las Condes</a></div>
+  </div>
+  <div class="f-bot"><span>© 2025 Subcentro Las Condes. Todos los derechos reservados.</span><span style="color:rgba(255,255,255,.28)">Diseñado con ♥ en Santiago</span></div>
+</footer>
+
+<a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="wa" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+
+<script>
+document.getElementById('burger').addEventListener('click',function(){const o=document.getElementById('mobMenu').classList.toggle('open');this.setAttribute('aria-expanded',o)});
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+// CAROUSEL
+(function(){
+  var track=document.getElementById('cTrack');
+  var slides=track?track.children:[];
+  var total=slides.length;
+  var cur=0;
+  var dotsEl=document.getElementById('cDots');
+  if(!track||!total)return;
+  // build dots
+  for(var i=0;i<total;i++){
+    var d=document.createElement('button');
+    d.className='carousel-dot'+(i===0?' active':'');
+    d.setAttribute('aria-label','Ir al banner '+(i+1));
+    (function(idx){d.addEventListener('click',function(){go(idx)})})(i);
+    dotsEl.appendChild(d);
+  }
+  function go(n){cur=(n+total)%total;track.style.transform='translateX(-'+cur*100+'%)';dotsEl.querySelectorAll('.carousel-dot').forEach(function(d,i){d.classList.toggle('active',i===cur)})}
+  document.getElementById('cPrev').addEventListener('click',function(){go(cur-1)});
+  document.getElementById('cNext').addEventListener('click',function(){go(cur+1)});
+  // autoplay
+  var timer=setInterval(function(){go(cur+1)},5000);
+  track.parentElement.addEventListener('mouseenter',function(){clearInterval(timer)});
+  track.parentElement.addEventListener('mouseleave',function(){timer=setInterval(function(){go(cur+1)},5000)});
+  // touch swipe
+  var sx=0;
+  track.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  track.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)go(dx<0?cur+1:cur-1)},{passive:true});
+})();
+</script>
+</body>
+</html>
