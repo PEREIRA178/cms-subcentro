@@ -84,12 +84,12 @@ func Dashboard(cfg *config.Config) fiber.Handler {
 	}
 }
 
-// DashboardStats renders the 4 stat cards for the dashboard (count of propiedades)
+// DashboardStats renders stat cards for tiendas.
 func DashboardStats(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		all, _ := pb.FindRecordsByFilter("propiedades", "", "", 1000, 0)
+		all, _ := pb.FindRecordsByFilter("tiendas", "", "", 1000, 0)
 		total := len(all)
-		publicadas, destacadas, ventas, arriendos := 0, 0, 0, 0
+		publicadas, destacadas, restaurantes, farmacias := 0, 0, 0, 0
 		for _, r := range all {
 			if r.GetString("status") == "publicado" {
 				publicadas++
@@ -97,33 +97,33 @@ func DashboardStats(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler
 			if r.GetBool("destacada") {
 				destacadas++
 			}
-			switch r.GetString("operacion") {
-			case "VENTA":
-				ventas++
-			case "ARRIENDO":
-				arriendos++
+			switch r.GetString("cat") {
+			case "restaurantes":
+				restaurantes++
+			case "farmacias":
+				farmacias++
 			}
 		}
 		html := fmt.Sprintf(`<div class="stat-card accent">
-  <div class="stat-card-label">Propiedades totales</div>
+  <div class="stat-card-label">Tiendas totales</div>
   <div class="stat-card-value">%d</div>
   <div class="stat-card-delta">%d publicadas · %d borradores</div>
 </div>
 <div class="stat-card">
   <div class="stat-card-label">Destacadas</div>
   <div class="stat-card-value">%d</div>
-  <div class="stat-card-delta">en portada</div>
+  <div class="stat-card-delta">con badge especial</div>
 </div>
 <div class="stat-card">
-  <div class="stat-card-label">En venta</div>
+  <div class="stat-card-label">Restaurantes</div>
   <div class="stat-card-value">%d</div>
-  <div class="stat-card-delta">ventas activas</div>
+  <div class="stat-card-delta">gastronomía</div>
 </div>
 <div class="stat-card">
-  <div class="stat-card-label">En arriendo</div>
+  <div class="stat-card-label">Farmacias</div>
   <div class="stat-card-value">%d</div>
-  <div class="stat-card-delta">arriendos activos</div>
-</div>`, total, publicadas, total-publicadas, destacadas, ventas, arriendos)
+  <div class="stat-card-delta">salud</div>
+</div>`, total, publicadas, total-publicadas, destacadas, restaurantes, farmacias)
 		c.Set("Content-Type", "text/html; charset=utf-8")
 		return c.SendString(html)
 	}

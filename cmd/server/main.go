@@ -70,7 +70,9 @@ func main() {
 	realtime.SetHubInstance(hub)
 
 	// ── PUBLIC WEB ──
-	app.Get("/", web.PageHandler(cfg, "propiedades"))
+	app.Get("/", web.PageHandler(cfg, "index"))
+	app.Get("/buscador-tiendas.html", web.PageHandler(cfg, "buscador-tiendas"))
+	app.Get("/tienda-individual.html", web.PageHandler(cfg, "tienda-individual"))
 	app.Get("/propiedades.html", web.PageHandler(cfg, "propiedades"))
 	app.Get("/noticias.html", web.PageHandler(cfg, "noticias"))
 
