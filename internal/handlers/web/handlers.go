@@ -16,6 +16,7 @@ import (
 type noticiaData struct {
 	Title    string
 	Date     string
+	Category string
 	ImgHTML  template.HTML
 	BodyHTML template.HTML
 }
@@ -113,9 +114,18 @@ func NoticiaHandler(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler
 	return func(c *fiber.Ctx) error {
 		id := c.Params("id")
 		r, err := pb.FindRecordById("content_blocks", id)
-		if err != nil || r.GetString("category") != "NOTICIA" || r.GetString("status") != "publicado" {
+		if err != nil || r.GetString("status") != "publicado" {
 			return c.Redirect("/", fiber.StatusFound)
 		}
+		cat := r.GetString("category")
+		if cat != "NOTICIA" && cat != "AVISO" && cat != "PUBLICIDAD" {
+			return c.Redirect("/", fiber.StatusFound)
+		}
+		catLabel := map[string]string{
+			"NOTICIA":    "Noticia",
+			"AVISO":      "Aviso",
+			"PUBLICIDAD": "Publicidad",
+		}[cat]
 
 		title := r.GetString("title")
 		desc := r.GetString("description")
@@ -130,10 +140,10 @@ func NoticiaHandler(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler
 		var imgHTML template.HTML
 		if imageURL != "" {
 			imgHTML = template.HTML(fmt.Sprintf(
-				`<div style="width:100%%;aspect-ratio:16/6;border-radius:24px;margin-bottom:48px;overflow:hidden"><img src="%s" style="width:100%%;height:100%%;object-fit:cover" alt="%s"/></div>`,
+				`<div style="width:100%%;aspect-ratio:16/6;border-radius:18px;margin-bottom:40px;overflow:hidden"><img src="%s" style="width:100%%;height:100%%;object-fit:cover" alt="%s"/></div>`,
 				template.HTMLEscapeString(imageURL), template.HTMLEscapeString(title)))
 		} else {
-			imgHTML = `<div style="width:100%;aspect-ratio:16/6;background:var(--md-primary-container);border-radius:24px;margin-bottom:48px;display:flex;align-items:center;justify-content:center"><span style="font-family:'DM Serif Display',Georgia,serif;font-size:80px;color:rgba(155,18,48,0.15)">SL</span></div>`
+			imgHTML = `<div style="width:100%;aspect-ratio:16/6;background:linear-gradient(135deg,#d60d5222,#00a0e322);border-radius:18px;margin-bottom:40px;display:flex;align-items:center;justify-content:center;font-size:3.5rem">📰</div>`
 		}
 
 		src := body
@@ -158,6 +168,7 @@ func NoticiaHandler(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler
 		return tmpl.ExecuteTemplate(c, "noticia.html", noticiaData{
 			Title:    title,
 			Date:     dateStr,
+			Category: catLabel,
 			ImgHTML:  imgHTML,
 			BodyHTML: bodyHTML,
 		})

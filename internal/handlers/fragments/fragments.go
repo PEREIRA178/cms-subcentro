@@ -176,7 +176,7 @@ func Noticias(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 		}
 
 		for i, n := range noticias {
-			thumbInner := `<div style="width:100%;height:100%;background:linear-gradient(135deg,#E8242A22,#F5C80022);display:flex;align-items:center;justify-content:center;font-size:2rem">📰</div>`
+			thumbInner := `<div style="width:100%;height:100%;background:linear-gradient(135deg,#d60d5222,#00a0e322);display:flex;align-items:center;justify-content:center;font-size:2rem">📰</div>`
 			if n.ImageURL != "" {
 				thumbInner = fmt.Sprintf(`<img src="%s" alt="%s" loading="lazy" style="width:100%%;height:100%%;object-fit:cover;display:block">`,
 					template.HTMLEscapeString(n.ImageURL), template.HTMLEscapeString(n.Title))
@@ -497,7 +497,7 @@ func NoticiasPage(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 			sb.WriteString(fmt.Sprintf(`<div style="grid-column:1/-1;text-align:center;padding:64px 24px;color:#6B6B6B"><p style="font-size:15px">%s</p></div>`, msg))
 		} else {
 			for _, n := range noticias {
-				thumbInner := `<div style="width:100%;height:100%;background:linear-gradient(135deg,#E8242A22,#F5C80022);display:flex;align-items:center;justify-content:center;font-size:2.2rem">📰</div>`
+				thumbInner := `<div style="width:100%;height:100%;background:linear-gradient(135deg,#d60d5222,#00a0e322);display:flex;align-items:center;justify-content:center;font-size:2.2rem">📰</div>`
 				if n.ImageURL != "" {
 					thumbInner = fmt.Sprintf(`<img src="%s" alt="%s" loading="lazy" style="width:100%%;height:100%%;object-fit:cover;display:block">`,
 						template.HTMLEscapeString(n.ImageURL), template.HTMLEscapeString(n.Title))

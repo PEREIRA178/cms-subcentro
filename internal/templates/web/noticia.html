@@ -3,254 +3,123 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>{{.Title}} — Colegio San Lorenzo · Copiapó</title>
-<link rel="icon" href="/static/logo.webp" type="image/webp"/>
+<title>{{.Title}} — Plaza Real Copiapó</title>
+<link rel="icon" type="image/png" href="https://plazareal.cl/wp-content/uploads/2025/12/logo-mall-plaza-real-2024@3x.png"/>
+<link rel="apple-touch-icon" href="https://plazareal.cl/wp-content/uploads/2025/12/logo-mall-plaza-real-2024@3x.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,900&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --md-primary:#9B1230;--md-on-primary:#fff;
-  --md-primary-container:#F5E0E4;--md-on-primary-container:#5C0A1E;
-  --md-primary-dark:#6E0C22;--md-primary-mid:#BE3356;--md-primary-faint:#FDF0F2;
-  --md-secondary:#9B9EA4;--md-secondary-container:#E8E8EC;--md-on-secondary-container:#3A3C42;
-  --md-surface:#FAF8F7;--md-surface-container-low:#F7F4F5;--md-surface-bright:#FFFFFF;
-  --md-surface-container-high:#ECE8E9;
-  --md-on-surface:#1C1B1A;--md-on-surface-variant:#4D4B4C;
-  --md-outline:#7E7B7C;--md-outline-variant:#CEC9CA;
-  --md-inverse-surface:#312F30;
-  --r-sm:12px;--r-md:16px;--r-lg:24px;--r-xl:32px;--r-2xl:40px;--r-full:9999px;
-  --glass-bg:rgba(250,248,247,0.72);--glass-blur:blur(20px) saturate(180%);
-  --glass-border:rgba(155,18,48,0.10);--glass-shadow:0 8px 32px rgba(155,18,48,0.08);
-  --elev-2:0 2px 6px rgba(28,27,26,.08);--elev-3:0 4px 12px rgba(28,27,26,.10);--elev-4:0 8px 24px rgba(28,27,26,.12);
-  --ease-express:cubic-bezier(0.05,0.7,0.1,1.0);
-  --font-display:'DM Serif Display',Georgia,serif;--font-body:'DM Sans',system-ui,sans-serif;
-  --max-w:1200px;--nav-h:72px;
+  --red:#d60d52;--red-d:#A80A40;--yellow:#00a0e3;--green:#2DB37A;
+  --dark:#0E0E0E;--dark2:#181818;
+  --surface:#F5F4F1;--surface2:#EBEBEA;
+  --white:#FFF;--text:#0E0E0E;--muted:#6B6B6B;--border:#E0DFDC;
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
-*{-webkit-tap-highlight-color:transparent}
-body{font-family:var(--font-body);background:var(--md-surface);color:var(--md-on-surface);line-height:1.6;overflow-x:hidden}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Geist',system-ui,sans-serif;background:var(--surface);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
-/* ===== NAV ===== */
-.nav{position:sticky;top:0;z-index:200;height:var(--nav-h);background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--glass-border);box-shadow:var(--glass-shadow)}
-.nav.scrolled{background:rgba(250,248,247,0.95);box-shadow:0 4px 24px rgba(155,18,48,0.12)}
-.nav-inner{max-width:var(--max-w);margin:0 auto;padding:0 24px;height:100%;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0}
-.nav-logo{width:44px;height:44px;border-radius:var(--r-sm);object-fit:contain;transition:transform 300ms var(--ease-express)}
-.nav-brand:hover .nav-logo{transform:scale(1.08)}
-.nav-brand-name{font-family:var(--font-display);font-size:16px;color:var(--md-on-surface);line-height:1.1}
-.nav-brand-sub{font-size:10px;font-weight:500;letter-spacing:.12em;color:var(--md-outline);text-transform:uppercase}
-.nav-links{display:flex;align-items:center;gap:2px}
-.nav-item-group{position:relative;padding-bottom:12px;margin-bottom:-12px}
-.nav-link-main{font-size:13.5px;color:var(--md-on-surface-variant);text-decoration:none;padding:8px 14px;border-radius:var(--r-full);transition:background 200ms,color 200ms;display:block;white-space:nowrap;user-select:none}
-.nav-link-main:hover,.nav-link-main.active{background:var(--md-primary-container);color:var(--md-on-primary-container)}
-.nav-link-main.active{font-weight:500}
-.nav-dropdown{position:absolute;top:calc(100% + 0px);left:0;background:var(--md-surface-bright);border:1px solid var(--md-outline-variant);border-radius:var(--r-lg);padding:8px;min-width:220px;box-shadow:0 8px 32px rgba(28,27,26,.14);opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity 180ms ease,transform 180ms ease;z-index:100}
-.nav-item-group:hover .nav-dropdown{opacity:1;pointer-events:auto;transform:none}
-.nav-dropdown a{display:block;font-size:13px;color:var(--md-on-surface-variant);text-decoration:none;padding:9px 14px;border-radius:var(--r-md);transition:background 150ms,color 150ms;line-height:1.35}
-.nav-dropdown a:hover{background:var(--md-primary-container);color:var(--md-on-primary-container)}
-.nav-cta{font-size:13px;font-weight:500;color:#fff;background:var(--md-primary);padding:10px 22px;border-radius:var(--r-full);text-decoration:none;flex-shrink:0;box-shadow:0 2px 8px rgba(155,18,48,0.30);transition:background 200ms,transform 200ms}
-.nav-cta:hover{background:var(--md-primary-dark);transform:translateY(-2px)}
-.nav-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:199;backdrop-filter:blur(4px)}
-.nav-overlay.open{display:block}
-.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
-.nav-hamburger span{display:block;width:24px;height:2px;background:var(--md-on-surface);border-radius:2px;transition:all 200ms}
-.nav-cta-mobile{display:none}
-@media(max-width:900px){
-  .nav-hamburger{display:flex!important}
-  .nav-cta{display:none}
-  .nav-links.open .nav-cta-mobile{display:block;margin-top:12px;background:var(--md-primary);color:#fff;text-align:center;border-radius:var(--r-full);padding:14px 24px;font-weight:500;font-size:15px;text-decoration:none;width:100%;box-sizing:border-box}
-  .nav-links.open{display:flex!important;flex-direction:column;position:fixed;top:0;right:0;width:300px;height:100vh;background:var(--md-surface-bright);z-index:200;padding:24px 16px;gap:4px;overflow-y:auto;box-shadow:-8px 0 32px rgba(28,27,26,.12)}
-  .nav-item-group{padding-bottom:0;margin-bottom:0}
-  .nav-link-main{font-size:15px;padding:12px 14px}
-  .nav-dropdown{position:static;opacity:1;pointer-events:auto;transform:none;box-shadow:none;border:none;background:var(--md-surface-container-low);border-radius:var(--r-md);padding:4px 8px;margin:4px 0 8px;display:none}
-  .nav-item-group.expanded .nav-dropdown{display:block}
-  .nav-dropdown a{font-size:14px;padding:10px 14px}
-}
+.navbar{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(14,14,14,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);padding:0 32px;height:68px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;text-decoration:none}
+.logo img{height:42px;width:auto;display:block;filter:brightness(0)invert(1)}
+.nav-links{display:flex;gap:36px;align-items:center}
+.nav-links a{color:rgba(255,255,255,.65);text-decoration:none;font-size:.87rem;font-weight:500;transition:color .18s}
+.nav-links a:hover,.nav-links a.active{color:#fff}
+.nav-cta{background:var(--red)!important;color:#fff!important;padding:9px 22px;border-radius:100px;font-weight:700!important;font-size:.87rem!important}
+.burger{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:4px}
+.burger span{display:block;width:24px;height:2px;background:#fff;border-radius:2px}
+.mob-menu{display:none;position:fixed;top:68px;left:0;right:0;background:var(--dark2);z-index:199;padding:16px 24px 24px;flex-direction:column;gap:2px;border-bottom:1px solid rgba(255,255,255,.08)}
+.mob-menu a{color:rgba(255,255,255,.78);text-decoration:none;font-size:1rem;font-weight:500;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06);display:block}
+.mob-menu.open{display:flex}
 
-/* ===== ARTICLE ===== */
-.article-wrap{max-width:760px;margin:64px auto 96px;padding:0 24px}
-.article-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--md-on-surface-variant);text-decoration:none;margin-bottom:32px;transition:color 200ms}
-.article-back:hover{color:var(--md-primary)}
-.article-cat{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--md-primary);margin-bottom:12px}
-.article-title{font-family:var(--font-display);font-size:clamp(28px,4vw,46px);line-height:1.1;color:var(--md-on-surface);margin-bottom:16px}
-.article-meta{font-size:13px;color:var(--md-outline);margin-bottom:40px;padding-bottom:32px;border-bottom:1px solid var(--md-outline-variant)}
-.article-body p{font-size:17px;line-height:1.85;color:var(--md-on-surface-variant);margin-bottom:20px}
+.article-wrap{max-width:760px;margin:120px auto 96px;padding:0 24px}
+.article-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;margin-bottom:28px;transition:color 200ms}
+.article-back:hover{color:var(--red)}
+.article-cat{font-size:.7rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--red);margin-bottom:12px}
+.article-title{font-family:'Montserrat',sans-serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:900;line-height:1.08;letter-spacing:-1px;color:var(--text);margin-bottom:16px}
+.article-meta{font-size:.85rem;color:var(--muted);margin-bottom:40px;padding-bottom:28px;border-bottom:1px solid var(--border)}
+.article-body p{font-size:1.02rem;line-height:1.8;color:#333;margin-bottom:20px;font-weight:300}
 
-/* ===== FOOTER ===== */
-footer{background:var(--md-inverse-surface);color:rgba(255,255,255,0.55);padding:56px 24px 36px}
-.footer-inner{max-width:var(--max-w);margin:0 auto}
-.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
-.footer-brand{display:flex;flex-direction:column;gap:12px}
-.footer-brand-row{display:flex;align-items:center;gap:12px}
-.footer-logo{width:40px;height:40px;object-fit:contain;opacity:.90;border-radius:var(--r-sm)}
-.footer-name{font-family:var(--font-display);font-size:16px;color:rgba(255,255,255,0.85)}
-.footer-lema{font-family:var(--font-display);font-style:italic;font-size:12px;color:rgba(255,255,255,0.3)}
-.footer-desc{font-size:12px;color:rgba(255,255,255,0.3);line-height:1.5}
-.footer-col h5{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.85);margin-bottom:14px}
-.footer-col a{display:block;font-size:13px;color:rgba(255,255,255,0.45);text-decoration:none;padding:3px 0;transition:color 200ms}
-.footer-col a:hover{color:rgba(255,255,255,0.85)}
-.footer-bottom{border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.footer-bottom p{font-size:12px}
-@media(max-width:1024px){.footer-grid{grid-template-columns:1fr 1fr;gap:32px}}
-@media(max-width:768px){:root{--nav-h:60px}.nav-links{display:none}.footer-grid{grid-template-columns:1fr}}
+.footer{background:#080808;color:rgba(255,255,255,.52);margin-top:64px}
+.f-top{padding:56px 24px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;max-width:1200px;margin:0 auto}
+.f-logo-img{height:32px;width:auto;display:block;filter:brightness(0)invert(1);margin-bottom:10px}
+.f-p{font-size:.82rem;line-height:1.7;max-width:260px;margin-bottom:18px}
+.f-socs{display:flex;gap:8px}
+.f-soc{width:34px;height:34px;background:rgba(255,255,255,.07);border-radius:9px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.55);text-decoration:none;transition:background .2s}
+.f-soc:hover{background:var(--red);color:#fff}
+.f-col h4{font-family:'Montserrat',sans-serif;font-weight:700;color:#fff;font-size:.88rem;margin-bottom:12px}
+.f-col a{display:block;color:rgba(255,255,255,.4);text-decoration:none;font-size:.8rem;margin-bottom:8px;transition:color .18s}
+.f-col a:hover{color:#fff}
+.f-bot{border-top:1px solid rgba(255,255,255,.07);padding:15px 24px;max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;font-size:.74rem}
+
+.wa-float{position:fixed;bottom:26px;right:26px;z-index:300;width:52px;height:52px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.42);text-decoration:none}
+.wa-float:hover{transform:scale(1.1)}
+.wa-float svg{width:25px;height:25px;fill:#fff}
+
+@media(max-width:1024px){.f-top{grid-template-columns:1fr 1fr;gap:28px}}
+@media(max-width:768px){.nav-links{display:none}.burger{display:flex}.f-top{grid-template-columns:1fr;gap:22px}.f-bot{flex-direction:column;gap:6px;text-align:center}}
 </style>
 </head>
 <body>
 
-<nav class="nav" id="main-nav">
-  <div class="nav-inner">
-    <a href="/" class="nav-brand">
-      <img src="/static/logo.webp" class="nav-logo" alt="Logo Colegio San Lorenzo"/>
-      <div>
-        <div class="nav-brand-name">Colegio San Lorenzo</div>
-        <div class="nav-brand-sub">Copiapó · Atacama</div>
-      </div>
-    </a>
-    <nav class="nav-links" id="nav-links">
-      <div class="nav-item-group">
-        <a href="/nuestro-colegio.html" class="nav-link-main">Nuestro Colegio</a>
-        <div class="nav-dropdown">
-          <a href="/nuestro-colegio.html">Historia y misión</a>
-          <a href="/nuestro-colegio.html#equipo">Equipo directivo</a>
-          <a href="/nuestro-colegio.html#infraestructura">Infraestructura</a>
-        </div>
-      </div>
-      <div class="nav-item-group">
-        <a href="/ceal.html" class="nav-link-main">CEAL</a>
-        <div class="nav-dropdown">
-          <a href="/ceal.html">Área académica</a>
-          <a href="/ceal.html#calendario">Calendario escolar</a>
-        </div>
-      </div>
-      <div class="nav-item-group">
-        <a href="/cepad.html" class="nav-link-main">CEPAD</a>
-        <div class="nav-dropdown">
-          <a href="/cepad.html">Convivencia escolar</a>
-          <a href="/cepad.html#utiles">Útiles escolares</a>
-        </div>
-      </div>
-      <div class="nav-item-group">
-        <a href="/edex.html" class="nav-link-main">EDEX</a>
-        <div class="nav-dropdown">
-          <a href="/edex.html">Área Artística</a>
-          <a href="/edex.html">Área Deportiva</a>
-          <a href="/edex.html">Área Conocimiento</a>
-        </div>
-      </div>
-      <div class="nav-item-group">
-        <a href="/inclusion.html" class="nav-link-main">Inclusión</a>
-        <div class="nav-dropdown">
-          <a href="/inclusion.html#pie">PIE</a>
-          <a href="/inclusion.html#convivencia">Convivencia escolar</a>
-        </div>
-      </div>
-      <div class="nav-item-group">
-        <a href="/comunicados.html" class="nav-link-main">Comunicados</a>
-        <div class="nav-dropdown">
-          <a href="/comunicados.html#comunicados">Avisos recientes</a>
-          <a href="/comunicados.html#calendario">Calendario escolar</a>
-        </div>
-      </div>
-      <a href="/admision.html" class="nav-cta-mobile">Admisión 2027</a>
-    </nav>
-    <a href="/admision.html" class="nav-cta">Admisión 2027</a>
-    <button class="nav-hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
+<nav class="navbar">
+  <a href="/" class="logo" aria-label="Plaza Real inicio"><img src="https://plazareal.cl/wp-content/uploads/2025/12/logo-mall-plaza-real-2024@3x.png" alt="Plaza Real"></a>
+  <div class="nav-links">
+    <a href="/">Inicio</a>
+    <a href="/buscador-tiendas.html">Tiendas</a>
+    <a href="/noticias.html" class="active">Comunicados</a>
+    <a href="/#mapa">Cómo llegar</a>
+    <a href="/#footer">Contacto</a>
+    <a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="nav-cta">WhatsApp →</a>
   </div>
+  <button class="burger" id="burger" aria-label="Abrir menú"><span></span><span></span><span></span></button>
 </nav>
+<div class="mob-menu" id="mobMenu">
+  <a href="/">Inicio</a>
+  <a href="/buscador-tiendas.html">Tiendas</a>
+  <a href="/noticias.html">Comunicados</a>
+  <a href="/#mapa">Cómo llegar</a>
+  <a href="/#footer">Contacto</a>
+</div>
 
 <main>
   <div class="article-wrap">
-    <a href="/" class="article-back">← Volver al inicio</a>
+    <a href="/noticias.html" class="article-back">← Volver a comunicados</a>
     {{.ImgHTML}}
-    <p class="article-cat">Noticia</p>
+    <p class="article-cat">{{.Category}}</p>
     <h1 class="article-title">{{.Title}}</h1>
     <p class="article-meta">{{.Date}}</p>
     <div class="article-body">{{.BodyHTML}}</div>
   </div>
 </main>
 
-<footer>
-  <div class="footer-inner">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <div class="footer-brand-row">
-          <img class="footer-logo" src="/static/logo.webp" alt="Logo"/>
-          <div>
-            <div class="footer-name">Colegio San Lorenzo</div>
-            <div class="footer-lema">Per laborem ad lucem</div>
-          </div>
-        </div>
-        <p class="footer-desc">Formando generaciones con excelencia académica y valores humanos desde 1990. Copiapó, Atacama.</p>
-      </div>
-      <div class="footer-col">
-        <h5>Nuestro colegio</h5>
-        <a href="/nuestro-colegio.html">Historia y misión</a>
-        <a href="/nuestro-colegio.html#equipo">Equipo directivo</a>
-        <a href="/admision.html">Admisión 2027</a>
-      </div>
-      <div class="footer-col">
-        <h5>Familias</h5>
-        <a href="/comunicados.html">Comunicados</a>
-        <a href="/ceal.html">CEAL</a>
-        <a href="/cepad.html">CEPAD</a>
-      </div>
-      <div class="footer-col">
-        <h5>Comunidad</h5>
-        <a href="/edex.html">EDEX</a>
-        <a href="/inclusion.html">Inclusión</a>
-        <a href="/rss.xml">RSS</a>
+<footer class="footer" id="footer">
+  <div class="f-top">
+    <div>
+      <img src="https://plazareal.cl/wp-content/uploads/2025/12/logo-mall-plaza-real-2024@3x.png" alt="Plaza Real" class="f-logo-img">
+      <p class="f-p">El centro comercial con más vida de Copiapó, en el corazón de la ciudad.</p>
+      <div class="f-socs">
+        <a href="https://www.instagram.com/plazareal_copiapo/" target="_blank" rel="noopener" class="f-soc" aria-label="Instagram">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
       </div>
     </div>
-    <div class="footer-bottom">
-      <p>© 2026 Colegio San Lorenzo · Pedro León Gallo 490, Copiapó · 52-2221073</p>
-    </div>
+    <div class="f-col"><h4>Tiendas</h4><a href="/buscador-tiendas.html?cat=tiendas">Moda & Ropa</a><a href="/buscador-tiendas.html?cat=restaurantes">Restaurantes</a><a href="/buscador-tiendas.html?cat=farmacias">Farmacias</a></div>
+    <div class="f-col"><h4>Información</h4><a href="/#mapa">Cómo llegar</a><a href="#">Horarios</a><a href="/noticias.html">Comunicados</a></div>
+    <div class="f-col"><h4>Contacto</h4><a href="tel:+56512345678">+56 52 1234 5678</a><a href="mailto:contacto@plazareal.cl">contacto@plazareal.cl</a><a href="/#mapa">Colipí 484, Copiapó</a></div>
   </div>
+  <div class="f-bot"><span>© 2025 Plaza Real Copiapó.</span><span style="color:rgba(255,255,255,.25)">Diseñado con ♥ en Copiapó</span></div>
 </footer>
 
-<div class="nav-overlay" id="nav-overlay"></div>
+<a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="wa-float" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
 <script>
-(function(){
-  var nav = document.getElementById('main-nav');
-  window.addEventListener('scroll', function(){
-    nav.classList.toggle('scrolled', window.scrollY > 10);
-  }, {passive:true});
-
-  var hamburger = document.querySelector('.nav-hamburger');
-  var navLinks  = document.getElementById('nav-links');
-  var overlay   = document.getElementById('nav-overlay');
-  if(!hamburger || !navLinks) return;
-
-  function closeMenu(){
-    navLinks.classList.remove('open');
-    overlay.classList.remove('open');
-    hamburger.querySelectorAll('span').forEach(function(s){ s.style.transform=''; s.style.opacity=''; });
-    navLinks.querySelectorAll('.nav-item-group.expanded').forEach(function(g){ g.classList.remove('expanded'); });
-  }
-
-  hamburger.addEventListener('click', function(){
-    var isOpen = navLinks.classList.toggle('open');
-    overlay.classList.toggle('open', isOpen);
-    var spans = hamburger.querySelectorAll('span');
-    if(isOpen){
-      spans[0].style.transform='rotate(45deg) translate(5px,5px)';
-      spans[1].style.opacity='0';
-      spans[2].style.transform='rotate(-45deg) translate(5px,-5px)';
-    } else { closeMenu(); }
-  });
-  overlay.addEventListener('click', closeMenu);
-
-  navLinks.querySelectorAll('.nav-item-group').forEach(function(group){
-    group.querySelector('.nav-link-main').addEventListener('click', function(e){
-      if(window.innerWidth > 900) return;
-      if(group.classList.contains('expanded')){ return; }
-      e.preventDefault();
-      navLinks.querySelectorAll('.nav-item-group.expanded').forEach(function(g){ g.classList.remove('expanded'); });
-      group.classList.add('expanded');
-    });
-  });
-})();
+document.getElementById('burger').addEventListener('click', function(){
+  var o = document.getElementById('mobMenu').classList.toggle('open');
+  this.setAttribute('aria-expanded', o);
+});
 </script>
 </body>
 </html>

@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="pgTitle">Tienda — Plaza Real Copiapó</title>
+  <link rel="icon" type="image/png" href="https://plazareal.cl/wp-content/uploads/2025/12/logo-mall-plaza-real-2024@3x.png">
+  <link rel="apple-touch-icon" href="https://plazareal.cl/wp-content/uploads/2025/12/logo-mall-plaza-real-2024@3x.png">
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,900&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{--red:#E8242A;--red-d:#B91A1F;--yellow:#F5C800;--green:#2DB37A;--dark:#0E0E0E;--dark2:#181818;--surface:#F5F4F1;--surface2:#EBEBEA;--white:#FFF;--text:#0E0E0E;--muted:#6B6B6B;--border:#E0DFDC}
+    :root{--red:#d60d52;--red-d:#A80A40;--yellow:#00a0e3;--green:#2DB37A;--dark:#0E0E0E;--dark2:#181818;--surface:#F5F4F1;--surface2:#EBEBEA;--white:#FFF;--text:#0E0E0E;--muted:#6B6B6B;--border:#E0DFDC}
     *{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
     body{font-family:'Geist',system-ui,sans-serif;background:var(--surface);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
@@ -80,7 +82,7 @@
     .gal-item:first-child{grid-row:span 2;min-height:300px}
     .gal-item:not(:first-child){min-height:142px}
     .gal-over{position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .3s;display:flex;align-items:center;justify-content:center}
-    .gal-item:hover .gal-over{background:rgba(232,36,42,.18)}
+    .gal-item:hover .gal-over{background:rgba(214,13,82,.18)}
     .gal-item:last-child .gal-over{background:rgba(0,0,0,.42)}
     .gal-more{color:#fff;font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:900}
     .sch-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #F0EEE9}
@@ -121,6 +123,20 @@
     @media(max-width:1024px){.main{grid-template-columns:1fr}.f-top{grid-template-columns:1fr 1fr;gap:28px}.s-hero-inner{flex-direction:column;align-items:flex-start;gap:20px}.logo-zone{margin-top:0}}
     @media(max-width:768px){.nav-links{display:none}.burger{display:flex}.gal-grid{grid-template-columns:1fr 1fr}.gal-item:first-child{grid-column:span 2;grid-row:auto;min-height:200px}.f-top{grid-template-columns:1fr;gap:22px}.f-bot{flex-direction:column;gap:6px;text-align:center}}
     @media(max-width:480px){.gal-grid{grid-template-columns:1fr}.gal-item:first-child{grid-column:auto}}
+
+    /* LIGHTBOX / CAROUSEL */
+    .lb{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;padding:24px;animation:lbFade .22s ease both}
+    .lb.open{display:flex}
+    @keyframes lbFade{from{opacity:0}to{opacity:1}}
+    .lb-img{max-width:min(1100px,100%);max-height:calc(100vh - 80px);object-fit:contain;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6);user-select:none}
+    .lb-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;width:48px;height:48px;border-radius:50%;font-size:1.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s}
+    .lb-btn:hover{background:rgba(255,255,255,.24)}
+    .lb-prev{left:18px}
+    .lb-next{right:18px}
+    .lb-close{position:absolute;top:18px;right:18px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;width:40px;height:40px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s}
+    .lb-close:hover{background:rgba(255,255,255,.24)}
+    .lb-count{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.85);font-family:'Geist',sans-serif;font-size:.88rem;font-weight:500;background:rgba(0,0,0,.5);padding:6px 14px;border-radius:100px}
+    @media(max-width:600px){.lb-btn{width:40px;height:40px;font-size:1.3rem}.lb-prev{left:10px}.lb-next{right:10px}}
   </style>
 </head>
 <body>
@@ -145,7 +161,7 @@
 
 <div id="store-content" style="min-height:60vh">
   <div style="display:flex;align-items:center;justify-content:center;padding:80px 24px;color:#6B6B6B">
-    <div style="width:24px;height:24px;border:3px solid #E8242A;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin-right:12px"></div>
+    <div style="width:24px;height:24px;border:3px solid #d60d52;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin-right:12px"></div>
     Cargando tienda...
   </div>
 </div>
@@ -157,7 +173,7 @@
       <img src="https://plazareal.cl/wp-content/uploads/2025/12/logo-mall-plaza-real-2024@3x.png" alt="Plaza Real" style="height:32px;width:auto;display:block;filter:brightness(0)invert(1);margin-bottom:10px">
       <p class="f-p">El centro comercial con más vida de Copiapó, en el corazón de la ciudad.</p>
       <div class="f-socs">
-        <a href="https://instagram.com/plazarealcopiapo" target="_blank" rel="noopener" class="f-soc">
+        <a href="https://www.instagram.com/plazareal_copiapo/" target="_blank" rel="noopener" class="f-soc">
           <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
         </a>
       </div>
@@ -172,6 +188,55 @@
 <a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="wa">
   <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
+
+<div id="lb" class="lb" role="dialog" aria-modal="true" aria-hidden="true">
+  <button class="lb-close" aria-label="Cerrar" onclick="lbClose()">✕</button>
+  <button class="lb-btn lb-prev" aria-label="Anterior" onclick="lbStep(-1)">‹</button>
+  <img id="lb-img" class="lb-img" alt="Foto"/>
+  <button class="lb-btn lb-next" aria-label="Siguiente" onclick="lbStep(1)">›</button>
+  <div id="lb-count" class="lb-count"></div>
+</div>
+
+<script>
+(function(){
+  var lb = document.getElementById('lb');
+  var lbImg = document.getElementById('lb-img');
+  var lbCount = document.getElementById('lb-count');
+  var photos = [];
+  var idx = 0;
+
+  window.lbOpen = function(list, start){
+    photos = Array.isArray(list) ? list.slice() : [];
+    idx = Math.max(0, Math.min(start|0, photos.length-1));
+    if(!photos.length) return;
+    render();
+    lb.classList.add('open');
+    lb.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+  };
+  window.lbClose = function(){
+    lb.classList.remove('open');
+    lb.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+  };
+  window.lbStep = function(d){
+    if(!photos.length) return;
+    idx = (idx + d + photos.length) % photos.length;
+    render();
+  };
+  function render(){
+    lbImg.src = photos[idx];
+    lbCount.textContent = (idx+1) + ' / ' + photos.length;
+  }
+  lb.addEventListener('click', function(e){ if(e.target === lb) lbClose(); });
+  document.addEventListener('keydown', function(e){
+    if(!lb.classList.contains('open')) return;
+    if(e.key === 'Escape') lbClose();
+    else if(e.key === 'ArrowLeft') lbStep(-1);
+    else if(e.key === 'ArrowRight') lbStep(1);
+  });
+})();
+</script>
 
 <script>
 // Load store data via HTMX from backend
