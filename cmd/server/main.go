@@ -71,6 +71,7 @@ func main() {
 
 	// ── PUBLIC WEB ──
 	app.Get("/", web.PageHandler(cfg, "index"))
+	app.Get("/index.html", web.PageHandler(cfg, "index"))
 	app.Get("/buscador-tiendas.html", web.PageHandler(cfg, "buscador-tiendas"))
 	app.Get("/tienda-individual.html", web.PageHandler(cfg, "tienda-individual"))
 	app.Get("/propiedades.html", web.PageHandler(cfg, "propiedades"))

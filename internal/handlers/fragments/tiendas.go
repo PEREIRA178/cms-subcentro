@@ -270,10 +270,18 @@ func renderIndexCard(t tienda, i int) string {
 // non-featured stores, per product requirement.
 func TiendasDestacadas(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		stores := fetchTiendas(pb, "status = 'publicado' && destacada = true", "-created", 6, 0)
+		all := fetchTiendas(pb, "status = 'publicado'", "-destacada,nombre", 200, 0)
 		var sb strings.Builder
-		for i, t := range stores {
-			sb.WriteString(renderIndexCard(t, i))
+		count := 0
+		for _, t := range all {
+			if !t.Destacada {
+				continue
+			}
+			sb.WriteString(renderIndexCard(t, count))
+			count++
+			if count >= 6 {
+				break
+			}
 		}
 		if sb.Len() == 0 {
 			sb.WriteString(`<p style="grid-column:1/-1;text-align:center;color:#6B6B6B">No hay tiendas destacadas aún.</p>`)
