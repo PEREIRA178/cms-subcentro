@@ -7,14 +7,14 @@
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,700&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,900&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{--red:#E8242A;--red-d:#B91A1F;--yellow:#F5C800;--green:#2DB37A;--dark:#0E0E0E;--dark2:#181818;--surface:#F5F4F1;--surface2:#EBEBEA;--white:#FFF;--text:#0E0E0E;--muted:#6B6B6B;--border:#E0DFDC}
     *{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
     body{font-family:'Geist',system-ui,sans-serif;background:var(--surface);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
     .navbar{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(14,14,14,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);padding:0 32px;height:68px;display:flex;align-items:center;justify-content:space-between}
-    .logo{font-family:'Fraunces',serif;font-weight:900;font-size:1.5rem;color:#fff;text-decoration:none;display:flex;align-items:baseline;gap:1px;letter-spacing:-.5px}
+    .logo{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.5rem;color:#fff;text-decoration:none;display:flex;align-items:baseline;gap:1px;letter-spacing:-.5px}
     .logo .dot{color:var(--red);font-size:2rem;line-height:0;position:relative;top:5px}
     .nav-links{display:flex;gap:36px;align-items:center}
     .nav-links a{color:rgba(255,255,255,.65);text-decoration:none;font-size:.87rem;font-weight:500;transition:color .18s}
@@ -39,7 +39,7 @@
     #storeLogoImg{width:100%;height:100%;object-fit:contain;padding:18px}
     .s-hero-info{flex:1;padding-bottom:4px;min-width:240px}
     .s-cat-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.88);padding:5px 14px;border-radius:100px;font-size:.76rem;font-weight:600;margin-bottom:12px}
-    .s-hero-name{font-family:'Fraunces',serif;font-size:clamp(1.9rem,5vw,3rem);font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.05;margin-bottom:9px}
+    .s-hero-name{font-family:'Montserrat',sans-serif;font-size:clamp(1.9rem,5vw,3rem);font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.05;margin-bottom:9px}
     .s-hero-desc{color:rgba(255,255,255,.65);font-size:.97rem;line-height:1.6;max-width:480px;margin-bottom:18px;font-weight:300}
     .s-tags{display:flex;flex-wrap:wrap;gap:7px}
     .s-tag{background:rgba(255,255,255,.10);color:rgba(255,255,255,.82);padding:4px 13px;border-radius:100px;font-size:.77rem;font-weight:500;border:1px solid rgba(255,255,255,.12)}
@@ -48,7 +48,7 @@
     @keyframes lp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
     .main{max-width:1100px;margin:0 auto;padding:44px 24px 72px;display:grid;grid-template-columns:1fr 320px;gap:32px;align-items:start}
     .card{background:#fff;border-radius:18px;padding:28px;box-shadow:0 1px 12px rgba(0,0,0,.07);margin-bottom:20px}
-    .card h2{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:900;margin-bottom:18px;color:var(--text);display:flex;align-items:center;gap:8px;letter-spacing:-.3px}
+    .card h2{font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:900;margin-bottom:18px;color:var(--text);display:flex;align-items:center;gap:8px;letter-spacing:-.3px}
     .i-row{display:flex;align-items:flex-start;gap:13px;margin-bottom:16px}
     .i-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem}
     .i-icon.r{background:#FEF0F0}.i-icon.y{background:#FFFAE0}.i-icon.g{background:#EDFFF5}.i-icon.b{background:#EFF4FF}
@@ -57,7 +57,7 @@
     .i-txt a{color:var(--red);text-decoration:none;font-size:.83rem}
     .i-txt a:hover{text-decoration:underline}
     .rating-strip{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:11px;padding:13px 15px;margin-bottom:18px}
-    .r-big{font-family:'Fraunces',serif;font-size:2rem;font-weight:900;color:var(--text);line-height:1}
+    .r-big{font-family:'Montserrat',sans-serif;font-size:2rem;font-weight:900;color:var(--text);line-height:1}
     .stars{color:var(--yellow);font-size:.87rem}
     .r-count{font-size:.78rem;color:var(--muted);margin-top:2px}
     .act-card{background:#fff;border-radius:18px;padding:24px;box-shadow:0 1px 12px rgba(0,0,0,.07);margin-bottom:20px}
@@ -82,7 +82,7 @@
     .gal-over{position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .3s;display:flex;align-items:center;justify-content:center}
     .gal-item:hover .gal-over{background:rgba(232,36,42,.18)}
     .gal-item:last-child .gal-over{background:rgba(0,0,0,.42)}
-    .gal-more{color:#fff;font-family:'Fraunces',serif;font-size:1.1rem;font-weight:900}
+    .gal-more{color:#fff;font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:900}
     .sch-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #F0EEE9}
     .sch-row:last-child{border-bottom:none}
     .sch-day{font-size:.87rem;color:var(--muted)}
@@ -97,19 +97,19 @@
     .sim-card:hover{border-color:var(--red);background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.08)}
     .sim-logo{width:46px;height:46px;border-radius:10px;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--border)}
     .sim-logo img{width:100%;height:100%;object-fit:contain;padding:6px}
-    .sim-name{font-family:'Fraunces',serif;font-weight:700;font-size:.9rem;margin-bottom:1px}
+    .sim-name{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:1px}
     .sim-sub{font-size:.75rem;color:var(--muted)}
     .sim-arr{margin-left:auto;color:var(--muted);font-size:.85rem}
     .sim-card:hover .sim-arr{color:var(--red)}
     .footer{background:#080808;color:rgba(255,255,255,.52)}
     .f-top{padding:56px 24px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;max-width:1200px;margin:0 auto}
-    .f-logo{font-family:'Fraunces',serif;font-weight:900;font-size:1.45rem;color:#fff;margin-bottom:10px;display:block}
+    .f-logo{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.45rem;color:#fff;margin-bottom:10px;display:block}
     .f-logo span{color:var(--red)}
     .f-p{font-size:.82rem;line-height:1.7;max-width:250px;margin-bottom:20px}
     .f-socs{display:flex;gap:8px}
     .f-soc{width:34px;height:34px;background:rgba(255,255,255,.07);border-radius:9px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.55);text-decoration:none;transition:background .2s}
     .f-soc:hover{background:var(--red);color:#fff}
-    .f-col h4{font-family:'Fraunces',serif;font-weight:700;color:#fff;font-size:.88rem;margin-bottom:12px}
+    .f-col h4{font-family:'Montserrat',sans-serif;font-weight:700;color:#fff;font-size:.88rem;margin-bottom:12px}
     .f-col a{display:block;color:rgba(255,255,255,.4);text-decoration:none;font-size:.8rem;margin-bottom:8px;transition:color .18s}
     .f-col a:hover{color:#fff}
     .f-bot{border-top:1px solid rgba(255,255,255,.07);padding:15px 24px;max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;font-size:.74rem}
@@ -155,18 +155,18 @@
   <div class="f-top">
     <div>
       <img src="https://plazareal.cl/wp-content/uploads/2025/12/logo-mall-plaza-real-2024@3x.png" alt="Plaza Real" style="height:32px;width:auto;display:block;filter:brightness(0)invert(1);margin-bottom:10px">
-      <p class="f-p">El centro comercial subterráneo de Copiapó, conectado con Metro Escuela Militar.</p>
+      <p class="f-p">El centro comercial con más vida de Copiapó, en el corazón de la ciudad.</p>
       <div class="f-socs">
-        <a href="https://instagram.com/subcentro.cl" target="_blank" rel="noopener" class="f-soc">
+        <a href="https://instagram.com/plazarealcopiapo" target="_blank" rel="noopener" class="f-soc">
           <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
         </a>
       </div>
     </div>
     <div class="f-col"><h4>Categorías</h4><a href="buscador-tiendas.html?cat=tiendas">Tiendas & Moda</a><a href="buscador-tiendas.html?cat=restaurantes">Restaurantes</a><a href="buscador-tiendas.html?cat=farmacias">Farmacias</a></div>
     <div class="f-col"><h4>Información</h4><a href="index.html#mapa">Cómo llegar</a><a href="#">Horarios</a><a href="#">Arriendos</a></div>
-    <div class="f-col"><h4>Contacto</h4><a href="tel:+56212345678">+56 2 1234 5678</a><a href="mailto:contacto@subcentro.cl">contacto@subcentro.cl</a><a href="index.html#mapa">Av. Apoquindo 4411</a></div>
+    <div class="f-col"><h4>Contacto</h4><a href="tel:+56512345678">+56 52 1234 5678</a><a href="mailto:contacto@plazareal.cl">contacto@plazareal.cl</a><a href="index.html#mapa">Colipí 484, Copiapó</a></div>
   </div>
-  <div class="f-bot"><span>© 2025 Plaza Real Copiapó.</span><span style="color:rgba(255,255,255,.25)">Diseñado con ♥ en Santiago</span></div>
+  <div class="f-bot"><span>© 2025 Plaza Real Copiapó.</span><span style="color:rgba(255,255,255,.25)">Diseñado con ♥ en Copiapó</span></div>
 </footer>
 
 <a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="wa">

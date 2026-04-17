@@ -196,7 +196,7 @@ func TiendasPage(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 
 		if len(stores) == 0 {
 			c.Set("Content-Type", "text/html; charset=utf-8")
-			return c.SendString(`<div id="empty" style="display:block;text-align:center;padding:72px 24px;max-width:360px;margin:0 auto"><div style="font-size:3.5rem;margin-bottom:16px;opacity:.45">🔍</div><h3 style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:900;margin-bottom:6px">Sin resultados</h3><p style="font-size:.87rem;color:#6B6B6B">Intenta con otro término o quita los filtros.</p></div>`)
+			return c.SendString(`<div id="empty" style="display:block;text-align:center;padding:72px 24px;max-width:360px;margin:0 auto"><div style="font-size:3.5rem;margin-bottom:16px;opacity:.45">🔍</div><h3 style="font-family:'Montserrat',sans-serif;font-size:1.3rem;font-weight:900;margin-bottom:6px">Sin resultados</h3><p style="font-size:.87rem;color:#6B6B6B">Intenta con otro término o quita los filtros.</p></div>`)
 		}
 
 		var sb strings.Builder
@@ -266,18 +266,39 @@ func renderIndexCard(t tienda, i int) string {
 }
 
 // TiendasDestacadas serves up to 6 featured store cards for the home page.
+// Only stores with destacada = true are returned — never falls back to
+// non-featured stores, per product requirement.
 func TiendasDestacadas(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		stores := fetchTiendas(pb, "status = 'publicado' && destacada = true", "-created", 6, 0)
-		if len(stores) == 0 {
-			stores = fetchTiendas(pb, "status = 'publicado'", "-created", 6, 0)
-		}
 		var sb strings.Builder
 		for i, t := range stores {
 			sb.WriteString(renderIndexCard(t, i))
 		}
 		if sb.Len() == 0 {
 			sb.WriteString(`<p style="grid-column:1/-1;text-align:center;color:#6B6B6B">No hay tiendas destacadas aún.</p>`)
+		}
+		c.Set("Content-Type", "text/html; charset=utf-8")
+		return c.SendString(sb.String())
+	}
+}
+
+// TiendasMarquee returns the inline HTML for the home marquee ticker.
+// Lists every published store name twice (duplicated for the CSS loop).
+func TiendasMarquee(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		stores := fetchTiendas(pb, "status = 'publicado'", "nombre", 500, 0)
+		var sb strings.Builder
+		writeRun := func() {
+			for _, t := range stores {
+				sb.WriteString(`<span class="mq-item">`)
+				sb.WriteString(template.HTMLEscapeString(t.Nombre))
+				sb.WriteString(`<span class="mq-dot"></span></span>`)
+			}
+		}
+		if len(stores) > 0 {
+			writeRun()
+			writeRun()
 		}
 		c.Set("Content-Type", "text/html; charset=utf-8")
 		return c.SendString(sb.String())
@@ -294,7 +315,7 @@ func TiendaDetail(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 
 		if len(stores) == 0 {
 			c.Set("Content-Type", "text/html; charset=utf-8")
-			return c.SendString(`<div style="text-align:center;padding:80px 24px"><h2 style="font-family:'Fraunces',serif">Tienda no encontrada</h2><p><a href="buscador-tiendas.html">Ver todas las tiendas</a></p></div>`)
+			return c.SendString(`<div style="text-align:center;padding:80px 24px"><h2 style="font-family:'Montserrat',sans-serif">Tienda no encontrada</h2><p><a href="buscador-tiendas.html">Ver todas las tiendas</a></p></div>`)
 		}
 
 		t := stores[0]
@@ -375,7 +396,7 @@ func TiendaDetail(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 			galLabel = "Sur"
 		}
 		localInfo := fmt.Sprintf("Galería %s · %s", galLabel, t.Local)
-		waLink := fmt.Sprintf("https://wa.me/%s?text=Hola,%%20quiero%%20informaci%%C3%%B3n%%20de%%20%s%%20en%%20Subcentro",
+		waLink := fmt.Sprintf("https://wa.me/%s?text=Hola,%%20quiero%%20informaci%%C3%%B3n%%20de%%20%s%%20en%%20Plaza%%20Real%%20Copiap%%C3%%B3",
 			t.Whatsapp, template.URLQueryEscaper(t.Nombre))
 		telLink := fmt.Sprintf("tel:%s", strings.ReplaceAll(t.Telefono, " ", ""))
 
@@ -428,13 +449,13 @@ func TiendaDetail(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
       <div>%s</div>
     </div>
     <div class="card fi" style="padding:20px">
-      <h2>📍 Ubicación en Subcentro</h2>
+      <h2>📍 Ubicación en Plaza Real</h2>
       <div class="map-mini">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3329.534!2d-70.5787!3d-33.4182!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662cf0f3b3a6d5f%%3A0x5f8e3a3a3a3a3a3a!2sAv.+Apoquindo+4411%%2C+Las+Condes!5e0!3m2!1ses!2scl!4v1700000000000" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación"></iframe>
+        <iframe src="https://www.google.com/maps?q=Plaza+Real+Copiap%%C3%%B3&output=embed" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación"></iframe>
       </div>
       <div style="margin-top:13px;display:flex;align-items:center;gap:9px;flex-wrap:wrap">
         <span style="background:var(--surface2);border-radius:9px;padding:7px 13px;font-size:.83rem;font-weight:600">📍 %s</span>
-        <span style="background:var(--surface2);border-radius:9px;padding:7px 13px;font-size:.83rem;font-weight:600;color:var(--muted)">🚇 Acceso Metro</span>
+        <span style="background:var(--surface2);border-radius:9px;padding:7px 13px;font-size:.83rem;font-weight:600;color:var(--muted)">🏙️ Centro de Copiapó</span>
       </div>
     </div>
   </div>
@@ -444,7 +465,7 @@ func TiendaDetail(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
         <div><div class="r-big">%s</div></div>
         <div><div class="stars">★★★★★</div><div class="r-count">Valoraciones Google</div></div>
       </div>
-      <div class="i-row"><div class="i-icon r">📍</div><div class="i-txt"><h4>Dirección</h4><p>Av. Apoquindo 4411, Las Condes</p><a href="https://maps.google.com/?q=Av+Apoquindo+4411+Las+Condes" target="_blank" rel="noopener">Ver en Google Maps →</a></div></div>
+      <div class="i-row"><div class="i-icon r">📍</div><div class="i-txt"><h4>Dirección</h4><p>Colipí 484, Copiapó, Atacama</p><a href="https://maps.google.com/?q=Plaza+Real+Copiap%%C3%%B3" target="_blank" rel="noopener">Ver en Google Maps →</a></div></div>
       <div class="i-row"><div class="i-icon y">🏬</div><div class="i-txt"><h4>Galería &amp; Local</h4><p>%s</p></div></div>
       <div class="i-row"><div class="i-icon g">🕐</div><div class="i-txt"><h4>Horario Lun–Vie</h4><p>%s</p></div></div>
       <div class="i-row"><div class="i-icon b">💳</div><div class="i-txt"><h4>Medios de pago</h4><p>%s</p></div></div>
@@ -456,7 +477,7 @@ func TiendaDetail(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
         <span class="ai"><svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span>
         <span class="al">WhatsApp</span><span class="ar">→</span>
       </a>
-      <a href="https://maps.google.com/?q=Av+Apoquindo+4411+Las+Condes" target="_blank" rel="noopener" class="a-btn"><span class="ai">🗺️</span><span class="al">Cómo llegar</span><span class="ar">→</span></a>
+      <a href="https://maps.google.com/?q=Plaza+Real+Copiap%%C3%%B3" target="_blank" rel="noopener" class="a-btn"><span class="ai">🗺️</span><span class="al">Cómo llegar</span><span class="ar">→</span></a>
       <a href="buscador-tiendas.html" class="a-btn"><span class="ai">🔍</span><span class="al">Ver todas las tiendas</span><span class="ar">→</span></a>
     </div>
     <div class="card fi">

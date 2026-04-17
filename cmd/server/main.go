@@ -87,6 +87,7 @@ func main() {
 	// Tiendas fragments (Subcentro)
 	frag.Get("/tiendas", fragments.TiendasPage(cfg, pb))
 	frag.Get("/tiendas-destacadas", fragments.TiendasDestacadas(cfg, pb))
+	frag.Get("/tiendas-marquee", fragments.TiendasMarquee(cfg, pb))
 	frag.Get("/tienda/:key", fragments.TiendaDetail(cfg, pb))
 	// Real-estate fragments (JCP Gestión Inmobiliaria)
 	frag.Get("/propiedades-destacadas", fragments.PropiedadesDestacadas(cfg, pb))

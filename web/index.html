@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plaza Real — El corazón comercial de Copiapó</title>
-  <meta name="description" content="Plaza Real, el centro comercial subterráneo ubicado en Metro Escuela Militar, Copiapó.">
+  <title>Plaza Real Copiapó — El corazón comercial de Copiapó</title>
+  <meta name="description" content="Plaza Real, el centro comercial en pleno centro de Copiapó, región de Atacama. Más de 100 tiendas, restaurantes y servicios.">
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,700;1,9..144,900&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,900&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
       --red:#E8242A; --red-d:#B91A1F;
@@ -26,7 +26,7 @@
 
     /* NAVBAR */
     .navbar{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(14,14,14,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);padding:0 32px;height:68px;display:flex;align-items:center;justify-content:space-between}
-    .logo{font-family:'Fraunces',serif;font-weight:900;font-size:1.5rem;color:#fff;text-decoration:none;display:flex;align-items:baseline;gap:1px;letter-spacing:-.5px}
+    .logo{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.5rem;color:#fff;text-decoration:none;display:flex;align-items:baseline;gap:1px;letter-spacing:-.5px}
     .logo .dot{color:var(--red);font-size:2rem;line-height:0;position:relative;top:5px}
     .nav-links{display:flex;gap:36px;align-items:center}
     .nav-links a{color:rgba(255,255,255,.65);text-decoration:none;font-size:.87rem;font-weight:500;transition:color .18s}
@@ -41,7 +41,7 @@
 
     /* HERO — flex column: buttons always ABOVE stats, no z-index overlap */
     .hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background:var(--dark);position:relative}
-    .hero-bg{position:absolute;inset:0;background:url('https://subcentro.cl/wp-content/uploads/2024/01/panoramica-d.jpg') center/cover no-repeat;opacity:.42;transform:scale(1.04);animation:heroZoom 24s ease-in-out infinite alternate}
+    .hero-bg{position:absolute;inset:0;background:url('https://plazareal.cl/wp-content/uploads/2025/12/plaza-real-hall-pantallas.jpeg') center/cover no-repeat;opacity:.42;transform:scale(1.04);animation:heroZoom 24s ease-in-out infinite alternate}
     @keyframes heroZoom{from{transform:scale(1.04)}to{transform:scale(1.10)}}
     .hero-grad{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(232,36,42,.20) 0%,transparent 70%),linear-gradient(180deg,rgba(14,14,14,.74) 0%,rgba(14,14,14,.44) 45%,rgba(14,14,14,.90) 100%)}
     .blob{position:absolute;border-radius:50%;filter:blur(110px);opacity:.15;animation:blobF 11s ease-in-out infinite;pointer-events:none}
@@ -55,7 +55,7 @@
     .hero-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(8px);color:rgba(255,255,255,.90);padding:7px 18px;border-radius:100px;font-size:.74rem;font-weight:600;letter-spacing:.9px;text-transform:uppercase;margin-bottom:28px;animation:fadeUp .5s ease both}
     .live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:lp 2s ease infinite;flex-shrink:0}
     @keyframes lp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
-    .hero-h1{font-family:'Fraunces',serif;font-size:clamp(2.9rem,8vw,6rem);font-weight:900;color:#fff;line-height:1.0;letter-spacing:-2px;margin-bottom:22px;animation:fadeUp .5s .08s ease both}
+    .hero-h1{font-family:'Montserrat',sans-serif;font-size:clamp(2.9rem,8vw,6rem);font-weight:900;color:#fff;line-height:1.0;letter-spacing:-2px;margin-bottom:22px;animation:fadeUp .5s .08s ease both}
     .hero-h1 em{font-style:italic;color:var(--yellow)}
     .hero-sub{font-size:clamp(.93rem,2vw,1.12rem);color:rgba(255,255,255,.68);max-width:520px;line-height:1.65;font-weight:300;margin-bottom:40px;animation:fadeUp .5s .16s ease both}
     /* Buttons — in flow, above stats */
@@ -63,7 +63,7 @@
     /* Stats — in flow, below buttons. No overlap ever. */
     .hero-stats{display:flex;gap:0;border-top:1px solid rgba(255,255,255,.12);padding-top:30px;animation:fadeUp .5s .32s ease both;width:100%;max-width:460px;justify-content:space-around}
     .stat{text-align:center}
-    .stat-n{font-family:'Fraunces',serif;font-size:2.1rem;font-weight:900;color:var(--yellow);line-height:1}
+    .stat-n{font-family:'Montserrat',sans-serif;font-size:2.1rem;font-weight:900;color:var(--yellow);line-height:1}
     .stat-l{font-size:.72rem;color:rgba(255,255,255,.5);letter-spacing:.4px;margin-top:4px}
     @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 
@@ -83,7 +83,7 @@
 
     /* SECTION */
     .eyebrow{font-size:.7rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--red);margin-bottom:10px}
-    .s-title{font-family:'Fraunces',serif;font-size:clamp(2rem,4vw,3rem);font-weight:900;color:var(--text);line-height:1.05;letter-spacing:-1px}
+    .s-title{font-family:'Montserrat',sans-serif;font-size:clamp(2rem,4vw,3rem);font-weight:900;color:var(--text);line-height:1.05;letter-spacing:-1px}
     .s-title em{font-style:italic;color:var(--red)}
     .container{max-width:1200px;margin:0 auto;padding:0 24px}
 
@@ -93,7 +93,7 @@
     .cat-card{border-radius:18px;padding:26px 18px;text-align:center;cursor:pointer;transition:transform .22s,box-shadow .22s;text-decoration:none;display:block;border:1.5px solid transparent}
     .cat-card:hover{transform:translateY(-5px);box-shadow:0 18px 44px rgba(0,0,0,.11)}
     .cat-icon{font-size:2.1rem;margin-bottom:11px;display:block}
-    .cat-name{font-family:'Fraunces',serif;font-weight:700;font-size:.93rem;line-height:1.2}
+    .cat-name{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.93rem;line-height:1.2}
     .cat-count{font-size:.75rem;margin-top:4px;opacity:.62}
     .c1{background:#FEF0F0;color:#8B1A1A;border-color:#F5CECE}
     .c2{background:#FFFAE0;color:#7A5F00;border-color:#F0DE90}
@@ -116,7 +116,7 @@
     .s-gallery{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);color:var(--text);padding:3px 10px;border-radius:100px;font-size:.65rem;font-weight:700;letter-spacing:.2px}
     .s-badge{position:absolute;top:10px;right:10px;background:var(--yellow);color:var(--dark);padding:3px 10px;border-radius:100px;font-size:.65rem;font-weight:700}
     .s-card-body{padding:17px 20px 20px;flex:1;display:flex;flex-direction:column}
-    .s-card-name{font-family:'Fraunces',serif;font-weight:700;font-size:1.02rem;margin-bottom:3px}
+    .s-card-name{font-family:'Montserrat',sans-serif;font-weight:700;font-size:1.02rem;margin-bottom:3px}
     .s-card-cat{font-size:.78rem;color:var(--muted);margin-bottom:13px;flex:1}
     .s-card-foot{display:flex;justify-content:space-between;align-items:center}
     .s-card-tag{background:var(--surface2);color:var(--mid);padding:4px 12px;border-radius:100px;font-size:.71rem;font-weight:600}
@@ -132,7 +132,7 @@
     .carousel-slide{min-width:100%;height:420px;flex-shrink:0;position:relative;overflow:hidden;border-radius:20px;background:#222}
     .carousel-slide img{width:100%;height:100%;object-fit:cover;display:block;user-select:none;pointer-events:none}
     .carousel-caption{position:absolute;bottom:0;left:0;right:0;padding:32px 36px;background:linear-gradient(0deg,rgba(0,0,0,.7) 0%,transparent 100%)}
-    .carousel-caption h3{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:900;color:#fff;letter-spacing:-.5px;margin-bottom:4px}
+    .carousel-caption h3{font-family:'Montserrat',sans-serif;font-size:1.6rem;font-weight:900;color:#fff;letter-spacing:-.5px;margin-bottom:4px}
     .carousel-caption p{color:rgba(255,255,255,.72);font-size:.9rem;font-weight:300}
     .carousel-btn{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);backdrop-filter:blur(8px);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:1.1rem;transition:background .2s;z-index:10}
     .carousel-btn:hover{background:var(--red);border-color:var(--red)}
@@ -158,7 +158,7 @@
     .map-s{padding:96px 0;background:var(--dark2)}
     .map-card{display:grid;grid-template-columns:1fr 1fr;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:22px;overflow:hidden;margin-top:52px}
     .map-info{padding:44px 40px}
-    .map-info h3{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:22px;letter-spacing:-.5px}
+    .map-info h3{font-family:'Montserrat',sans-serif;font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:22px;letter-spacing:-.5px}
     .map-row{display:flex;align-items:flex-start;gap:13px;margin-bottom:18px}
     .m-icon{width:38px;height:38px;background:rgba(255,255,255,.08);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
     .m-txt h4{font-weight:700;font-size:.85rem;color:#fff;margin-bottom:1px}
@@ -171,7 +171,7 @@
     .cta-card{max-width:860px;margin:0 auto;background:var(--dark);border-radius:26px;padding:68px 52px;text-align:center;position:relative;overflow:hidden}
     .cta-card::before{content:'';position:absolute;width:380px;height:380px;background:var(--red);border-radius:50%;top:-190px;right:-100px;opacity:.11;filter:blur(40px)}
     .cta-card::after{content:'';position:absolute;width:280px;height:280px;background:var(--yellow);border-radius:50%;bottom:-140px;left:-70px;opacity:.09;filter:blur(40px)}
-    .cta-h{font-family:'Fraunces',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;color:#fff;letter-spacing:-1px;margin-bottom:12px;position:relative;z-index:1}
+    .cta-h{font-family:'Montserrat',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;color:#fff;letter-spacing:-1px;margin-bottom:12px;position:relative;z-index:1}
     .cta-h em{font-style:italic;color:var(--yellow)}
     .cta-p{color:rgba(255,255,255,.6);font-size:.97rem;margin-bottom:34px;position:relative;z-index:1;font-weight:300}
     .cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
@@ -179,13 +179,13 @@
     /* FOOTER */
     .footer{background:#080808;color:rgba(255,255,255,.52)}
     .f-top{padding:58px 24px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;max-width:1200px;margin:0 auto}
-    .f-logo{font-family:'Fraunces',serif;font-weight:900;font-size:1.45rem;color:#fff;margin-bottom:10px;letter-spacing:-.4px;display:block}
+    .f-logo{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.45rem;color:#fff;margin-bottom:10px;letter-spacing:-.4px;display:block}
     .f-logo span{color:var(--red)}
     .f-p{font-size:.83rem;line-height:1.7;max-width:252px;margin-bottom:20px}
     .f-socs{display:flex;gap:9px}
     .f-soc{width:34px;height:34px;background:rgba(255,255,255,.07);border-radius:9px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.55);text-decoration:none;transition:background .2s,color .2s}
     .f-soc:hover{background:var(--red);color:#fff}
-    .f-col h4{font-family:'Fraunces',serif;font-weight:700;color:#fff;font-size:.9rem;margin-bottom:13px;letter-spacing:-.2px}
+    .f-col h4{font-family:'Montserrat',sans-serif;font-weight:700;color:#fff;font-size:.9rem;margin-bottom:13px;letter-spacing:-.2px}
     .f-col a{display:block;color:rgba(255,255,255,.42);text-decoration:none;font-size:.81rem;margin-bottom:8px;transition:color .18s}
     .f-col a:hover{color:#fff}
     .f-bot{border-top:1px solid rgba(255,255,255,.07);padding:16px 24px;max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;font-size:.76rem}
@@ -238,7 +238,7 @@
   <div class="hero-inner">
     <div class="hero-pill"><span class="live-dot" aria-hidden="true"></span>Abierto hoy · Lun–Sáb 9:00–21:00</div>
     <h1 class="hero-h1">El corazón<br><em>comercial</em><br>de Copiapó</h1>
-    <p class="hero-sub">Más de 80 tiendas, restaurantes y servicios bajo el Metro Escuela Militar. Todo lo que necesitas, en un solo lugar.</p>
+    <p class="hero-sub">Más de 100 tiendas, restaurantes y servicios en el centro de la ciudad. Todo lo que necesitas, en un solo lugar.</p>
     <!-- BUTTONS: rendered before stats — never obscured -->
     <div class="hero-btns">
       <a href="buscador-tiendas.html" class="btn-red">
@@ -252,20 +252,20 @@
     </div>
     <!-- STATS: rendered after buttons — always below, never overlapping -->
     <div class="hero-stats" aria-label="Datos clave">
-      <div class="stat"><div class="stat-n">80+</div><div class="stat-l">Locales</div></div>
-      <div class="stat"><div class="stat-n">2</div><div class="stat-l">Galerías</div></div>
-      <div class="stat"><div class="stat-n">15+</div><div class="stat-l">Restaurantes</div></div>
-      <div class="stat"><div class="stat-n">L1</div><div class="stat-l">Metro</div></div>
+      <div class="stat"><div class="stat-n">100+</div><div class="stat-l">Locales</div></div>
+      <div class="stat"><div class="stat-n">2</div><div class="stat-l">Niveles</div></div>
+      <div class="stat"><div class="stat-n">25+</div><div class="stat-l">Tiendas</div></div>
+      <div class="stat"><div class="stat-n">2</div><div class="stat-l">Accesos</div></div>
     </div>
   </div>
 </section>
 
 <!-- MARQUEE -->
 <div class="mq-wrap" aria-hidden="true">
-  <div class="mq-track">
-    <span class="mq-item">Starbucks<span class="mq-dot"></span></span><span class="mq-item">Adidas Combat Sports<span class="mq-dot"></span></span><span class="mq-item">Falafel Republic<span class="mq-dot"></span></span><span class="mq-item">Krispy Kreme<span class="mq-dot"></span></span><span class="mq-item">Farmacias Ahumada<span class="mq-dot"></span></span><span class="mq-item">OakBerry<span class="mq-dot"></span></span><span class="mq-item">Subway<span class="mq-dot"></span></span><span class="mq-item">Cruz Verde<span class="mq-dot"></span></span><span class="mq-item">Chilexpress<span class="mq-dot"></span></span><span class="mq-item">Dunkin'<span class="mq-dot"></span></span><span class="mq-item">Librería Nacional<span class="mq-dot"></span></span><span class="mq-item">Natura<span class="mq-dot"></span></span><span class="mq-item">Little Caesars<span class="mq-dot"></span></span><span class="mq-item">Doggis<span class="mq-dot"></span></span><span class="mq-item">TUA<span class="mq-dot"></span></span>
-    <span class="mq-item">Starbucks<span class="mq-dot"></span></span><span class="mq-item">Adidas Combat Sports<span class="mq-dot"></span></span><span class="mq-item">Falafel Republic<span class="mq-dot"></span></span><span class="mq-item">Krispy Kreme<span class="mq-dot"></span></span><span class="mq-item">Farmacias Ahumada<span class="mq-dot"></span></span><span class="mq-item">OakBerry<span class="mq-dot"></span></span><span class="mq-item">Subway<span class="mq-dot"></span></span><span class="mq-item">Cruz Verde<span class="mq-dot"></span></span><span class="mq-item">Chilexpress<span class="mq-dot"></span></span><span class="mq-item">Dunkin'<span class="mq-dot"></span></span><span class="mq-item">Librería Nacional<span class="mq-dot"></span></span><span class="mq-item">Natura<span class="mq-dot"></span></span><span class="mq-item">Little Caesars<span class="mq-dot"></span></span><span class="mq-item">Doggis<span class="mq-dot"></span></span><span class="mq-item">TUA<span class="mq-dot"></span></span>
-  </div>
+  <div class="mq-track"
+       hx-get="/fragments/tiendas-marquee"
+       hx-trigger="load"
+       hx-swap="innerHTML"></div>
 </div>
 
 <!-- CATEGORIES -->
@@ -310,7 +310,7 @@
         <!-- BANNER 1 — reemplaza src con tu imagen -->
         <div class="carousel-slide">
           <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1400&q=85" alt="Banner 1">
-          <div class="carousel-caption"><h3>Bienvenido a Plaza Real</h3><p>Más de 80 tiendas bajo el Metro Escuela Militar</p></div>
+          <div class="carousel-caption"><h3>Bienvenido a Plaza Real</h3><p>Más de 100 tiendas en el centro de Copiapó</p></div>
         </div>
         <!-- BANNER 2 — reemplaza src con tu imagen -->
         <div class="carousel-slide">
@@ -320,12 +320,12 @@
         <!-- BANNER 3 — reemplaza src con tu imagen -->
         <div class="carousel-slide">
           <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=85" alt="Banner 3">
-          <div class="carousel-caption"><h3>Gastronomía para todos</h3><p>19 restaurantes y cafés esperan por ti</p></div>
+          <div class="carousel-caption"><h3>Gastronomía para todos</h3><p>Restaurantes y cafés para disfrutar en familia</p></div>
         </div>
         <!-- BANNER 4 — reemplaza src con tu imagen -->
         <div class="carousel-slide">
           <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1400&q=85" alt="Banner 4">
-          <div class="carousel-caption"><h3>Galerías Norte y Sur</h3><p>Todo lo que necesitas en un mismo lugar</p></div>
+          <div class="carousel-caption"><h3>Corazón de Copiapó</h3><p>Todo lo que necesitas en un mismo lugar</p></div>
         </div>
       </div>
     </div>
@@ -340,9 +340,9 @@
   <div class="container">
     <div class="reveal" style="text-align:center"><p class="eyebrow">Lo que dicen</p><h2 class="s-title" id="testi-h">Nuestros <em>clientes</em> hablan</h2></div>
     <div class="testi-grid">
-      <div class="t-card reveal"><div class="stars">★★★★★</div><p class="t-text">Paso aquí casi todos los días al salir del metro. Tienen de todo: Starbucks para empezar el día, Falafel Republic para almorzar y la farmacia para lo que necesite. ¡Perfecto!</p><div class="t-auth"><img src="https://picsum.photos/seed/caro/40/40" alt="Carolina M." class="t-avatar"><div><div class="t-name">Carolina M.</div><div class="t-role">Profesional, Copiapó</div></div></div></div>
-      <div class="t-card reveal"><div class="stars">★★★★★</div><p class="t-text">La ubicación es insuperable. Entro desde el metro directamente y puedo hacer todas mis compras sin sol ni frío. Los precios son buenos y la variedad increíble.</p><div class="t-auth"><img src="https://picsum.photos/seed/andres/40/40" alt="Andrés T." class="t-avatar"><div><div class="t-name">Andrés T.</div><div class="t-role">Estudiante universitario</div></div></div></div>
-      <div class="t-card reveal"><div class="stars">★★★★☆</div><p class="t-text">El Dunkin' y el OakBerry son mis favoritos. Me encanta la mezcla de locales: comida rápida, ropa y farmacias. Todo en un solo lugar, sin salir a la calle.</p><div class="t-auth"><img src="https://picsum.photos/seed/val/40/40" alt="Valentina R." class="t-avatar"><div><div class="t-name">Valentina R.</div><div class="t-role">Sector financiero</div></div></div></div>
+      <div class="t-card reveal"><div class="stars">★★★★★</div><p class="t-text">Paso aquí casi todos los días al salir del trabajo. Tienen de todo: cafetería para empezar el día, opciones para almorzar y farmacia para lo que necesite. ¡Perfecto!</p><div class="t-auth"><img src="https://picsum.photos/seed/caro/40/40" alt="Carolina M." class="t-avatar"><div><div class="t-name">Carolina M.</div><div class="t-role">Profesional, Copiapó</div></div></div></div>
+      <div class="t-card reveal"><div class="stars">★★★★★</div><p class="t-text">La ubicación en el centro de Copiapó es insuperable. Llego caminando y puedo hacer todas mis compras en un solo lugar. Los precios son buenos y la variedad increíble.</p><div class="t-auth"><img src="https://picsum.photos/seed/andres/40/40" alt="Andrés T." class="t-avatar"><div><div class="t-name">Andrés T.</div><div class="t-role">Estudiante universitario</div></div></div></div>
+      <div class="t-card reveal"><div class="stars">★★★★☆</div><p class="t-text">La variedad de locales es lo mejor: comida, ropa, tecnología y farmacias. Me encanta que esté todo en un solo lugar, pleno centro de la ciudad.</p><div class="t-auth"><img src="https://picsum.photos/seed/val/40/40" alt="Valentina R." class="t-avatar"><div><div class="t-name">Valentina R.</div><div class="t-role">Vecina de Copiapó</div></div></div></div>
     </div>
   </div>
 </section>
@@ -354,17 +354,17 @@
     <div class="map-card reveal">
       <div class="map-info">
         <h3>Plaza Real Copiapó</h3>
-        <div class="map-row"><div class="m-icon">📍</div><div class="m-txt"><h4>Dirección</h4><p>Av. Apoquindo 4411, Copiapó, Santiago</p></div></div>
-        <div class="map-row"><div class="m-icon">🚇</div><div class="m-txt"><h4>Metro</h4><p>Estación Escuela Militar, Línea 1 — acceso directo</p></div></div>
-        <div class="map-row"><div class="m-icon">🕐</div><div class="m-txt"><h4>Horario</h4><p>Lunes a Sábado: 9:00 – 21:00 hrs</p></div></div>
-        <div class="map-row"><div class="m-icon">🅿️</div><div class="m-txt"><h4>Estacionamiento</h4><p>Disponible en edificio adyacente</p></div></div>
-        <a href="https://maps.google.com/?q=Av+Apoquindo+4411+Las+Condes+Santiago" target="_blank" rel="noopener" class="btn-red" style="margin-top:22px;display:inline-flex">
+        <div class="map-row"><div class="m-icon">📍</div><div class="m-txt"><h4>Dirección</h4><p>Colipí 484, Copiapó, Atacama</p></div></div>
+        <div class="map-row"><div class="m-icon">🏙️</div><div class="m-txt"><h4>Centro</h4><p>Frente a Plaza de Armas de Copiapó</p></div></div>
+        <div class="map-row"><div class="m-icon">🕐</div><div class="m-txt"><h4>Horario</h4><p>Lunes a Domingo: 9:00 – 21:00 hrs</p></div></div>
+        <div class="map-row"><div class="m-icon">🅿️</div><div class="m-txt"><h4>Estacionamiento</h4><p>Gratuito los primeros 30 minutos</p></div></div>
+        <a href="https://maps.google.com/?q=Plaza+Real+Copiap%C3%B3" target="_blank" rel="noopener" class="btn-red" style="margin-top:22px;display:inline-flex">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           Abrir en Google Maps
         </a>
       </div>
       <div class="map-iframe">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3329.534!2d-70.5787!3d-33.4182!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662cf0f3b3a6d5f%3A0x5f8e3a3a3a3a3a3a!2sAv.+Apoquindo+4411%2C+Las+Condes!5e0!3m2!1ses!2scl!4v1700000000000" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa Plaza Real Copiapó"></iframe>
+        <iframe src="https://www.google.com/maps?q=Plaza+Real+Copiap%C3%B3&output=embed" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa Plaza Real Copiapó"></iframe>
       </div>
     </div>
   </div>
@@ -375,7 +375,7 @@
   <div class="container">
     <div class="cta-card reveal">
       <h2 class="cta-h">¿Listo para explorar<br><em>Plaza Real</em>?</h2>
-      <p class="cta-p">Más de 80 locales a tu disposición. Moda, comida, tecnología, farmacias y mucho más.</p>
+      <p class="cta-p">Más de 100 locales a tu disposición. Moda, comida, tecnología, farmacias y mucho más.</p>
       <div class="cta-btns">
         <a href="buscador-tiendas.html" class="btn-red">Explorar todas las tiendas</a>
         <a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="btn-ghost">
@@ -392,17 +392,17 @@
   <div class="f-top">
     <div>
       <img src="https://plazareal.cl/wp-content/uploads/2025/12/logo-mall-plaza-real-2024@3x.png" alt="Plaza Real" style="height:32px;width:auto;display:block;filter:brightness(0)invert(1);margin-bottom:10px">
-      <p class="f-p">El centro comercial subterráneo de Copiapó, conectado directamente con Metro Escuela Militar.</p>
+      <p class="f-p">El centro comercial con más vida de Copiapó, conectado directamente con el corazón de la ciudad.</p>
       <div class="f-socs">
-        <a href="https://instagram.com/subcentro.cl" target="_blank" rel="noopener" class="f-soc" aria-label="Instagram"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+        <a href="https://instagram.com/plazarealcopiapo" target="_blank" rel="noopener" class="f-soc" aria-label="Instagram"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
         <a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="f-soc" aria-label="WhatsApp"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
       </div>
     </div>
     <div class="f-col"><h4>Tiendas</h4><a href="buscador-tiendas.html?cat=tiendas">Moda & Ropa</a><a href="buscador-tiendas.html?cat=restaurantes">Restaurantes</a><a href="buscador-tiendas.html?cat=farmacias">Farmacias</a><a href="buscador-tiendas.html?cat=tecnologia">Tecnología</a><a href="buscador-tiendas.html?cat=servicios">Servicios</a></div>
     <div class="f-col"><h4>Información</h4><a href="#mapa">Cómo llegar</a><a href="#">Horarios</a><a href="#">Arriendos</a><a href="#">Trabaja con nosotros</a></div>
-    <div class="f-col"><h4>Contacto</h4><a href="tel:+56212345678">+56 2 1234 5678</a><a href="mailto:contacto@subcentro.cl">contacto@subcentro.cl</a><a href="#mapa">Av. Apoquindo 4411, Copiapó</a></div>
+    <div class="f-col"><h4>Contacto</h4><a href="tel:+56512345678">+56 52 1234 5678</a><a href="mailto:contacto@plazareal.cl">contacto@plazareal.cl</a><a href="#mapa">Colipí 484, Copiapó</a></div>
   </div>
-  <div class="f-bot"><span>© 2025 Plaza Real Copiapó. Todos los derechos reservados.</span><span style="color:rgba(255,255,255,.28)">Diseñado con ♥ en Santiago</span></div>
+  <div class="f-bot"><span>© 2025 Plaza Real Copiapó. Todos los derechos reservados.</span><span style="color:rgba(255,255,255,.28)">Diseñado con ♥ en Copiapó</span></div>
 </footer>
 
 <a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="wa" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
