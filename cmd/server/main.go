@@ -182,6 +182,8 @@ func main() {
 	// Tiendas
 	adm.Get("/tiendas", admin.TiendasList(cfg, pb))
 	adm.Get("/tiendas/new", admin.TiendaForm(cfg))
+	adm.Get("/tiendas/bulk", admin.TiendaBulkForm(cfg))
+	adm.Post("/tiendas/bulk", admin.TiendaBulkCreate(cfg, pb))
 	adm.Post("/tiendas", admin.TiendaCreate(cfg, pb))
 	adm.Get("/tiendas/:id/edit", admin.TiendaEdit(cfg, pb))
 	adm.Put("/tiendas/:id", admin.TiendaUpdate(cfg, pb))

@@ -15,6 +15,10 @@
     <a href="/buscador-tiendas.html" target="_blank" class="topbar-btn topbar-btn-outline">
       <span class="material-symbols-outlined" style="font-size:16px">open_in_new</span> Ver web
     </a>
+    <button class="topbar-btn topbar-btn-outline"
+      hx-get="/admin/tiendas/bulk" hx-target="#modal-container" hx-swap="innerHTML">
+      <span class="material-symbols-outlined" style="font-size:16px">upload_file</span> Carga masiva
+    </button>
     <button class="topbar-btn topbar-btn-primary"
       hx-get="/admin/tiendas/new" hx-target="#modal-container" hx-swap="innerHTML">
       <span class="material-symbols-outlined" style="font-size:16px">add</span> Nueva tienda

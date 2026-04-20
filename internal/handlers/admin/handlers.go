@@ -3,10 +3,14 @@ package admin
 import (
 	"jcp-gestioninmobiliaria/internal/auth"
 	"jcp-gestioninmobiliaria/internal/config"
+	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
+	"regexp"
 	"strings"
 	"time"
 
@@ -1958,6 +1962,339 @@ func tiendaFormHTML(id, nombre, slug, cat, gal, local, logo, tags, desc, about, 
 		template.HTMLEscapeString(horarioDom),
 		chk(destacada),
 	)
+}
+
+// ── TIENDAS BULK UPLOAD ──
+
+// tiendaBulkRow is the normalized shape expected from CSV/JSON bulk uploads.
+type tiendaBulkRow struct {
+	Nombre     string `json:"nombre"`
+	Slug       string `json:"slug"`
+	Cat        string `json:"cat"`
+	Gal        string `json:"gal"`
+	Local      string `json:"local"`
+	Logo       string `json:"logo"`
+	Tags       string `json:"tags"`
+	Desc       string `json:"desc"`
+	About      string `json:"about"`
+	About2     string `json:"about2"`
+	Pay        string `json:"pay"`
+	Photos     string `json:"photos"`
+	Similar    string `json:"similar"`
+	Whatsapp   string `json:"whatsapp"`
+	Telefono   string `json:"telefono"`
+	Rating     string `json:"rating"`
+	HorarioLV  string `json:"horario_lv"`
+	HorarioSab string `json:"horario_sab"`
+	HorarioDom string `json:"horario_dom"`
+	Status     string `json:"status"`
+	Destacada  string `json:"destacada"`
+}
+
+var tiendaSlugRe = regexp.MustCompile(`[^a-z0-9]+`)
+
+func slugifyTienda(s string) string {
+	s = strings.ToLower(strings.TrimSpace(s))
+	s = strings.ReplaceAll(s, "á", "a")
+	s = strings.ReplaceAll(s, "é", "e")
+	s = strings.ReplaceAll(s, "í", "i")
+	s = strings.ReplaceAll(s, "ó", "o")
+	s = strings.ReplaceAll(s, "ú", "u")
+	s = strings.ReplaceAll(s, "ñ", "n")
+	s = tiendaSlugRe.ReplaceAllString(s, "-")
+	return strings.Trim(s, "-")
+}
+
+func truthy(s string) bool {
+	switch strings.ToLower(strings.TrimSpace(s)) {
+	case "1", "true", "t", "yes", "y", "si", "sí", "on", "x":
+		return true
+	}
+	return false
+}
+
+// parseTiendaBulk parses JSON array or CSV into rows. Detects format by first non-whitespace char.
+func parseTiendaBulk(raw string) ([]tiendaBulkRow, error) {
+	trimmed := strings.TrimSpace(raw)
+	if trimmed == "" {
+		return nil, fmt.Errorf("contenido vacío")
+	}
+	if trimmed[0] == '[' || trimmed[0] == '{' {
+		var rows []tiendaBulkRow
+		if trimmed[0] == '{' {
+			var single tiendaBulkRow
+			if err := json.Unmarshal([]byte(trimmed), &single); err != nil {
+				return nil, fmt.Errorf("JSON inválido: %w", err)
+			}
+			rows = []tiendaBulkRow{single}
+		} else {
+			if err := json.Unmarshal([]byte(trimmed), &rows); err != nil {
+				return nil, fmt.Errorf("JSON inválido: %w", err)
+			}
+		}
+		return rows, nil
+	}
+
+	r := csv.NewReader(strings.NewReader(trimmed))
+	r.TrimLeadingSpace = true
+	r.FieldsPerRecord = -1
+	// Auto-detect delimiter: if first line has ';' and no ',' use ';'
+	firstLine := trimmed
+	if i := strings.IndexAny(trimmed, "\r\n"); i >= 0 {
+		firstLine = trimmed[:i]
+	}
+	if strings.Contains(firstLine, ";") && !strings.Contains(firstLine, ",") {
+		r.Comma = ';'
+	}
+
+	records, err := r.ReadAll()
+	if err != nil {
+		return nil, fmt.Errorf("CSV inválido: %w", err)
+	}
+	if len(records) < 2 {
+		return nil, fmt.Errorf("el CSV debe tener cabecera y al menos una fila")
+	}
+	headers := records[0]
+	idx := map[string]int{}
+	for i, h := range headers {
+		idx[strings.ToLower(strings.TrimSpace(h))] = i
+	}
+	pick := func(row []string, keys ...string) string {
+		for _, k := range keys {
+			if i, ok := idx[k]; ok && i < len(row) {
+				return strings.TrimSpace(row[i])
+			}
+		}
+		return ""
+	}
+	out := make([]tiendaBulkRow, 0, len(records)-1)
+	for i := 1; i < len(records); i++ {
+		row := records[i]
+		if len(row) == 0 {
+			continue
+		}
+		nombre := pick(row, "nombre", "name")
+		if nombre == "" {
+			continue
+		}
+		out = append(out, tiendaBulkRow{
+			Nombre:     nombre,
+			Slug:       pick(row, "slug"),
+			Cat:        pick(row, "cat", "categoria", "categoría"),
+			Gal:        pick(row, "gal", "nivel"),
+			Local:      pick(row, "local"),
+			Logo:       pick(row, "logo"),
+			Tags:       pick(row, "tags"),
+			Desc:       pick(row, "desc", "descripcion", "descripción"),
+			About:      pick(row, "about", "sobre"),
+			About2:     pick(row, "about2", "sobre2"),
+			Pay:        pick(row, "pay", "pagos"),
+			Photos:     pick(row, "photos", "fotos", "galeria", "galería"),
+			Similar:    pick(row, "similar", "similares"),
+			Whatsapp:   pick(row, "whatsapp", "wsp"),
+			Telefono:   pick(row, "telefono", "teléfono", "phone"),
+			Rating:     pick(row, "rating"),
+			HorarioLV:  pick(row, "horario_lv", "lv"),
+			HorarioSab: pick(row, "horario_sab", "sab", "sabado", "sábado"),
+			HorarioDom: pick(row, "horario_dom", "dom", "domingo"),
+			Status:     pick(row, "status", "estado"),
+			Destacada:  pick(row, "destacada", "featured"),
+		})
+	}
+	return out, nil
+}
+
+func TiendaBulkForm(cfg *config.Config) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		html := `<div class="modal-overlay" onclick="this.remove()">
+  <div class="modal-card" onclick="event.stopPropagation()" style="max-width:820px;max-height:92vh;overflow-y:auto">
+    <div class="modal-header">
+      <h3>Carga masiva de tiendas</h3>
+      <button onclick="document.getElementById('modal-container').innerHTML=''" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--md-outline)">✕</button>
+    </div>
+    <div style="padding:0 0 12px 0;font-size:13px;color:var(--md-outline);line-height:1.55">
+      Sube un archivo <b>CSV</b> o <b>JSON</b>, o pega el contenido abajo. Cada fila se guardará como tienda y mostrará los mismos campos que la página individual.
+      <br/>Campos soportados: <code>nombre</code> (requerido), <code>slug</code>, <code>cat</code>, <code>gal</code>, <code>local</code>, <code>logo</code>, <code>tags</code>, <code>desc</code>, <code>about</code>, <code>about2</code>, <code>pay</code>, <code>photos</code>, <code>similar</code>, <code>whatsapp</code>, <code>telefono</code>, <code>rating</code>, <code>horario_lv</code>, <code>horario_sab</code>, <code>horario_dom</code>, <code>status</code>, <code>destacada</code>.
+      <br/><b>cat</b>: tiendas | restaurantes | farmacias | salud | tecnologia | servicios. <b>gal</b>: norte | sur. <b>status</b>: publicado | borrador. <b>destacada</b>: true/false.
+    </div>
+    <form hx-post="/admin/tiendas/bulk" hx-encoding="multipart/form-data" hx-target="#tienda-bulk-result" hx-swap="innerHTML" hx-indicator="#tienda-bulk-spinner">
+      <div class="form-field">
+        <label>Archivo CSV o JSON</label>
+        <input type="file" name="file" accept=".csv,.json,text/csv,application/json" class="form-input"/>
+      </div>
+      <div class="form-field">
+        <label>…o pega el contenido aquí</label>
+        <textarea name="content" class="form-input" rows="10" placeholder='[{"nombre":"Starbucks","cat":"restaurantes","gal":"norte","local":"Local 8","desc":"Café y pastelería","photos":"url1,url2,url3,url4","whatsapp":"56912345678","horario_lv":"9:00 – 21:00","status":"publicado"}]'></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-field" style="display:flex;align-items:center;padding-top:10px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+            <input type="checkbox" name="upsert" checked style="width:16px;height:16px;accent-color:var(--md-primary)"/>
+            Actualizar si ya existe (por slug)
+          </label>
+        </div>
+        <div class="form-field" style="display:flex;align-items:center;padding-top:10px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+            <input type="checkbox" name="default_publicado" checked style="width:16px;height:16px;accent-color:var(--md-primary)"/>
+            Publicar por defecto
+          </label>
+        </div>
+      </div>
+      <div id="tienda-bulk-result" style="margin-top:12px"></div>
+      <div class="modal-actions">
+        <button type="button" onclick="document.getElementById('modal-container').innerHTML=''" class="topbar-btn topbar-btn-outline">Cerrar</button>
+        <button type="submit" class="topbar-btn topbar-btn-primary">
+          <span id="tienda-bulk-spinner" class="htmx-indicator">⏳ </span>Importar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>`
+		c.Set("Content-Type", "text/html; charset=utf-8")
+		return c.SendString(html)
+	}
+}
+
+func TiendaBulkCreate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		raw := strings.TrimSpace(c.FormValue("content"))
+		upsert := c.FormValue("upsert") == "on"
+		defaultPublicado := c.FormValue("default_publicado") == "on"
+
+		if fh, err := c.FormFile("file"); err == nil && fh != nil && fh.Size > 0 {
+			f, ferr := fh.Open()
+			if ferr != nil {
+				return c.SendString(`<div class="toast toast-error">No se pudo leer el archivo: ` + template.HTMLEscapeString(ferr.Error()) + `</div>`)
+			}
+			defer f.Close()
+			var buf bytes.Buffer
+			if _, cerr := io.Copy(&buf, f); cerr != nil {
+				return c.SendString(`<div class="toast toast-error">Error leyendo archivo: ` + template.HTMLEscapeString(cerr.Error()) + `</div>`)
+			}
+			raw = strings.TrimSpace(buf.String())
+		}
+
+		if raw == "" {
+			return c.SendString(`<div class="toast toast-error">Sube un archivo o pega el contenido.</div>`)
+		}
+
+		rows, err := parseTiendaBulk(raw)
+		if err != nil {
+			return c.SendString(`<div class="toast toast-error">` + template.HTMLEscapeString(err.Error()) + `</div>`)
+		}
+		if len(rows) == 0 {
+			return c.SendString(`<div class="toast toast-error">No se detectaron filas válidas (se requiere columna "nombre").</div>`)
+		}
+
+		col, err := pb.FindCollectionByNameOrId("tiendas")
+		if err != nil {
+			return c.Status(500).SendString(`<div class="toast toast-error">Error de BD</div>`)
+		}
+
+		existing, _ := pb.FindRecordsByFilter("tiendas", "", "", 2000, 0)
+		bySlug := map[string]*core.Record{}
+		for _, r := range existing {
+			if s := r.GetString("slug"); s != "" {
+				bySlug[s] = r
+			}
+		}
+
+		created, updated, skipped := 0, 0, 0
+		var errs []string
+
+		validCats := map[string]bool{"tiendas": true, "restaurantes": true, "farmacias": true, "salud": true, "tecnologia": true, "servicios": true}
+
+		for i, row := range rows {
+			nombre := strings.TrimSpace(row.Nombre)
+			if nombre == "" {
+				skipped++
+				continue
+			}
+			slug := strings.TrimSpace(row.Slug)
+			if slug == "" {
+				slug = slugifyTienda(nombre)
+			}
+			cat := strings.ToLower(strings.TrimSpace(row.Cat))
+			if !validCats[cat] {
+				cat = "tiendas"
+			}
+			gal := strings.ToLower(strings.TrimSpace(row.Gal))
+			if gal != "norte" && gal != "sur" {
+				gal = "norte"
+			}
+			status := strings.ToLower(strings.TrimSpace(row.Status))
+			if status != "publicado" && status != "borrador" {
+				if defaultPublicado {
+					status = "publicado"
+				} else {
+					status = "borrador"
+				}
+			}
+			rating := strings.TrimSpace(row.Rating)
+			if rating == "" {
+				rating = "4.5"
+			}
+
+			var rec *core.Record
+			isUpdate := false
+			if existingRec, ok := bySlug[slug]; ok {
+				if !upsert {
+					skipped++
+					continue
+				}
+				rec = existingRec
+				isUpdate = true
+			} else {
+				rec = core.NewRecord(col)
+			}
+
+			rec.Set("nombre", nombre)
+			rec.Set("slug", slug)
+			rec.Set("cat", cat)
+			rec.Set("gal", gal)
+			rec.Set("local", row.Local)
+			rec.Set("logo", row.Logo)
+			rec.Set("tags", row.Tags)
+			rec.Set("desc", row.Desc)
+			rec.Set("about", row.About)
+			rec.Set("about2", row.About2)
+			rec.Set("pay", row.Pay)
+			rec.Set("photos", row.Photos)
+			rec.Set("similar", row.Similar)
+			rec.Set("whatsapp", row.Whatsapp)
+			rec.Set("telefono", row.Telefono)
+			rec.Set("rating", rating)
+			rec.Set("horario_lv", row.HorarioLV)
+			rec.Set("horario_sab", row.HorarioSab)
+			rec.Set("horario_dom", row.HorarioDom)
+			rec.Set("status", status)
+			rec.Set("destacada", truthy(row.Destacada))
+
+			if err := pb.Save(rec); err != nil {
+				errs = append(errs, fmt.Sprintf("fila %d (%s): %s", i+1, nombre, err.Error()))
+				continue
+			}
+			if isUpdate {
+				updated++
+			} else {
+				created++
+				bySlug[slug] = rec
+			}
+		}
+
+		var b strings.Builder
+		b.WriteString(fmt.Sprintf(`<div class="toast toast-success" style="margin-bottom:8px">✅ Creadas: %d · 🔄 Actualizadas: %d · ⏭️ Omitidas: %d</div>`, created, updated, skipped))
+		if len(errs) > 0 {
+			b.WriteString(`<div class="toast toast-error" style="max-height:200px;overflow:auto"><b>Errores:</b><ul style="margin:6px 0 0 18px;padding:0">`)
+			for _, e := range errs {
+				b.WriteString(`<li>` + template.HTMLEscapeString(e) + `</li>`)
+			}
+			b.WriteString(`</ul></div>`)
+		}
+		b.WriteString(`<script>htmx.ajax('GET','/admin/tiendas?fragment=rows',{target:'#tiendas-tbody',swap:'innerHTML'});</script>`)
+		c.Set("Content-Type", "text/html; charset=utf-8")
+		return c.SendString(b.String())
+	}
 }
 
 // sel returns " selected" if val == target
