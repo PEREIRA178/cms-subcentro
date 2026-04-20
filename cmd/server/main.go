@@ -70,7 +70,9 @@ func main() {
 	realtime.SetHubInstance(hub)
 
 	// ── PUBLIC WEB ──
-	app.Get("/", web.PageHandler(cfg, "index"))
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Redirect("/index.html", fiber.StatusMovedPermanently)
+	})
 	app.Get("/index.html", web.PageHandler(cfg, "index"))
 	app.Get("/buscador-tiendas.html", web.PageHandler(cfg, "buscador-tiendas"))
 	app.Get("/tienda-individual.html", web.PageHandler(cfg, "tienda-individual"))

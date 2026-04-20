@@ -5,6 +5,7 @@ pb_data/logs/
 
 # Build output
 /jcp-gestioninmobiliaria
+/server
 /tmp/
 
 # Go build cache
