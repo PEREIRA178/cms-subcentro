@@ -1,6 +1,6 @@
 module jcp-gestioninmobiliaria
 
-go 1.23
+go 1.24
 
 require (
 	github.com/aws/aws-sdk-go-v2/config v1.29.3
@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.75.1
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/gofiber/websocket/v2 v2.2.1
-	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/pocketbase/pocketbase v0.25.0
 )
 
