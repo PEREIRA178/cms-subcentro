@@ -1653,7 +1653,7 @@ func TiendasList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 					dest = `<span class="badge badge-info" style="font-size:10px">⭐</span>`
 				}
 				nivelLabel := "Placa Comercial"
-				if r.GetString("gal") == "sur" {
+				if r.GetString("gal") == "flamenco" {
 					nivelLabel = "Torre Flamenco"
 				}
 				sb.WriteString(fmt.Sprintf(`<tr>
@@ -1688,7 +1688,7 @@ func TiendasList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 
 func TiendaForm(cfg *config.Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		html := tiendaFormHTML("", "", "", "tiendas", "norte", "", "", "", "", "", "", "", "", "", "", "", "4.5", "9:00 – 21:00", "10:00 – 20:00", "Cerrado", "publicado", false)
+		html := tiendaFormHTML("", "", "", "tiendas", "placa", "", "", "", "", "", "", "", "", "", "", "", "4.5", "9:00 – 21:00", "10:00 – 20:00", "Cerrado", "publicado", false)
 		c.Set("Content-Type", "text/html; charset=utf-8")
 		return c.SendString(html)
 	}
@@ -1864,7 +1864,7 @@ func tiendaFormHTML(id, nombre, slug, cat, gal, local, logo, tags, desc, about, 
 		catOpts.WriteString(fmt.Sprintf(`<option value="%s"%s>%s</option>`, o.v, s, o.l))
 	}
 
-	gals := []struct{ v, l string }{{"norte", "Placa Comercial"}, {"sur", "Torre Flamenco"}}
+	gals := []struct{ v, l string }{{"placa", "Placa Comercial"}, {"flamenco", "Torre Flamenco"}}
 	var galOpts strings.Builder
 	for _, o := range gals {
 		s := ""
@@ -2124,7 +2124,7 @@ func TiendaBulkForm(cfg *config.Config) fiber.Handler {
       </div>
       <div class="form-field">
         <label>…o pega el contenido aquí</label>
-        <textarea name="content" class="form-input" rows="10" placeholder='[{"nombre":"Starbucks","cat":"restaurantes","gal":"norte","local":"Local 8","desc":"Café y pastelería","photos":"url1,url2,url3,url4","whatsapp":"56912345678","horario_lv":"9:00 – 21:00","status":"publicado"}]'></textarea>
+        <textarea name="content" class="form-input" rows="10" placeholder='[{"nombre":"Starbucks","cat":"restaurantes","gal":"placa","local":"Local 8","desc":"Café y pastelería","photos":"url1,url2,url3,url4","whatsapp":"56912345678","horario_lv":"9:00 – 21:00","status":"publicado"}]'></textarea>
       </div>
       <div class="form-row">
         <div class="form-field" style="display:flex;align-items:center;padding-top:10px">
@@ -2219,8 +2219,8 @@ func TiendaBulkCreate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handl
 				cat = "tiendas"
 			}
 			gal := strings.ToLower(strings.TrimSpace(row.Gal))
-			if gal != "norte" && gal != "sur" {
-				gal = "norte"
+			if gal != "placa" && gal != "flamenco" {
+				gal = "placa"
 			}
 			status := strings.ToLower(strings.TrimSpace(row.Status))
 			if status != "publicado" && status != "borrador" {

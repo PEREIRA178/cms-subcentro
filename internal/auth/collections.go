@@ -192,7 +192,7 @@ func ensureCollections(app core.App) error {
 			&core.TextField{Name: "slug"},
 			// tiendas|restaurantes|farmacias|salud|tecnologia|servicios
 			&core.TextField{Name: "cat", Required: true},
-			// norte|sur
+			// placa|flamenco
 			&core.TextField{Name: "gal"},
 			&core.TextField{Name: "local"},
 			&core.TextField{Name: "logo"},
@@ -260,6 +260,47 @@ func ensureCollections(app core.App) error {
 			return err
 		}
 		log.Println("  ✅ Collection 'propiedades' created")
+	}
+
+	// ── 12. CAROUSEL SLIDES (banners del hero/carrusel del index) ──
+	if _, err := app.FindCollectionByNameOrId("carousel_slides"); err != nil {
+		col := core.NewBaseCollection("carousel_slides")
+		col.Fields.Add(
+			&core.TextField{Name: "title"},
+			&core.TextField{Name: "subtitle"},
+			&core.TextField{Name: "image_url", Required: true},
+			&core.TextField{Name: "link_url"},
+			&core.NumberField{Name: "orden"},
+			&core.BoolField{Name: "activo"},
+		)
+		if err := app.Save(col); err != nil {
+			return err
+		}
+		log.Println("  ✅ Collection 'carousel_slides' created")
+	}
+
+	// ── 13. CATEGORIAS (categorías editables de tiendas) ──
+	if _, err := app.FindCollectionByNameOrId("categorias"); err != nil {
+		col := core.NewBaseCollection("categorias")
+		col.Fields.Add(
+			&core.TextField{Name: "slug", Required: true},
+			&core.TextField{Name: "nombre", Required: true},
+			&core.TextField{Name: "icono"},
+			&core.NumberField{Name: "orden"},
+			&core.BoolField{Name: "activo"},
+		)
+		if err := app.Save(col); err != nil {
+			return err
+		}
+		log.Println("  ✅ Collection 'categorias' created")
+	}
+
+	// ── Seed carousel_slides & categorias if empty ──
+	if err := seedCarouselSlides(app); err != nil {
+		log.Printf("⚠️  Error seeding carousel_slides: %v", err)
+	}
+	if err := seedCategorias(app); err != nil {
+		log.Printf("⚠️  Error seeding categorias: %v", err)
 	}
 
 	// ── 11. Default superadmin ──
@@ -877,7 +918,7 @@ func seedTiendas(app core.App) error {
 	seeds := []tiendaSeed{
 		{
 			nombre: "Starbucks", slug: "starbucks",
-			cat: "restaurantes", gal: "norte", local: "Local 34",
+			cat: "restaurantes", gal: "placa", local: "Local 34",
 			logo:       "https://logo.clearbit.com/starbucks.com",
 			tags:       "Café,Frappuccino,WiFi,Snacks",
 			desc:       "Tu café favorito con las mejores bebidas frías, calientes y Frappuccino.",
@@ -892,7 +933,7 @@ func seedTiendas(app core.App) error {
 		},
 		{
 			nombre: "Adidas Combat Sports", slug: "adidas-combat",
-			cat: "tiendas", gal: "norte", local: "Local 8",
+			cat: "tiendas", gal: "placa", local: "Local 8",
 			logo:       "https://subcentro.cl/wp-content/uploads/2026/03/Adidas-combat-100-1.jpg",
 			tags:       "MMA,Boxeo,Judo,Equipamiento",
 			desc:       "Tienda especializada en equipamiento y ropa de combate de la marca más icónica del deporte.",
@@ -907,7 +948,7 @@ func seedTiendas(app core.App) error {
 		},
 		{
 			nombre: "La Fête", slug: "la-fete",
-			cat: "tiendas", gal: "norte", local: "Local 15",
+			cat: "tiendas", gal: "placa", local: "Local 15",
 			logo:       "https://subcentro.cl/wp-content/uploads/2025/05/la-fete-100-1.jpg",
 			tags:       "Moda femenina,Accesorios,Francés",
 			desc:       "Moda y accesorios con estilo francés. Elegancia y tendencia en cada colección.",
@@ -922,7 +963,7 @@ func seedTiendas(app core.App) error {
 		},
 		{
 			nombre: "TUA", slug: "tua",
-			cat: "tiendas", gal: "sur", local: "Local 22",
+			cat: "tiendas", gal: "flamenco", local: "Local 22",
 			logo:       "https://subcentro.cl/wp-content/uploads/2025/08/TUA.png",
 			tags:       "Accesorios,Moda,Mujer",
 			desc:       "Accesorios y complementos de moda para la mujer contemporánea.",
@@ -937,7 +978,7 @@ func seedTiendas(app core.App) error {
 		},
 		{
 			nombre: "OakBerry", slug: "oakberry",
-			cat: "restaurantes", gal: "norte", local: "Local 27",
+			cat: "restaurantes", gal: "placa", local: "Local 27",
 			logo:       "https://logo.clearbit.com/oakberry.com",
 			tags:       "Açaí,Saludable,Vegano,Sin gluten",
 			desc:       "Los mejores açaí bowls energizantes, personalizados con tus toppings favoritos.",
@@ -952,7 +993,7 @@ func seedTiendas(app core.App) error {
 		},
 		{
 			nombre: "Falafel Republic", slug: "falafel-republic",
-			cat: "restaurantes", gal: "sur", local: "Local 12",
+			cat: "restaurantes", gal: "flamenco", local: "Local 12",
 			logo:       "https://subcentro.cl/wp-content/uploads/2025/02/LOGO-FALAFEL-100.jpg",
 			tags:       "Árabe,Vegetariano,Vegano",
 			desc:       "Auténtica cocina árabe: falafel crujiente, shawarma, hummus y mucho más.",
@@ -967,7 +1008,7 @@ func seedTiendas(app core.App) error {
 		},
 		{
 			nombre: "Krispy Kreme", slug: "krispy-kreme",
-			cat: "restaurantes", gal: "sur", local: "Local 19",
+			cat: "restaurantes", gal: "flamenco", local: "Local 19",
 			logo:       "https://logo.clearbit.com/krispykreme.com",
 			tags:       "Donas,Café,Postres",
 			desc:       "Las donas más famosas del mundo, recién horneadas. El letrero rojo lo dice todo.",
@@ -982,7 +1023,7 @@ func seedTiendas(app core.App) error {
 		},
 		{
 			nombre: "Farmacias Ahumada", slug: "ahumada",
-			cat: "farmacias", gal: "norte", local: "Local 5",
+			cat: "farmacias", gal: "placa", local: "Local 5",
 			logo:       "https://subcentro.cl/wp-content/uploads/2023/12/Farmacias-Ahumada_250px.png",
 			tags:       "Farmacia,Salud,Medicamentos",
 			desc:       "Tu farmacia de confianza con amplio stock de medicamentos y productos de salud.",
@@ -997,7 +1038,7 @@ func seedTiendas(app core.App) error {
 		},
 		{
 			nombre: "Cruz Verde", slug: "cruz-verde",
-			cat: "farmacias", gal: "sur", local: "Local 6",
+			cat: "farmacias", gal: "flamenco", local: "Local 6",
 			logo:       "https://subcentro.cl/wp-content/uploads/2023/12/Logo_Cruz_FondoBlanco_250px.png",
 			tags:       "Farmacia,Salud,Dermocosméticos",
 			desc:       "Farmacia Cruz Verde con atención personalizada y los mejores precios en salud.",
@@ -1012,7 +1053,7 @@ func seedTiendas(app core.App) error {
 		},
 		{
 			nombre: "Salcobrand", slug: "salcobrand",
-			cat: "farmacias", gal: "norte", local: "Local 7",
+			cat: "farmacias", gal: "placa", local: "Local 7",
 			logo:       "https://subcentro.cl/wp-content/uploads/2023/12/LOGO-SB_250px.png",
 			tags:       "Farmacia,Salud,Belleza",
 			desc:       "La farmacia con los mejores precios en medicamentos, belleza y cuidado personal.",
@@ -1027,7 +1068,7 @@ func seedTiendas(app core.App) error {
 		},
 		{
 			nombre: "Subway", slug: "subway",
-			cat: "restaurantes", gal: "sur", local: "Local 31",
+			cat: "restaurantes", gal: "flamenco", local: "Local 31",
 			logo:       "https://logo.clearbit.com/subway.com",
 			tags:       "Sándwiches,Saludable,Personalizado",
 			desc:       "Sándwiches frescos y saludables hechos a tu gusto en el momento.",
@@ -1070,5 +1111,88 @@ func seedTiendas(app core.App) error {
 		}
 	}
 	log.Printf("  ✅ seedTiendas: %d stores", len(seeds))
+	return nil
+}
+
+// seedCarouselSlides inserts the default 4 banners if empty.
+func seedCarouselSlides(app core.App) error {
+	col, err := app.FindCollectionByNameOrId("carousel_slides")
+	if err != nil {
+		return err
+	}
+	existing, _ := app.FindRecordsByFilter(col, "", "", 1, 0)
+	if len(existing) > 0 {
+		return nil
+	}
+
+	type slideSeed struct {
+		title, subtitle, image, link string
+		orden                        int
+	}
+	seeds := []slideSeed{
+		{title: "Bienvenido a Plaza Real", subtitle: "Más de 100 tiendas en el centro de Copiapó",
+			image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1400&q=85",
+			link: "/buscador-tiendas.html", orden: 1},
+		{title: "Moda & Tendencias", subtitle: "Descubre las últimas colecciones en nuestras tiendas",
+			image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1400&q=85",
+			link: "/buscador-tiendas.html", orden: 2},
+		{title: "Gastronomía para todos", subtitle: "Restaurantes y cafés para disfrutar en familia",
+			image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=85",
+			link: "/buscador-tiendas.html", orden: 3},
+		{title: "Corazón de Copiapó", subtitle: "Todo lo que necesitas en un mismo lugar",
+			image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1400&q=85",
+			link: "/buscador-tiendas.html", orden: 4},
+	}
+	for _, s := range seeds {
+		r := core.NewRecord(col)
+		r.Set("title", s.title)
+		r.Set("subtitle", s.subtitle)
+		r.Set("image_url", s.image)
+		r.Set("link_url", s.link)
+		r.Set("orden", s.orden)
+		r.Set("activo", true)
+		if err := app.Save(r); err != nil {
+			log.Printf("⚠️  seed carousel slide: %v", err)
+		}
+	}
+	log.Printf("  ✅ seedCarouselSlides: %d banners", len(seeds))
+	return nil
+}
+
+// seedCategorias inserts the default store categories if empty.
+func seedCategorias(app core.App) error {
+	col, err := app.FindCollectionByNameOrId("categorias")
+	if err != nil {
+		return err
+	}
+	existing, _ := app.FindRecordsByFilter(col, "", "", 1, 0)
+	if len(existing) > 0 {
+		return nil
+	}
+
+	type catSeed struct {
+		slug, nombre, icono string
+		orden               int
+	}
+	seeds := []catSeed{
+		{slug: "tiendas", nombre: "Tiendas & Moda", icono: "🛍️", orden: 1},
+		{slug: "restaurantes", nombre: "Restaurantes & Café", icono: "🍽️", orden: 2},
+		{slug: "farmacias", nombre: "Farmacias", icono: "💊", orden: 3},
+		{slug: "salud", nombre: "Salud & Belleza", icono: "💆", orden: 4},
+		{slug: "tecnologia", nombre: "Tecnología", icono: "💻", orden: 5},
+		{slug: "servicios", nombre: "Servicios", icono: "🛠️", orden: 6},
+	}
+	for _, s := range seeds {
+		r := core.NewRecord(col)
+		r.Set("slug", s.slug)
+		r.Set("nombre", s.nombre)
+		r.Set("icono", s.icono)
+		r.Set("orden", s.orden)
+		r.Set("activo", true)
+		if err := app.Save(r); err != nil {
+			log.Printf("⚠️  seed categoria %s: %v", s.slug, err)
+		}
+	}
+	log.Printf("  ✅ seedCategorias: %d categorías", len(seeds))
 	return nil
 }

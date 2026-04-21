@@ -4,7 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Dashboard — Plaza Real</title>
-<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
+<link rel="icon" type="image/png" href="https://plazareal.cl/wp-content/uploads/2025/12/logo-mall-plaza-real-2024@3x.png"/>
+<link rel="apple-touch-icon" href="https://plazareal.cl/wp-content/uploads/2025/12/logo-mall-plaza-real-2024@3x.png"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet"/>
 <script src="https://unpkg.com/htmx.org@1.9.12"></script>
@@ -190,6 +191,12 @@ textarea.form-input{resize:vertical;min-height:80px}
     <a href="/admin/tiendas" class="sidebar-link" hx-get="/admin/tiendas" hx-target="#main-content" hx-push-url="true">
       <span class="material-symbols-outlined">storefront</span> Tiendas
     </a>
+    <a href="/admin/categorias" class="sidebar-link" hx-get="/admin/categorias" hx-target="#main-content" hx-push-url="true">
+      <span class="material-symbols-outlined">category</span> Categorías
+    </a>
+    <a href="/admin/carousel" class="sidebar-link" hx-get="/admin/carousel" hx-target="#main-content" hx-push-url="true">
+      <span class="material-symbols-outlined">view_carousel</span> Carrusel
+    </a>
     <a href="/admin/news" class="sidebar-link" hx-get="/admin/news" hx-target="#main-content" hx-push-url="true">
       <span class="material-symbols-outlined">campaign</span> Comunicados
     </a>
@@ -281,7 +288,7 @@ document.querySelectorAll('.sidebar-link').forEach(link => {
 // Auto-load section on direct navigation (F5 / bookmark / deep link)
 (function(){
   var path = window.location.pathname;
-  var sections = ['/admin/tiendas','/admin/news','/admin/events','/admin/multimedia','/admin/playlists','/admin/devices','/admin/users','/admin/whatsapp-logs','/admin/propiedades'];
+  var sections = ['/admin/tiendas','/admin/categorias','/admin/carousel','/admin/news','/admin/events','/admin/multimedia','/admin/playlists','/admin/devices','/admin/users','/admin/whatsapp-logs','/admin/propiedades'];
   if(sections.indexOf(path) !== -1){
     htmx.ajax('GET', path, {target:'#main-content', swap:'innerHTML'});
     document.querySelectorAll('.sidebar-link').forEach(function(l){

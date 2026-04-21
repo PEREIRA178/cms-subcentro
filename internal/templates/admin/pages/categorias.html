@@ -1,0 +1,60 @@
+<style>
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+
+<header class="topbar">
+  <h1 class="topbar-title">Categorías</h1>
+  <div class="topbar-actions">
+    <button class="topbar-btn topbar-btn-primary"
+      hx-get="/admin/categorias/new" hx-target="#modal-container" hx-swap="innerHTML">
+      <span class="material-symbols-outlined" style="font-size:16px">add</span> Nueva categoría
+    </button>
+  </div>
+</header>
+
+<div class="content">
+  <div class="card" style="margin-bottom:20px;padding:16px 24px">
+    <p style="margin:0;color:var(--md-outline);font-size:13px">
+      Administra las categorías para las tiendas del mall (Tiendas & Moda, Restaurantes, Salud, Tecnología, etc.). Puedes agregar, editar o eliminar categorías según tus necesidades.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Listado de categorías</h2>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Orden</th>
+            <th>Ícono</th>
+            <th>Nombre</th>
+            <th>Slug</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="categorias-tbody"
+          hx-get="/admin/categorias?fragment=rows"
+          hx-trigger="load"
+          hx-swap="innerHTML">
+          <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--md-outline)">
+            <div style="width:18px;height:18px;border:2px solid var(--md-primary);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px"></div>
+            Cargando...
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var tbody = document.getElementById('categorias-tbody');
+  if (tbody && !tbody.dataset.loaded) {
+    tbody.dataset.loaded = '1';
+    htmx.ajax('GET', '/admin/categorias?fragment=rows', {target: '#categorias-tbody', swap: 'innerHTML'});
+  }
+})();
+</script>

@@ -82,6 +82,7 @@ func main() {
 	// ── HTMX FRAGMENTS ──
 	frag := app.Group("/fragments")
 	frag.Get("/hero", fragments.HeroCarousel(cfg, pb))
+	frag.Get("/home-carousel", fragments.HomeCarousel(cfg, pb))
 	frag.Get("/eventos", fragments.Eventos(cfg, pb))
 	frag.Get("/noticias", fragments.Noticias(cfg, pb))
 	frag.Get("/comunicados", fragments.Comunicados(cfg, pb))
@@ -178,6 +179,22 @@ func main() {
 	adm.Delete("/users/:id", middleware.RoleRequired("superadmin"), admin.UserDelete(cfg))
 
 	adm.Get("/whatsapp-logs", admin.WhatsAppLogs(cfg))
+
+	// Carousel (banners del hero)
+	adm.Get("/carousel", admin.CarouselList(cfg, pb))
+	adm.Get("/carousel/new", admin.CarouselForm(cfg))
+	adm.Post("/carousel", admin.CarouselCreate(cfg, pb))
+	adm.Get("/carousel/:id/edit", admin.CarouselEdit(cfg, pb))
+	adm.Put("/carousel/:id", admin.CarouselUpdate(cfg, pb))
+	adm.Delete("/carousel/:id", admin.CarouselDelete(cfg, pb))
+
+	// Categorías (tipos de tiendas)
+	adm.Get("/categorias", admin.CategoriasList(cfg, pb))
+	adm.Get("/categorias/new", admin.CategoriaForm(cfg))
+	adm.Post("/categorias", admin.CategoriaCreate(cfg, pb))
+	adm.Get("/categorias/:id/edit", admin.CategoriaEdit(cfg, pb))
+	adm.Put("/categorias/:id", admin.CategoriaUpdate(cfg, pb))
+	adm.Delete("/categorias/:id", admin.CategoriaDelete(cfg, pb))
 
 	// Tiendas
 	adm.Get("/tiendas", admin.TiendasList(cfg, pb))

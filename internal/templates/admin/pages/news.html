@@ -1,30 +1,96 @@
+<style>
+@keyframes spin{to{transform:rotate(360deg)}}
+.n-filter-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.n-filter-bar input,.n-filter-bar select{
+  padding:8px 12px;border:1.5px solid var(--md-outline-variant);border-radius:var(--r-md);
+  font-family:var(--font-body);font-size:13px;color:var(--md-on-surface);background:var(--md-surface);
+  outline:none;transition:border-color 150ms;
+}
+.n-filter-bar input:focus,.n-filter-bar select:focus{border-color:var(--md-primary)}
+</style>
+
+<header class="topbar">
+  <h1 class="topbar-title">Comunicados</h1>
+  <div class="topbar-actions">
+    <button class="topbar-btn topbar-btn-primary"
+            hx-get="/admin/news/new"
+            hx-target="#modal-container"
+            hx-swap="innerHTML">
+      <span class="material-symbols-outlined" style="font-size:16px">add</span> Nuevo comunicado
+    </button>
+  </div>
+</header>
+
+<div class="content">
+  <div class="card" style="margin-bottom:20px;padding:16px 24px">
+    <div class="n-filter-bar">
+      <input id="n-search" type="text" placeholder="Buscar por título..." style="flex:1;min-width:200px"
+        oninput="filterNewsRows()"/>
+      <select id="n-cat" onchange="filterNewsRows()">
+        <option value="">Todas las categorías</option>
+        <option value="noticia">📰 Noticia</option>
+        <option value="aviso">📢 Aviso</option>
+        <option value="publicidad">⭐ Publicidad</option>
+      </select>
+      <select id="n-status" onchange="filterNewsRows()">
+        <option value="">Todos los estados</option>
+        <option value="publicado">Publicado</option>
+        <option value="borrador">Borrador</option>
+      </select>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-header">
-      <h2 class="card-title">Gestión de Comunicados</h2>
-      <button class="topbar-btn topbar-btn-primary"
-              hx-get="/admin/news/new"
-              hx-target="#modal-container"
-              hx-swap="innerHTML">
-        <span class="material-symbols-outlined" style="font-size:16px">add</span> Nuevo comunicado
-      </button>
+      <h2 class="card-title">Listado</h2>
+      <span id="n-count" style="font-size:13px;color:var(--md-outline)"></span>
     </div>
-    <p style="margin:0 0 12px;color:var(--md-outline);font-size:13px">
+    <p style="margin:0;padding:12px 24px;color:var(--md-outline);font-size:13px;border-bottom:1px solid var(--md-outline-variant)">
       Publica Noticias, Avisos o Publicidad seleccionando la categoría al crear el comunicado.
     </p>
-    <table>
-      <thead>
-        <tr>
-          <th>Título</th><th>Categoría</th><th>Fecha</th><th>Estado</th><th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="news-tbody"
-             hx-get="/admin/news?fragment=rows"
-             hx-trigger="load, eventCreated from:body, eventUpdated from:body, eventDeleted from:body"
-             hx-swap="innerHTML">
-        <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--md-outline)">
-          <div style="width:24px;height:24px;border:2px solid var(--md-primary);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 8px"></div>
-          Cargando comunicados...
-        </td></tr>
-      </tbody>
-    </table>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Título</th><th>Categoría</th><th>Fecha</th><th>Estado</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="news-tbody"
+               hx-get="/admin/news?fragment=rows"
+               hx-trigger="load, eventCreated from:body, eventUpdated from:body, eventDeleted from:body"
+               hx-swap="innerHTML">
+          <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--md-outline)">
+            <div style="width:24px;height:24px;border:2px solid var(--md-primary);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 8px"></div>
+            Cargando comunicados...
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
+</div>
+
+<script>
+function filterNewsRows() {
+  var q = (document.getElementById('n-search').value || '').toLowerCase();
+  var cat = (document.getElementById('n-cat').value || '').toLowerCase();
+  var st = (document.getElementById('n-status').value || '').toLowerCase();
+  var rows = document.querySelectorAll('#news-tbody tr:not(.empty-row)');
+  var visible = 0;
+  rows.forEach(function(row) {
+    var text = row.textContent.toLowerCase();
+    var show = (!q || text.includes(q)) && (!cat || text.includes(cat)) && (!st || text.includes(st));
+    row.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  var cnt = document.getElementById('n-count');
+  if (cnt) cnt.textContent = visible > 0 ? (visible + ' comunicado' + (visible !== 1 ? 's' : '')) : '';
+}
+var _ntbody = document.getElementById('news-tbody');
+if (_ntbody) {
+  _ntbody.addEventListener('htmx:afterSwap', filterNewsRows);
+  if (!_ntbody.dataset.loaded) {
+    _ntbody.dataset.loaded = '1';
+    htmx.ajax('GET', '/admin/news?fragment=rows', {target: '#news-tbody', swap: 'innerHTML'});
+  }
+}
+</script>

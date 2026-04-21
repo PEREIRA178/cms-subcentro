@@ -1,0 +1,64 @@
+<style>
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+
+<header class="topbar">
+  <h1 class="topbar-title">Carrusel</h1>
+  <div class="topbar-actions">
+    <a href="/" target="_blank" class="topbar-btn topbar-btn-outline">
+      <span class="material-symbols-outlined" style="font-size:16px">open_in_new</span> Ver web
+    </a>
+    <button class="topbar-btn topbar-btn-primary"
+      hx-get="/admin/carousel/new" hx-target="#modal-container" hx-swap="innerHTML">
+      <span class="material-symbols-outlined" style="font-size:16px">add</span> Nuevo banner
+    </button>
+  </div>
+</header>
+
+<div class="content">
+  <div class="card" style="margin-bottom:20px;padding:16px 24px">
+    <p style="margin:0;color:var(--md-outline);font-size:13px">
+      Administra las imágenes del carrusel de banners en la página principal. El orden determina la secuencia de aparición. Puedes definir el hipervínculo donde se dirige cada banner al hacer clic.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Banners del carrusel</h2>
+      <span id="c-count" style="font-size:13px;color:var(--md-outline)"></span>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Imagen</th>
+            <th>Título</th>
+            <th>Hipervínculo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="carousel-tbody"
+          hx-get="/admin/carousel?fragment=rows"
+          hx-trigger="load"
+          hx-swap="innerHTML">
+          <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--md-outline)">
+            <div style="width:18px;height:18px;border:2px solid var(--md-primary);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px"></div>
+            Cargando...
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var tbody = document.getElementById('carousel-tbody');
+  if (tbody && !tbody.dataset.loaded) {
+    tbody.dataset.loaded = '1';
+    htmx.ajax('GET', '/admin/carousel?fragment=rows', {target: '#carousel-tbody', swap: 'innerHTML'});
+  }
+})();
+</script>

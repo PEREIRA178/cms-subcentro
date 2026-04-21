@@ -232,7 +232,7 @@ func renderIndexCard(t tienda, i int) string {
 		logoSrc = fmt.Sprintf("https://picsum.photos/seed/%s/320/160", t.Slug)
 	}
 	galBadge := "Placa Comercial"
-	if t.Gal == "sur" {
+	if t.Gal == "flamenco" {
 		galBadge = "Torre Flamenco"
 	}
 	featured := ""
@@ -399,7 +399,7 @@ func TiendaDetail(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 		}
 
 		galLabel := "Placa Comercial"
-		if t.Gal == "sur" {
+		if t.Gal == "flamenco" {
 			galLabel = "Torre Flamenco"
 		}
 		localInfo := fmt.Sprintf("%s · %s", galLabel, t.Local)

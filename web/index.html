@@ -322,31 +322,15 @@
   </div>
 </section>
 
-<!-- ABOUT -->
+<!-- CAROUSEL DE BANNERS — cargado dinámicamente desde el admin -->
 <section class="carousel-section" aria-label="Banners Plaza Real">
   <div class="carousel-wrap">
     <div class="carousel-track-outer">
-      <div class="carousel-track" id="cTrack">
-        <!-- BANNER 1 — reemplaza src con tu imagen -->
-        <div class="carousel-slide">
-          <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1400&q=85" alt="Banner 1">
-          <div class="carousel-caption"><h3>Bienvenido a Plaza Real</h3><p>Más de 100 tiendas en el centro de Copiapó</p></div>
-        </div>
-        <!-- BANNER 2 — reemplaza src con tu imagen -->
-        <div class="carousel-slide">
-          <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1400&q=85" alt="Banner 2">
-          <div class="carousel-caption"><h3>Moda & Tendencias</h3><p>Descubre las últimas colecciones en nuestras tiendas</p></div>
-        </div>
-        <!-- BANNER 3 — reemplaza src con tu imagen -->
-        <div class="carousel-slide">
-          <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=85" alt="Banner 3">
-          <div class="carousel-caption"><h3>Gastronomía para todos</h3><p>Restaurantes y cafés para disfrutar en familia</p></div>
-        </div>
-        <!-- BANNER 4 — reemplaza src con tu imagen -->
-        <div class="carousel-slide">
-          <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1400&q=85" alt="Banner 4">
-          <div class="carousel-caption"><h3>Corazón de Copiapó</h3><p>Todo lo que necesitas en un mismo lugar</p></div>
-        </div>
+      <div class="carousel-track" id="cTrack"
+           hx-get="/fragments/home-carousel"
+           hx-trigger="load"
+           hx-swap="innerHTML">
+        <div class="carousel-slide" style="display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6)">Cargando banners…</div>
       </div>
     </div>
     <button class="carousel-btn carousel-prev" id="cPrev" aria-label="Anterior">&#8592;</button>
@@ -429,7 +413,7 @@
     <div class="f-col"><h4>Información</h4><a href="#mapa">Cómo llegar</a><a href="#">Horarios</a><a href="#">Arriendos</a><a href="#">Trabaja con nosotros</a></div>
     <div class="f-col"><h4>Contacto</h4><a href="tel:+56512345678">+56 52 1234 5678</a><a href="mailto:contacto@plazareal.cl">contacto@plazareal.cl</a><a href="#mapa">Colipí 484, Copiapó</a></div>
   </div>
-  <div class="f-bot"><span>© 2025 Plaza Real Copiapó. Todos los derechos reservados.</span><span style="color:rgba(255,255,255,.28)">Diseñado con ♥ en Copiapó</span></div>
+  <div class="f-bot"><span>© 2026 Plaza Real Copiapó. Todos los derechos reservados.</span><span style="color:rgba(255,255,255,.38)">Sitio web desarrollado por <a href="https://dgtlwellness.cl" target="_blank" rel="noopener" style="color:#5B3FFF;text-decoration:none;font-weight:600">Digital Wellness</a></span></div>
 </footer>
 
 <a href="https://wa.me/56912345678" target="_blank" rel="noopener" class="wa" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
@@ -438,14 +422,17 @@
 document.getElementById('burger').addEventListener('click',function(){const o=document.getElementById('mobMenu').classList.toggle('open');this.setAttribute('aria-expanded',o)});
 const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
-// CAROUSEL
-(function(){
+// CAROUSEL — re-initializes after HTMX loads dynamic slides
+function initCarousel(){
   var track=document.getElementById('cTrack');
-  var slides=track?track.children:[];
+  if(!track)return;
+  var slides=track.children;
   var total=slides.length;
+  if(!total)return;
   var cur=0;
   var dotsEl=document.getElementById('cDots');
-  if(!track||!total)return;
+  if(track._carouselTimer)clearInterval(track._carouselTimer);
+  dotsEl.innerHTML='';
   // build dots
   for(var i=0;i<total;i++){
     var d=document.createElement('button');
@@ -455,17 +442,23 @@ document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
     dotsEl.appendChild(d);
   }
   function go(n){cur=(n+total)%total;track.style.transform='translateX(-'+cur*100+'%)';dotsEl.querySelectorAll('.carousel-dot').forEach(function(d,i){d.classList.toggle('active',i===cur)})}
-  document.getElementById('cPrev').addEventListener('click',function(){go(cur-1)});
-  document.getElementById('cNext').addEventListener('click',function(){go(cur+1)});
+  document.getElementById('cPrev').onclick=function(){go(cur-1)};
+  document.getElementById('cNext').onclick=function(){go(cur+1)};
   // autoplay
   var timer=setInterval(function(){go(cur+1)},5000);
-  track.parentElement.addEventListener('mouseenter',function(){clearInterval(timer)});
-  track.parentElement.addEventListener('mouseleave',function(){timer=setInterval(function(){go(cur+1)},5000)});
+  track._carouselTimer=timer;
+  track.parentElement.onmouseenter=function(){clearInterval(timer)};
+  track.parentElement.onmouseleave=function(){timer=setInterval(function(){go(cur+1)},5000);track._carouselTimer=timer};
   // touch swipe
   var sx=0;
-  track.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
-  track.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)go(dx<0?cur+1:cur-1)},{passive:true});
-})();
+  track.ontouchstart=function(e){sx=e.touches[0].clientX};
+  track.ontouchend=function(e){var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)go(dx<0?cur+1:cur-1)};
+}
+document.addEventListener('htmx:afterSwap',function(evt){
+  if(evt.target&&evt.target.id==='cTrack')initCarousel();
+});
+// also try after DOM ready in case of cached swap
+document.addEventListener('DOMContentLoaded',function(){setTimeout(initCarousel,100)});
 </script>
 </body>
 </html>
