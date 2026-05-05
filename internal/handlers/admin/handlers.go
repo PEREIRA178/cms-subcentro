@@ -333,7 +333,7 @@ func EventsList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 
 		var sb strings.Builder
 		if err != nil || len(records) == 0 {
-			sb.WriteString(`<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--md-outline)">Sin eventos — agrega uno con el botón de arriba</td></tr>`)
+			sb.WriteString(`<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--md-outline)">Sin eventos — agrega uno con el botón de arriba</td></tr>`)
 		} else {
 			for _, r := range records {
 				status := r.GetString("status")
@@ -341,16 +341,12 @@ func EventsList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 				if status == "publicado" {
 					badgeClass = "badge-success"
 				}
-				urgIcon := ""
-				if r.GetBool("urgency") {
-					urgIcon = `<span class="badge badge-danger">URGENTE</span>`
-				}
 				dateStr := "—"
 				if dt := r.GetDateTime("date"); !dt.IsZero() {
 					dateStr = dt.Time().Format("2 Jan 2006")
 				}
 				sb.WriteString(fmt.Sprintf(`<tr>
-          <td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+          <td>%s</td><td>%s</td><td>%s</td>
           <td><span class="badge %s">%s</span></td>
           <td>
             <button class="topbar-btn topbar-btn-outline" style="padding:4px 10px;font-size:12px"
@@ -360,7 +356,7 @@ func EventsList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
           </td></tr>`,
 					template.HTMLEscapeString(r.GetString("title")),
 					template.HTMLEscapeString(r.GetString("category")),
-					urgIcon, dateStr,
+					dateStr,
 					badgeClass, template.HTMLEscapeString(status),
 					r.Id, r.Id,
 				))
@@ -397,7 +393,6 @@ func EventCreate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 		r.Set("title", title)
 		r.Set("description", description)
 		r.Set("category", c.FormValue("category"))
-		r.Set("urgency", c.FormValue("category") == "EMERGENCIA")
 		if ds := c.FormValue("date"); ds != "" {
 			if t, err2 := time.Parse("2006-01-02T15:04", ds); err2 == nil {
 				r.Set("date", t.UTC())
@@ -461,7 +456,6 @@ func EventUpdate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 		r.Set("title", title)
 		r.Set("description", description)
 		r.Set("category", c.FormValue("category"))
-		r.Set("urgency", c.FormValue("category") == "EMERGENCIA")
 		if ds := c.FormValue("date"); ds != "" {
 			if t, err2 := time.Parse("2006-01-02T15:04", ds); err2 == nil {
 				r.Set("date", t.UTC())
@@ -513,7 +507,6 @@ func EventPublish(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 }
 
 // eventFormHTML builds the create/edit modal form for events (all categories except NOTICIA).
-// Urgency is auto-derived from category=EMERGENCIA — no checkbox needed.
 func eventFormHTML(id, title, description, category, status, date, pdfUrl string) string {
 	method := `hx-post="/admin/events"`
 	if id != "" {
@@ -1616,9 +1609,6 @@ func buildContentPool(c *fiber.Ctx, pb *pocketbase.PocketBase) error {
 			dtype = "noticias"
 		}
 		icon := "event"
-		if r.GetBool("urgency") {
-			icon = "campaign"
-		}
 		if dtype == "noticias" {
 			icon = "newspaper"
 		}

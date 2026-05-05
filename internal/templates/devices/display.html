@@ -234,14 +234,10 @@ function buildSlide(item){
       +'<source src="'+escA(src)+'" type="video/mp4"/></video>';
   }
   if(tipo==='content_block'){
-    const urgent = item.urgency;
     const bgImgHTML = item.image_url
       ? '<div class="slide-cb-bg"><img src="'+escA(item.image_url)+'" alt=""/></div>' : '';
-    const chipHTML = urgent
-      ? '<div class="slide-cb-chip">⚠ URGENTE</div>' : '';
-    return '<div class="slide-cb'+(urgent?' urgent':'')+'">'+bgImgHTML
+    return '<div class="slide-cb">'+bgImgHTML
       +'<div class="slide-cb-body">'
-      +chipHTML
       +'<div class="slide-cb-title">'+esc(item.title||item.name||'')+'</div>'
       +(item.description?'<div class="slide-cb-desc">'+esc(item.description)+'</div>':'')
       +'</div></div>';
@@ -325,11 +321,12 @@ function loadEvents(){
         return;
       }
       el.innerHTML = evs.map(ev=>`
-        <div class="event-item${ev.urgency?' urgent':''}">
+        <div class="event-item">
           <div class="event-cat">${esc(ev.category)}</div>
           <div class="event-title">${esc(ev.title)}</div>
           ${ev.date?'<div class="event-date">'+esc(ev.date)+'</div>':''}
         </div>`).join('');
+        // sanitized via esc() helper
     })
     .catch(()=>{});
 }

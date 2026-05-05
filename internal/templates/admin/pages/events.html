@@ -11,14 +11,14 @@
     <table>
       <thead>
         <tr>
-          <th>Título</th><th>Categoría</th><th>Urgente</th><th>Fecha</th><th>Estado</th><th>Acciones</th>
+          <th>Título</th><th>Categoría</th><th>Fecha</th><th>Estado</th><th>Acciones</th>
         </tr>
       </thead>
       <tbody id="events-tbody"
              hx-get="/admin/events?fragment=rows"
              hx-trigger="load, eventCreated from:body, eventUpdated from:body, eventDeleted from:body"
              hx-swap="innerHTML">
-        <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--md-outline)">
+        <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--md-outline)">
           <div style="width:24px;height:24px;border:2px solid var(--md-primary);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 8px"></div>
           Cargando eventos...
         </td></tr>

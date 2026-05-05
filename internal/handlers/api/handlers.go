@@ -90,7 +90,6 @@ func DevicePlaylist(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler
 				item["title"] = cb.GetString("title")
 				item["description"] = cb.GetString("description")
 				item["category"] = cb.GetString("category")
-				item["urgency"] = cb.GetBool("urgency")
 				item["image_url"] = cb.GetString("image_url")
 				item["url"] = cb.GetString("image_url")
 
@@ -143,7 +142,7 @@ func UpcomingEvents(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler
 
 		records, err := pb.FindRecordsByFilter("content_blocks",
 			"status = 'publicado' && category != 'NOTICIA'",
-			"-urgency,date", limit, 0)
+			"date", limit, 0)
 
 		events := make([]fiber.Map, 0)
 		if err == nil {
@@ -157,7 +156,6 @@ func UpcomingEvents(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler
 					"title":    r.GetString("title"),
 					"category": r.GetString("category"),
 					"date":     dateStr,
-					"urgency":  r.GetBool("urgency"),
 				})
 			}
 		}

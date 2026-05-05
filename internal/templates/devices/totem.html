@@ -244,12 +244,10 @@ function buildSlide(item){
       +'<source src="'+escA(src)+'" type="video/mp4"/></video>';
   }
   if(tipo==='content_block'){
-    const urgent = item.urgency;
     const bgImgHTML = item.image_url
       ? '<div class="slide-cb-bg"><img src="'+escA(item.image_url)+'" alt=""/></div>' : '';
-    return '<div class="slide-cb'+(urgent?' urgent':'')+'">'+bgImgHTML
+    return '<div class="slide-cb">'+bgImgHTML
       +'<div class="slide-cb-body">'
-      +(urgent?'<div class="slide-cb-chip">⚠ URGENTE</div>':'')
       +'<div class="slide-cb-title">'+esc(item.title||item.name||'')+'</div>'
       +(item.description?'<div class="slide-cb-desc">'+esc(item.description)+'</div>':'')
       +'</div></div>';
@@ -410,7 +408,7 @@ function renderEvents(){
     return;
   }
   el.innerHTML = eventsData.map((ev,i)=>`
-    <div class="event-item${ev.urgency?' urgent':''}" onclick="showEventDetail(${i})" ontouchend="showEventDetail(${i})">
+    <div class="event-item" onclick="showEventDetail(${i})" ontouchend="showEventDetail(${i})">
       <div class="event-cat">${esc(ev.category)}</div>
       <div class="event-title">${esc(ev.title)}</div>
       ${ev.date?'<div class="event-date">'+esc(ev.date)+'</div>':''}

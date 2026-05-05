@@ -28,7 +28,6 @@ type Slide struct {
 	ContentID   string
 	Description string
 	Category    string
-	Urgency     bool
 	ImageURL    string
 }
 
@@ -76,7 +75,6 @@ func FetchWebHeroSlides(pb *pocketbase.PocketBase) (slides []Slide, deviceID str
 			slide.Title = cb.GetString("title")
 			slide.Description = cb.GetString("description")
 			slide.Category = cb.GetString("category")
-			slide.Urgency = cb.GetBool("urgency")
 			slide.ImageURL = cb.GetString("image_url")
 
 		case "image":

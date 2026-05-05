@@ -34,10 +34,7 @@ func HeroCarousel(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 }
 
 // cssClassForCategory maps content_block category to CSS class
-func cssClassForCategory(category, urgency string) string {
-	if urgency == "true" || category == "EMERGENCIA" {
-		return "ev-urgente"
-	}
+func cssClassForCategory(category string) string {
 	switch category {
 	case "REUNIÓN":
 		return "ev-reunion"
@@ -58,7 +55,6 @@ type contentBlock struct {
 	Desc     string
 	Category string
 	Date     string
-	Urgency  bool
 	Featured bool
 	CSSClass string
 	PdfURL   string
@@ -66,17 +62,12 @@ type contentBlock struct {
 }
 
 func fetchContentBlocks(pb *pocketbase.PocketBase, filter string, limit int) []contentBlock {
-	records, err := pb.FindRecordsByFilter("content_blocks", filter, "-urgency,-date", limit, 0)
+	records, err := pb.FindRecordsByFilter("content_blocks", filter, "-date", limit, 0)
 	if err != nil || len(records) == 0 {
 		return nil
 	}
 	result := make([]contentBlock, 0, len(records))
 	for _, r := range records {
-		urgency := r.GetBool("urgency")
-		urg := ""
-		if urgency {
-			urg = "true"
-		}
 		category := r.GetString("category")
 		dateStr := ""
 		if dt := r.GetDateTime("date"); !dt.IsZero() {
@@ -88,8 +79,7 @@ func fetchContentBlocks(pb *pocketbase.PocketBase, filter string, limit int) []c
 			Desc:     r.GetString("description"),
 			Category: category,
 			Date:     dateStr,
-			Urgency:  urgency,
-			CSSClass: cssClassForCategory(category, urg),
+			CSSClass: cssClassForCategory(category),
 			PdfURL:   r.GetString("pdf_url"),
 			ImageURL: r.GetString("image_url"),
 		})
@@ -105,7 +95,7 @@ func Eventos(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 
 		if len(blocks) == 0 {
 			blocks = []contentBlock{
-				{ID: "1", Title: "Cierre temporal del estacionamiento norte", Desc: "Por mantenimiento programado, el estacionamiento norte permanecerá cerrado durante el fin de semana.", Category: "AVISO", Date: "5 may 2026", Urgency: true, CSSClass: "ev-urgente"},
+				{ID: "1", Title: "Cierre temporal del estacionamiento norte", Desc: "Por mantenimiento programado, el estacionamiento norte permanecerá cerrado durante el fin de semana.", Category: "AVISO", Date: "5 may 2026", CSSClass: "ev-info"},
 				{ID: "2", Title: "Horarios extendidos por temporada navideña", Desc: "Plaza Real abrirá hasta las 23:00 hrs durante todo el mes de diciembre.", Category: "INFORMACIÓN", Date: "1 dic 2026", CSSClass: "ev-info"},
 				{ID: "3", Title: "Nueva tienda inaugurada en Placa Comercial", Desc: "Visita la nueva apertura del primer piso, con promociones exclusivas durante toda la semana.", Category: "EVENTO", Date: "10 may 2026", CSSClass: "ev-info"},
 			}
@@ -243,16 +233,11 @@ func Comunicados(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 		}
 
 		offset := (page - 1) * pageSize
-		records, err := pb.FindRecordsByFilter("content_blocks", pbFilter, "-urgency,-date", pageSize+1, offset)
+		records, err := pb.FindRecordsByFilter("content_blocks", pbFilter, "-date", pageSize+1, offset)
 
 		var blocks []contentBlock
 		if err == nil {
 			for _, r := range records {
-				urgency := r.GetBool("urgency")
-				urg := ""
-				if urgency {
-					urg = "true"
-				}
 				cat := r.GetString("category")
 				dateStr := ""
 				if dt := r.GetDateTime("date"); !dt.IsZero() {
@@ -264,8 +249,7 @@ func Comunicados(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 					Desc:     r.GetString("description"),
 					Category: cat,
 					Date:     dateStr,
-					Urgency:  urgency,
-					CSSClass: cssClassForCategory(cat, urg),
+					CSSClass: cssClassForCategory(cat),
 					PdfURL:   r.GetString("pdf_url"),
 					ImageURL: r.GetString("image_url"),
 				})
@@ -330,7 +314,7 @@ func Comunicados(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 		}
 
 		for i, b := range blocks {
-			_, chip, accentClass := categoryToTipo(b.Category, b.Urgency)
+			_, chip, accentClass := categoryToTipo(b.Category)
 			verMasBtn := ""
 			if b.PdfURL != "" {
 				verMasBtn = fmt.Sprintf(`<a href="%s" class="comunicado-btn" target="_blank" rel="noopener">Ver comunicado →</a>`,
@@ -386,10 +370,7 @@ func Comunicados(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	}
 }
 
-func categoryToTipo(category string, urgency bool) (tipo, chip, accentClass string) {
-	if urgency || category == "EMERGENCIA" {
-		return "urgente", "⚠ Emergencia", "tipo-urgente"
-	}
+func categoryToTipo(category string) (tipo, chip, accentClass string) {
 	switch category {
 	case "REUNIÓN":
 		return "reunion", "Reunión", "tipo-reunion"
