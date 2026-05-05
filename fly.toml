@@ -1,7 +1,6 @@
 # fly.toml app configuration file generated for cms-plazareal on 2026-04-16T17:53:48Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
 
 app = 'cms-plazareal'
 primary_region = 'gru'
@@ -21,3 +20,7 @@ primary_region = 'gru'
   cpu_kind = 'shared'
   cpus = 1
   memory_mb = 1024
+
+[[mounts]]
+  source = "pb_data"
+  destination = "/app/pb_data"

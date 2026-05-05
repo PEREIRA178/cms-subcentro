@@ -73,9 +73,9 @@ func RSSFeed(cfg *config.Config) fiber.Handler {
     <atom:link href="%s/rss.xml" rel="self" type="application/rss+xml"/>
     <!-- Items from PocketBase -->
     <item>
-      <title>Simulacro de Evacuación — 2 de abril</title>
+      <title>Plaza Real Copiapó</title>
       <link>%s/comunicados.html</link>
-      <description>Recordamos a toda la comunidad escolar el simulacro de evacuación obligatorio.</description>
+      <description>Noticias y actividades del centro comercial.</description>
       <pubDate>%s</pubDate>
       <guid>%s/events/1</guid>
     </item>

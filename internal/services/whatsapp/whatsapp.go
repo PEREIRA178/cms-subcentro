@@ -74,7 +74,7 @@ func (c *Client) Send(to, body string) (*SendResult, error) {
 // SendEventNotification sends a formatted event notification
 func (c *Client) SendEventNotification(to, eventTitle, eventDate, eventDesc string) (*SendResult, error) {
 	body := fmt.Sprintf(
-		"📢 *Colegio San Lorenzo*\n\n*%s*\n📅 %s\n\n%s\n\n_Responde: ✅ Asistiré | ❌ No asistiré | ❓ Tengo dudas_",
+		"📢 *Plaza Real*\n\n*%s*\n📅 %s\n\n%s\n\n_Responde: ✅ Asistiré | ❌ No asistiré | ❓ Tengo dudas_",
 		eventTitle, eventDate, eventDesc,
 	)
 	return c.Send(to, body)

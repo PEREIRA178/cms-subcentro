@@ -105,9 +105,9 @@ func Eventos(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 
 		if len(blocks) == 0 {
 			blocks = []contentBlock{
-				{ID: "1", Title: "Simulacro de Evacuación", Desc: "Jueves 2 de abril, participación obligatoria.", Category: "EMERGENCIA", Date: "2 abr 2026", Urgency: true, CSSClass: "ev-urgente"},
-				{ID: "2", Title: "Reunión de Apoderados 7mos", Desc: "Reunión primer trimestre 2026. Asistencia obligatoria.", Category: "REUNIÓN", Date: "17 abr 2026", CSSClass: "ev-reunion"},
-				{ID: "3", Title: "Campeonato de tenis padre-hijo", Desc: "Inscripciones abiertas. Una iniciativa que une familias.", Category: "EVENTO", Date: "3 abr 2026", CSSClass: "ev-info"},
+				{ID: "1", Title: "Cierre temporal del estacionamiento norte", Desc: "Por mantenimiento programado, el estacionamiento norte permanecerá cerrado durante el fin de semana.", Category: "AVISO", Date: "5 may 2026", Urgency: true, CSSClass: "ev-urgente"},
+				{ID: "2", Title: "Horarios extendidos por temporada navideña", Desc: "Plaza Real abrirá hasta las 23:00 hrs durante todo el mes de diciembre.", Category: "INFORMACIÓN", Date: "1 dic 2026", CSSClass: "ev-info"},
+				{ID: "3", Title: "Nueva tienda inaugurada en Placa Comercial", Desc: "Visita la nueva apertura del primer piso, con promociones exclusivas durante toda la semana.", Category: "EVENTO", Date: "10 may 2026", CSSClass: "ev-info"},
 			}
 		}
 
@@ -408,14 +408,9 @@ func categoryToTipo(category string, urgency bool) (tipo, chip, accentClass stri
 
 func hardcodedComunicados() []contentBlock {
 	return []contentBlock{
-		{Title: "⚠ Simulacro de Evacuación — Jueves 2 de abril", Desc: "Recordamos a toda la comunidad escolar que el jueves 2 de abril se realizará el simulacro de evacuación obligatorio a las 10:00 horas. Participación de todos los cursos.", Category: "EMERGENCIA", Date: "31 de marzo, 2026", Urgency: true},
-		{Title: "Reunión de Apoderados 7° Básico", Desc: "Se cita a los apoderados de 7° año básico a reunión del primer trimestre 2026. La reunión se realizará el 17 de abril a las 18:30 hrs en la sala del curso. Asistencia obligatoria.", Category: "REUNIÓN", Date: "17 de abril, 2026"},
-		{Title: "Campeonato de Tenis Padre-Hijo", Desc: "Inscripciones abiertas para el campeonato de tenis padre-hijo, 3 de abril de 2026. Una iniciativa del Área Deportiva EDEX que une a las familias.", Category: "EVENTO", Date: "3 de abril, 2026"},
-		{Title: "Inicio año escolar 2026 — Nuevas iniciativas pedagógicas", Desc: "El Colegio San Lorenzo inicia el año escolar 2026 con importantes cambios en su propuesta pedagógica, incorporando metodologías activas y herramientas tecnológicas.", Category: "ACADÉMICO", Date: "1 de abril, 2026"},
-		{Title: "Sistema Digital Wellness — Comunicación por WhatsApp", Desc: "El colegio informa que toda la comunicación oficial con apoderados se realizará a través del sistema Digital Wellness. Los avisos llegan directamente por WhatsApp.", Category: "INFORMACIÓN", Date: "15 de marzo, 2026"},
-		{Title: "Reunión General Enseñanza Media — 6 de mayo", Desc: "Se cita a apoderados de 1° a 4° Medio a reunión general informativa del primer trimestre 2026. Miércoles 6 de mayo a las 19:00 hrs en el gimnasio.", Category: "REUNIÓN", Date: "6 de mayo, 2026"},
-		{Title: "Calendario de pruebas primer trimestre 2026 — CEAL", Desc: "El calendario de pruebas del primer trimestre 2026 está disponible en la sección CEAL. Incluye fechas de pruebas, integradoras y exámenes para todos los niveles.", Category: "ACADÉMICO", Date: "5 de marzo, 2026"},
-		{Title: "Lista de útiles escolares 2026 disponible en CEPAD", Desc: "Las listas de útiles escolares para todos los niveles del año 2026 ya están disponibles en la sección CEPAD del sitio web del colegio.", Category: "INFORMACIÓN", Date: "1 de marzo, 2026"},
+		{Title: "Horarios extendidos por temporada navideña", Desc: "Plaza Real abrirá sus puertas hasta las 23:00 hrs durante todo el mes de diciembre. Disfruta de nuestras tiendas, restaurantes y entretenimiento con horarios extendidos para acompañarte en estas fiestas.", Category: "INFORMACIÓN", Date: "1 de diciembre, 2026"},
+		{Title: "Cierre temporal del estacionamiento norte por mantenimiento", Desc: "Informamos a nuestros visitantes que el estacionamiento norte permanecerá cerrado el sábado 9 y domingo 10 de mayo por trabajos de mantenimiento programado. Te invitamos a utilizar el estacionamiento sur durante esos días.", Category: "AVISO", Date: "5 de mayo, 2026"},
+		{Title: "Nueva tienda inaugurada en Placa Comercial", Desc: "Te invitamos a conocer la más reciente incorporación a Plaza Real. Disfruta de promociones exclusivas durante toda la semana de apertura y descubre nuestra renovada oferta comercial.", Category: "EVENTO", Date: "10 de mayo, 2026"},
 	}
 }
 

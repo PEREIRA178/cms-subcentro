@@ -172,20 +172,20 @@ func FallbackHeroHTML() string {
       <div class="hero-slide-bg slide-grad-1"></div>
       <div class="hero-slide-content">
         <div class="hero-text">
-          <p class="hero-eyebrow">Copiapó, Atacama · desde 1990</p>
-          <h1 class="hero-title">Per laborem<br/><em>ad lucem</em></h1>
-          <p class="hero-desc">Formando generaciones con excelencia académica, valores humanos y el espíritu del norte de Chile.</p>
+          <p class="hero-eyebrow">Copiapó, Atacama</p>
+          <h1 class="hero-title">Plaza Real<br/><em>Copiapó</em></h1>
+          <p class="hero-desc">Tu centro comercial en el corazón de Copiapó. Más de 100 tiendas, restaurantes y entretenimiento. Visítanos todos los días.</p>
           <div class="hero-actions">
-            <a href="admision.html" class="btn-filled">Admisión 2027</a>
-            <a href="nuestro-colegio.html" class="btn-tonal-white">Conocer más</a>
+            <a href="tiendas.html" class="btn-filled">Ver tiendas</a>
+            <a href="comunicados.html" class="btn-tonal-white">Noticias</a>
           </div>
         </div>
         <div class="hero-float-card">
           <div class="hero-stat-row">
-            <div><div class="hero-stat-num">35+</div><div class="hero-stat-label">años formando<br/>estudiantes</div></div>
-            <div><div class="hero-stat-num">3</div><div class="hero-stat-label">niveles:<br/>Básica y Media</div></div>
+            <div><div class="hero-stat-num">100+</div><div class="hero-stat-label">tiendas<br/>y servicios</div></div>
+            <div><div class="hero-stat-num">7</div><div class="hero-stat-label">días<br/>a la semana</div></div>
           </div>
-          <div class="hero-lema-float"><em>"Por el trabajo hacia la luz"</em></div>
+          <div class="hero-lema-float"><em>"Tu centro comercial en Copiapó"</em></div>
         </div>
       </div>
     </div>
@@ -252,7 +252,7 @@ func buildContentBlockSlideHTML(slide Slide, currentIndex, totalSlides int) stri
 	}
 }
 
-// buildHeroClassicHTML renders the "Per laborem ad lucem" landing hero exactly
+// buildHeroClassicHTML renders the Plaza Real Copiapó landing hero exactly
 // as it appeared before dynamic playlists were introduced.
 func buildHeroClassicHTML(currentIndex, totalSlides int) string {
 	controls := buildCarouselControls(currentIndex, totalSlides)
@@ -262,20 +262,20 @@ func buildHeroClassicHTML(currentIndex, totalSlides int) string {
       <div class="hero-slide-bg slide-grad-1"></div>
       <div class="hero-slide-content">
         <div class="hero-text">
-          <p class="hero-eyebrow">Copiapó, Atacama · desde 1990</p>
-          <h1 class="hero-title">Per laborem<br/><em>ad lucem</em></h1>
-          <p class="hero-desc">Formando generaciones con excelencia académica, valores humanos y el espíritu del norte de Chile.</p>
+          <p class="hero-eyebrow">Copiapó, Atacama</p>
+          <h1 class="hero-title">Plaza Real<br/><em>Copiapó</em></h1>
+          <p class="hero-desc">Tu centro comercial en el corazón de Copiapó. Más de 100 tiendas, restaurantes y entretenimiento. Visítanos todos los días.</p>
           <div class="hero-actions">
-            <a href="admision.html" class="btn-filled">Admisión 2027</a>
-            <a href="nuestro-colegio.html" class="btn-tonal-white">Conocer más</a>
+            <a href="tiendas.html" class="btn-filled">Ver tiendas</a>
+            <a href="comunicados.html" class="btn-tonal-white">Noticias</a>
           </div>
         </div>
         <div class="hero-float-card">
           <div class="hero-stat-row">
-            <div><div class="hero-stat-num">35+</div><div class="hero-stat-label">años formando<br/>estudiantes</div></div>
-            <div><div class="hero-stat-num">3</div><div class="hero-stat-label">niveles:<br/>Básica y Media</div></div>
+            <div><div class="hero-stat-num">100+</div><div class="hero-stat-label">tiendas<br/>y servicios</div></div>
+            <div><div class="hero-stat-num">7</div><div class="hero-stat-label">días<br/>a la semana</div></div>
           </div>
-          <div class="hero-lema-float"><em>"Por el trabajo hacia la luz"</em></div>
+          <div class="hero-lema-float"><em>"Tu centro comercial en Copiapó"</em></div>
         </div>
       </div>
     </div>
