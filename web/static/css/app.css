@@ -1,0 +1,219 @@
+/* ═══════════════════════════════════════
+   PLAZA REAL — PUBLIC CSS
+   Design: Liquid Glass + Ultra Modern
+   ═══════════════════════════════════════ */
+
+/* ── TOKENS ── */
+:root {
+  /* Brand */
+  --red: #d71055;
+  --red-d: #a80940;
+  --red-glass: rgba(215, 16, 85, 0.15);
+  --blue: #06a0e0;
+  --blue-glass: rgba(6, 160, 224, 0.15);
+  --lime: #acc60d;
+  --lime-glass: rgba(172, 198, 13, 0.12);
+
+  /* Neutrals */
+  --ink: #0a0a0a;
+  --ink-2: #141414;
+  --ink-3: #1e1e1e;
+  --surface: #f6f5f2;
+  --surface-2: #ebebea;
+  --white: #ffffff;
+  --muted: #6b6b6b;
+  --border: #e0dfdc;
+  --border-dark: rgba(255,255,255,0.10);
+
+  /* Glass */
+  --glass-bg: rgba(255,255,255,0.65);
+  --glass-bg-dark: rgba(20,20,20,0.55);
+  --glass-border: rgba(255,255,255,0.35);
+  --glass-border-dark: rgba(255,255,255,0.12);
+  --glass-blur: blur(24px) saturate(180%);
+  --glass-shadow: 0 8px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.25);
+  --glass-shadow-dark: 0 8px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.08);
+
+  /* Typography */
+  --font-display: 'Montserrat', sans-serif;
+  --font-body: 'Geist', system-ui, sans-serif;
+
+  /* Radius */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-full: 9999px;
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-body);
+  background: var(--surface);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }
+
+/* ── TYPOGRAPHY ── */
+.display { font-family: var(--font-display); font-weight: 900; letter-spacing: -2px; }
+.display em { font-style: italic; color: var(--blue); }
+h1,h2,h3,h4 { font-family: var(--font-display); }
+
+/* ── GLASS CARD ── */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--r-lg);
+}
+.glass-card-dark {
+  background: var(--glass-bg-dark);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-dark);
+  box-shadow: var(--glass-shadow-dark);
+  border-radius: var(--r-lg);
+}
+
+/* ── NAVBAR ── */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 68px;
+  background: rgba(10,10,10,0.82);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border-bottom: 1px solid var(--border-dark);
+  padding: 0 40px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.navbar-logo img { height: 40px; filter: brightness(0) invert(1); }
+.navbar-links { display: flex; gap: 32px; align-items: center; }
+.navbar-links a {
+  color: rgba(255,255,255,.58);
+  font-size: .86rem; font-weight: 500;
+  transition: color .15s;
+}
+.navbar-links a:hover, .navbar-links a.active { color: #fff; }
+.navbar-cta {
+  background: var(--red) !important;
+  color: #fff !important;
+  padding: 9px 22px;
+  border-radius: var(--r-full);
+  font-weight: 700 !important;
+  font-size: .83rem !important;
+  transition: opacity .15s;
+}
+.navbar-cta:hover { opacity: .88; }
+.navbar-burger { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 5px; padding: 4px; }
+.navbar-burger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; }
+.mob-menu {
+  display: none; position: fixed; top: 68px; left: 0; right: 0;
+  background: rgba(10,10,10,.96);
+  backdrop-filter: blur(24px);
+  z-index: 199;
+  padding: 16px 24px 28px;
+  flex-direction: column; gap: 2px;
+  border-bottom: 1px solid var(--border-dark);
+}
+.mob-menu a { color: rgba(255,255,255,.75); font-size: .97rem; font-weight: 500; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.06); display: block; }
+.mob-menu.open { display: flex; }
+
+/* ── PAGE HERO ── */
+.page-hero {
+  background: linear-gradient(rgba(10,10,10,.72), rgba(10,10,10,.86)),
+              url('https://plazareal.cl/wp-content/uploads/2025/12/plaza-real-hall-pantallas.jpeg');
+  background-size: cover; background-position: center; background-attachment: fixed;
+  padding: 130px 24px 72px;
+  position: relative; overflow: hidden;
+}
+.page-hero::before {
+  content: ''; position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, var(--red) 0%, transparent 70%);
+  top: -300px; right: -200px; opacity: .12; pointer-events: none;
+}
+.page-hero::after {
+  content: ''; position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, var(--blue) 0%, transparent 70%);
+  bottom: -200px; left: -100px; opacity: .10; pointer-events: none;
+}
+.page-hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+.page-hero-eyebrow {
+  font-size: .68rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 10px; display: block;
+}
+.page-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+  font-weight: 900; color: #fff;
+  letter-spacing: -2px; line-height: 1.02;
+  margin-bottom: 14px;
+}
+.page-hero-title em { font-style: italic; color: var(--blue); }
+.page-hero-sub { color: rgba(255,255,255,.62); font-size: .97rem; max-width: 600px; line-height: 1.7; font-weight: 300; }
+
+/* ── SECTION ── */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.section { padding: 64px 0 96px; }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--red); color: #fff;
+  border: none; padding: 12px 28px;
+  border-radius: var(--r-full);
+  font-family: var(--font-body); font-size: .9rem; font-weight: 700;
+  cursor: pointer; transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .86; }
+.btn-outline {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; color: var(--muted);
+  border: 1.5px solid var(--border);
+  padding: 11px 24px; border-radius: var(--r-full);
+  font-family: var(--font-body); font-size: .9rem; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.btn-outline:hover { border-color: var(--muted); color: var(--ink); }
+
+/* ── CHIP / TAG ── */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-body); font-size: .74rem; font-weight: 700;
+  padding: 7px 16px; border-radius: var(--r-full);
+  border: 1.5px solid var(--border); background: var(--white);
+  color: var(--muted); cursor: pointer; transition: all .15s;
+}
+.chip:hover, .chip.active { border-color: var(--red); color: var(--red); background: var(--red-glass); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--ink); color: rgba(255,255,255,.42);
+  padding: 40px 24px; text-align: center;
+  font-size: .8rem; line-height: 1.8;
+}
+footer a { color: rgba(255,255,255,.55); }
+footer a:hover { color: #fff; }
+
+/* ── ANIMATIONS ── */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.animate-fadeup { animation: fadeUp .4s ease forwards; }
+
+/* ── LOADING ── */
+.loading-spin { animation: spin 1s linear infinite; }
+.htmx-indicator { opacity: 0; transition: opacity .2s; }
+.htmx-request .htmx-indicator { opacity: 1; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .navbar-links { display: none; }
+  .navbar-burger { display: flex; }
+}

@@ -1,0 +1,63 @@
+package layout
+
+templ Base(title string, activePage string) {
+	<!DOCTYPE html>
+	<html lang="es">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ title } — Plaza Real Copiapó</title>
+		<meta name="description" content="Centro comercial Plaza Real en Copiapó. Tiendas, restaurantes, servicios y más."/>
+		<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
+		<link rel="preconnect" href="https://fonts.googleapis.com"/>
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,800;0,900;1,900&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+		<link rel="stylesheet" href="/static/css/app.css"/>
+		<script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
+		<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+	</head>
+	<body>
+		@Navbar(activePage)
+		{ children... }
+		@Footer()
+		<script>
+			document.querySelector('.navbar-burger')?.addEventListener('click', function() {
+				document.querySelector('.mob-menu')?.classList.toggle('open');
+			});
+		</script>
+	</body>
+	</html>
+}
+
+templ Navbar(activePage string) {
+	<nav class="navbar">
+		<a href="/index.html" class="navbar-logo">
+			<img src="https://plazareal.cl/wp-content/uploads/2025/12/logo-mall-plaza-real-2024@3x.png" alt="Plaza Real"/>
+		</a>
+		<div class="navbar-links">
+			<a href="/index.html" class={ "navbar-link", templ.KV("active", activePage == "inicio") }>Inicio</a>
+			<a href="/buscador-tiendas" class={ "navbar-link", templ.KV("active", activePage == "tiendas") }>Tiendas</a>
+			<a href="/locales" class={ "navbar-link", templ.KV("active", activePage == "locales") }>Locales</a>
+			<a href="/promociones" class={ "navbar-link", templ.KV("active", activePage == "promociones") }>Eventos</a>
+			<a href="/noticias" class={ "navbar-link", templ.KV("active", activePage == "noticias") }>Noticias</a>
+			<a href="/admin" class="navbar-cta">Admin</a>
+		</div>
+		<button class="navbar-burger" aria-label="Menú">
+			<span></span><span></span><span></span>
+		</button>
+	</nav>
+	<div class="mob-menu">
+		<a href="/index.html">Inicio</a>
+		<a href="/buscador-tiendas">Tiendas</a>
+		<a href="/locales">Locales Disponibles</a>
+		<a href="/promociones">Eventos & Promociones</a>
+		<a href="/noticias">Noticias</a>
+		<a href="/admin">Admin</a>
+	</div>
+}
+
+templ Footer() {
+	<footer>
+		<p>&copy; 2026 Plaza Real Copiapó · <a href="/admin">Admin</a></p>
+	</footer>
+}
