@@ -28,7 +28,7 @@ func GenerateToken(cfg *config.Config, userID, email, role, nombre string) (stri
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(cfg.JWTExpiration)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "jcp-gestioninmobiliaria",
+			Issuer:    "cms-plazareal",
 		},
 	}
 

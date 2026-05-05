@@ -10,7 +10,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/pocketbase/pocketbase"
-	"github.com/pocketbase/pocketbase/core"
 )
 
 type noticiaData struct {
@@ -19,20 +18,6 @@ type noticiaData struct {
 	Category string
 	ImgHTML  template.HTML
 	BodyHTML template.HTML
-}
-
-type propiedadData struct {
-	Titulo        string
-	Direccion     string
-	PriceHTML     template.HTML
-	PriceSub      string
-	ChipsHTML     template.HTML
-	CoverHTML     template.HTML
-	ThumbsHTML    template.HTML
-	FeatsHTML     template.HTML
-	BodyHTML      template.HTML
-	AmenitiesHTML template.HTML
-	WhatsappHTML  template.HTML
 }
 
 // IndexHandler serves the main index.html (with HTMX fragment placeholders)
@@ -80,9 +65,9 @@ func RSSFeed(cfg *config.Config) fiber.Handler {
 		rss := fmt.Sprintf(`<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Colegio San Lorenzo — Noticias y Eventos</title>
+    <title>Plaza Real — Noticias y Comunicados</title>
     <link>%s</link>
-    <description>Comunicados, eventos y noticias del Colegio San Lorenzo de Copiapó</description>
+    <description>Noticias, comunicados y promociones de Plaza Real Copiapó</description>
     <language>es-cl</language>
     <lastBuildDate>%s</lastBuildDate>
     <atom:link href="%s/rss.xml" rel="self" type="application/rss+xml"/>
@@ -175,234 +160,3 @@ func NoticiaHandler(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler
 	}
 }
 
-// PropiedadHandler renders a single real-estate listing using the detail template.
-// Matches either slug or id.
-func PropiedadHandler(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		key := c.Params("key")
-		var r *core.Record
-		// try by slug first
-		recs, err := pb.FindRecordsByFilter("propiedades",
-			fmt.Sprintf("slug = '%s' && status = 'publicado'",
-				strings.ReplaceAll(key, "'", "")), "", 1, 0)
-		if err == nil && len(recs) > 0 {
-			r = recs[0]
-		} else {
-			rec, err2 := pb.FindRecordById("propiedades", key)
-			if err2 == nil && rec.GetString("status") == "publicado" {
-				r = rec
-			}
-		}
-		if r == nil {
-			return c.Redirect("/propiedades.html", fiber.StatusFound)
-		}
-
-		titulo := r.GetString("titulo")
-		descripcion := r.GetString("descripcion")
-		operacion := r.GetString("operacion")
-		direccion := r.GetString("direccion")
-		comuna := r.GetString("comuna")
-		region := r.GetString("region")
-		precioUF := r.GetFloat("precio_uf")
-		precioCLP := r.GetFloat("precio_clp")
-		dorm := r.GetInt("dormitorios")
-		banos := r.GetInt("banos")
-		estac := r.GetInt("estacionamientos")
-		supUtil := r.GetFloat("superficie_util")
-		supTotal := r.GetFloat("superficie_total")
-		ano := r.GetInt("ano_construccion")
-		cover := r.GetString("cover_image")
-		gallery := splitAndTrim(r.GetString("gallery"))
-		amenities := splitAndTrim(r.GetString("amenidades"))
-		destacada := r.GetBool("destacada")
-		oportunidad := r.GetBool("oportunidad")
-		whatsapp := r.GetString("contacto_whatsapp")
-
-		locLine := strings.TrimSpace(strings.Trim(
-			fmt.Sprintf("%s, %s · %s", direccion, comuna, region), ", ·"))
-		if locLine == "" {
-			locLine = direccion
-		}
-
-		// Cover
-		var coverHTML template.HTML
-		if cover != "" {
-			coverHTML = template.HTML(fmt.Sprintf(`<img src="%s" alt="%s"/>`,
-				template.HTMLEscapeString(cover), template.HTMLEscapeString(titulo)))
-		} else {
-			coverHTML = `<span class="gallery-placeholder">JCP</span>`
-		}
-		// Thumbs: up to 4 cells
-		thumbs := ""
-		for i := 0; i < 4; i++ {
-			if i < len(gallery) {
-				thumbs += fmt.Sprintf(`<div class="g-cell"><img src="%s" alt=""/></div>`,
-					template.HTMLEscapeString(gallery[i]))
-			} else {
-				thumbs += `<div class="g-cell"></div>`
-			}
-		}
-
-		// Chips
-		chips := ""
-		switch operacion {
-		case "VENTA":
-			chips += `<span class="op-chip op-venta">En Venta</span>`
-		case "ARRIENDO":
-			chips += `<span class="op-chip op-arriendo">En Arriendo</span>`
-		}
-		if destacada {
-			chips += `<span class="op-chip op-dest">Destacada</span>`
-		}
-		if oportunidad {
-			chips += `<span class="op-chip op-deal">Oportunidad</span>`
-		}
-
-		// Price
-		priceMain := ""
-		if precioUF > 0 {
-			if precioUF == float64(int64(precioUF)) {
-				priceMain = fmt.Sprintf("UF %d", int64(precioUF))
-			} else {
-				priceMain = fmt.Sprintf("UF %.1f", precioUF)
-			}
-		} else if precioCLP > 0 {
-			priceMain = formatCLPString(precioCLP)
-		}
-		priceSub := ""
-		if precioUF > 0 && precioCLP > 0 {
-			priceSub = "Referencia: " + formatCLPString(precioCLP)
-		} else if operacion == "ARRIENDO" && precioCLP > 0 {
-			priceSub = "Mensual"
-		}
-
-		// Feature boxes
-		feats := ""
-		if dorm > 0 {
-			feats += featBox(fmt.Sprintf("%d", dorm), "Dormitorios")
-		}
-		if banos > 0 {
-			feats += featBox(fmt.Sprintf("%d", banos), "Baños")
-		}
-		if supUtil > 0 {
-			feats += featBox(fmt.Sprintf("%g m²", supUtil), "Sup. útil")
-		}
-		if supTotal > 0 && supTotal != supUtil {
-			feats += featBox(fmt.Sprintf("%g m²", supTotal), "Sup. total")
-		}
-		if estac > 0 {
-			feats += featBox(fmt.Sprintf("%d", estac), "Estacionamientos")
-		}
-		if ano > 0 {
-			feats += featBox(fmt.Sprintf("%d", ano), "Año")
-		}
-
-		// Amenities section
-		amenitiesHTML := ""
-		if len(amenities) > 0 {
-			var ab strings.Builder
-			ab.WriteString(`<h2 style="font-family:var(--font-display);font-size:24px;margin:16px 0 8px">Comodidades</h2><div class="amenities">`)
-			for _, a := range amenities {
-				a = strings.ReplaceAll(a, "_", " ")
-				ab.WriteString(`<span class="amenity">`)
-				ab.WriteString(template.HTMLEscapeString(a))
-				ab.WriteString(`</span>`)
-			}
-			ab.WriteString(`</div>`)
-			amenitiesHTML = ab.String()
-		}
-
-		// Description body (preserve paragraph breaks)
-		var bodyParts []string
-		src := strings.TrimSpace(descripcion)
-		if src == "" {
-			src = "Sin descripción disponible."
-		}
-		for _, p := range strings.Split(src, "\n\n") {
-			p = strings.TrimSpace(p)
-			if p != "" {
-				bodyParts = append(bodyParts, "<p>"+template.HTMLEscapeString(p)+"</p>")
-			}
-		}
-		bodyHTML := template.HTML(strings.Join(bodyParts, "\n"))
-
-		whatsappHTML := ""
-		if whatsapp != "" {
-			msg := "Hola! Me interesa la propiedad: " + titulo
-			whatsappHTML = fmt.Sprintf(`<a href="https://wa.me/%s?text=%s" target="_blank" rel="noopener" class="btn-whatsapp">💬 WhatsApp directo</a>`,
-				onlyDigits(whatsapp), urlEscape(msg))
-		}
-
-		tmpl, err2 := template.ParseFiles("./internal/templates/web/propiedad.html")
-		if err2 != nil {
-			return c.Status(500).SendString("Template error")
-		}
-		c.Set("Content-Type", "text/html; charset=utf-8")
-		return tmpl.ExecuteTemplate(c, "propiedad.html", propiedadData{
-			Titulo:        titulo,
-			Direccion:     locLine,
-			PriceHTML:     template.HTML(priceMain),
-			PriceSub:      priceSub,
-			ChipsHTML:     template.HTML(chips),
-			CoverHTML:     coverHTML,
-			ThumbsHTML:    template.HTML(thumbs),
-			FeatsHTML:     template.HTML(feats),
-			BodyHTML:      bodyHTML,
-			AmenitiesHTML: template.HTML(amenitiesHTML),
-			WhatsappHTML:  template.HTML(whatsappHTML),
-		})
-	}
-}
-
-// ── helpers ──
-
-func splitAndTrim(s string) []string {
-	if strings.TrimSpace(s) == "" {
-		return nil
-	}
-	parts := strings.Split(s, ",")
-	out := make([]string, 0, len(parts))
-	for _, p := range parts {
-		p = strings.TrimSpace(p)
-		if p != "" {
-			out = append(out, p)
-		}
-	}
-	return out
-}
-
-func featBox(value, label string) string {
-	return fmt.Sprintf(`<div class="feat-box"><strong>%s</strong><span>%s</span></div>`,
-		template.HTMLEscapeString(value), template.HTMLEscapeString(label))
-}
-
-func formatCLPString(v float64) string {
-	if v <= 0 {
-		return ""
-	}
-	n := int64(v)
-	s := fmt.Sprintf("%d", n)
-	out := make([]byte, 0, len(s)+len(s)/3)
-	for i, c := range []byte(s) {
-		if i > 0 && (len(s)-i)%3 == 0 {
-			out = append(out, '.')
-		}
-		out = append(out, c)
-	}
-	return "$ " + string(out)
-}
-
-func onlyDigits(s string) string {
-	b := make([]byte, 0, len(s))
-	for i := 0; i < len(s); i++ {
-		if s[i] >= '0' && s[i] <= '9' {
-			b = append(b, s[i])
-		}
-	}
-	return string(b)
-}
-
-func urlEscape(s string) string {
-	// minimal: replace spaces
-	return strings.ReplaceAll(s, " ", "%20")
-}

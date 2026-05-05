@@ -4,6 +4,7 @@ pb_data/*.db-wal
 pb_data/logs/
 
 # Build output
+/cms-plazareal
 /jcp-gestioninmobiliaria
 /tmp/
 
@@ -14,3 +15,7 @@ pb_data/logs/
 # Environment
 .env
 .env.local
+
+# OS / tooling
+.DS_Store
+node_modules/

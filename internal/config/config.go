@@ -39,10 +39,6 @@ type Config struct {
 	TwilioAuthToken  string
 	TwilioFromNumber string
 
-	// Ollama
-	OllamaURL   string
-	OllamaModel string
-
 	// Web
 	BaseURL     string
 	SiteName    string
@@ -58,22 +54,22 @@ func Load() *Config {
 
 		// PocketBase
 		PBUrl:   getEnv("PB_URL", "http://127.0.0.1:8090"),
-		PBAdmin: getEnv("PB_ADMIN_EMAIL", "admin@jcp.cl"),
+		PBAdmin: getEnv("PB_ADMIN_EMAIL", "admin@plazareal.cl"),
 		PBPass:  getEnv("PB_ADMIN_PASSWORD", ""),
 
 		// Admin credentials
-		AdminEmail:    getEnv("ADMIN_EMAIL", "admin@jcp-gestioninmobiliaria.cl"),
-		AdminPassword: getEnv("ADMIN_PASSWORD", "jcp2026admin!"),
+		AdminEmail:    getEnv("ADMIN_EMAIL", "admin@plazareal.cl"),
+		AdminPassword: getEnv("ADMIN_PASSWORD", "plazareal2026admin!"),
 
 		// JWT
-		JWTSecret:     getEnv("JWT_SECRET", "jcp-secret-change-me-in-production"),
+		JWTSecret:     getEnv("JWT_SECRET", "pr-secret-change-in-production"),
 		JWTExpiration: 72 * time.Hour,
 
 		// Cloudflare R2
 		R2AccountID:  getEnv("R2_ACCOUNT_ID", ""),
 		R2AccessKey:  getEnv("R2_ACCESS_KEY_ID", ""),
 		R2SecretKey:  getEnv("R2_SECRET_ACCESS_KEY", ""),
-		R2BucketName: getEnv("R2_BUCKET_NAME", "jcp-media"),
+		R2BucketName: getEnv("R2_BUCKET_NAME", "plazareal-media"),
 		R2Region:     getEnv("R2_REGION", "auto"),
 		R2PublicURL:  getEnv("R2_PUBLIC_URL", ""),
 
@@ -82,13 +78,9 @@ func Load() *Config {
 		TwilioAuthToken:  getEnv("TWILIO_AUTH_TOKEN", ""),
 		TwilioFromNumber: getEnv("TWILIO_FROM_NUMBER", ""),
 
-		// Ollama
-		OllamaURL:   getEnv("OLLAMA_URL", "http://localhost:11434"),
-		OllamaModel: getEnv("OLLAMA_MODEL", "llama3"),
-
 		// Web
 		BaseURL:  getEnv("BASE_URL", "http://localhost:3000"),
-		SiteName: "JCP Gestión Inmobiliaria",
+		SiteName: "Plaza Real",
 	}
 }
 

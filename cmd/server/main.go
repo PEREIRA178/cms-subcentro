@@ -74,7 +74,6 @@ func main() {
 	app.Get("/index.html", web.PageHandler(cfg, "index"))
 	app.Get("/buscador-tiendas.html", web.PageHandler(cfg, "buscador-tiendas"))
 	app.Get("/tienda-individual.html", web.PageHandler(cfg, "tienda-individual"))
-	app.Get("/propiedades.html", web.PageHandler(cfg, "propiedades"))
 	app.Get("/noticias.html", web.PageHandler(cfg, "noticias"))
 
 	// ── HTMX FRAGMENTS ──
@@ -90,12 +89,8 @@ func main() {
 	frag.Get("/tiendas-destacadas", fragments.TiendasDestacadas(cfg, pb))
 	frag.Get("/tiendas-marquee", fragments.TiendasMarquee(cfg, pb))
 	frag.Get("/tienda/:key", fragments.TiendaDetail(cfg, pb))
-	// Real-estate fragments (JCP Gestión Inmobiliaria)
-	frag.Get("/propiedades-destacadas", fragments.PropiedadesDestacadas(cfg, pb))
-	frag.Get("/propiedades-page", fragments.PropiedadesPage(cfg, pb))
 
 	app.Get("/noticias/:id", web.NoticiaHandler(cfg, pb))
-	app.Get("/propiedades/:key", web.PropiedadHandler(cfg, pb))
 	app.Get("/rss.xml", web.RSSFeed(cfg))
 
 	// ── PUBLIC API ──
@@ -186,15 +181,6 @@ func main() {
 	adm.Delete("/tiendas/:id", admin.TiendaDelete(cfg, pb))
 	adm.Post("/tiendas/:id/publish", admin.TiendaToggleStatus(cfg, pb))
 
-	// Propiedades (kept for backwards compat)
-	adm.Get("/propiedades", admin.PropiedadesList(cfg, pb))
-	adm.Get("/propiedades/new", admin.PropiedadForm(cfg))
-	adm.Post("/propiedades", admin.PropiedadCreate(cfg, pb))
-	adm.Get("/propiedades/:id/edit", admin.PropiedadEdit(cfg, pb))
-	adm.Put("/propiedades/:id", admin.PropiedadUpdate(cfg, pb))
-	adm.Delete("/propiedades/:id", admin.PropiedadDelete(cfg, pb))
-	adm.Post("/propiedades/:id/publish", admin.PropiedadToggleStatus(cfg, pb))
-
 	app.Post("/webhook/whatsapp", web.WhatsAppWebhook(cfg))
 
 	port := cfg.Port
@@ -205,7 +191,7 @@ func main() {
 		port = envPort
 	}
 
-	log.Printf("🏢 JCP Gestión Inmobiliaria en http://localhost:%s", port)
+	log.Printf("🏢 Plaza Real CMS en http://localhost:%s", port)
 	log.Printf("📊 Dashboard: http://localhost:%s/admin", port)
 	log.Printf("🔧 PocketBase Admin: http://localhost:8090/_/")
 

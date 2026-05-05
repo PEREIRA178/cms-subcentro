@@ -536,3 +536,26 @@ func TiendaDetail(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 		return c.SendString(html)
 	}
 }
+
+// ── shared helpers ───────────────────────────────────────────────────────────
+
+// splitCSV trims and returns non-empty comma-separated tokens.
+func splitCSV(s string) []string {
+	if strings.TrimSpace(s) == "" {
+		return nil
+	}
+	parts := strings.Split(s, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
+// escapeFilter strips characters that would break a PocketBase filter expression.
+func escapeFilter(s string) string {
+	return strings.ReplaceAll(strings.ReplaceAll(s, "'", ""), "\\", "")
+}

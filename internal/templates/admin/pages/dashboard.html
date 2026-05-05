@@ -281,7 +281,7 @@ document.querySelectorAll('.sidebar-link').forEach(link => {
 // Auto-load section on direct navigation (F5 / bookmark / deep link)
 (function(){
   var path = window.location.pathname;
-  var sections = ['/admin/tiendas','/admin/news','/admin/events','/admin/multimedia','/admin/playlists','/admin/devices','/admin/users','/admin/whatsapp-logs','/admin/propiedades'];
+  var sections = ['/admin/tiendas','/admin/news','/admin/events','/admin/multimedia','/admin/playlists','/admin/devices','/admin/users','/admin/whatsapp-logs'];
   if(sections.indexOf(path) !== -1){
     htmx.ajax('GET', path, {target:'#main-content', swap:'innerHTML'});
     document.querySelectorAll('.sidebar-link').forEach(function(l){
