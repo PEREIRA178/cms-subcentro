@@ -7,29 +7,21 @@ import (
 	"strings"
 
 	"cms-plazareal/internal/config"
-	"cms-plazareal/internal/services"
+	"cms-plazareal/internal/helpers"
+	fragmentsView "cms-plazareal/internal/view/fragments"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/pocketbase/pocketbase"
 )
 
-// GET /fragments/hero — dynamic playlist carousel for the web_hero device.
-// Falls back to the static hero when no playlist is configured.
+// GET /fragments/hero — renders the public landing hero using the
+// Liquid Glass design system (page-hero classes from app.css).
+// The optional background image is sourced from site_settings.hero_bg_url.
 func HeroCarousel(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		slides, deviceID, err := services.FetchWebHeroSlides(pb)
-		if err != nil || len(slides) == 0 {
-			c.Set("Content-Type", "text/html; charset=utf-8")
-			return c.SendString(services.FallbackHeroHTML())
-		}
-
-		idx := services.CalculateCurrentIndex(c, len(slides))
-		slide := slides[idx]
-
-		services.UpdateDeviceStatus(pb, deviceID, slide.Title)
-
-		c.Set("Content-Type", "text/html; charset=utf-8")
-		return c.SendString(services.BuildHeroHTML(slide, idx, len(slides)))
+		return helpers.Render(c, fragmentsView.Hero(fragmentsView.HeroData{
+			BgURL: helpers.GetSetting(pb, "hero_bg_url"),
+		}))
 	}
 }
 

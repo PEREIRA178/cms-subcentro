@@ -1,0 +1,34 @@
+package fragments
+
+templ TiendasMarquee(items []TiendaCard) {
+	if len(items) == 0 {
+		<!-- silent empty state -->
+	} else {
+		<style>
+		@keyframes marquee-scroll {
+			0% { transform: translateX(0); }
+			100% { transform: translateX(-50%); }
+		}
+		.pr-marquee-track { animation: marquee-scroll 40s linear infinite; }
+		</style>
+		<div style="overflow:hidden;width:100%">
+			<div class="pr-marquee-track" style="display:flex;gap:48px;align-items:center;white-space:nowrap;padding:8px 0">
+				for _, t := range items {
+					if t.Logo != "" {
+						<img src={ t.Logo } alt={ t.Nombre } style="height:50px;width:auto;opacity:.7;filter:brightness(0) invert(1);flex-shrink:0"/>
+					} else {
+						<span style="color:rgba(255,255,255,.55);font-weight:600;font-size:1rem;flex-shrink:0">{ t.Nombre }</span>
+					}
+				}
+				<!-- duplicate for seamless loop -->
+				for _, t := range items {
+					if t.Logo != "" {
+						<img src={ t.Logo } alt={ t.Nombre } style="height:50px;width:auto;opacity:.7;filter:brightness(0) invert(1);flex-shrink:0"/>
+					} else {
+						<span style="color:rgba(255,255,255,.55);font-weight:600;font-size:1rem;flex-shrink:0">{ t.Nombre }</span>
+					}
+				}
+			</div>
+		</div>
+	}
+}

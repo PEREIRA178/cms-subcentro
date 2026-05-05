@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"cms-plazareal/internal/config"
+	"cms-plazareal/internal/helpers"
+	fragmentsView "cms-plazareal/internal/view/fragments"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/pocketbase/pocketbase"
@@ -266,51 +268,65 @@ func renderIndexCard(t tienda, i int) string {
 	)
 }
 
-// TiendasDestacadas serves up to 6 featured store cards for the home page.
-// Only stores with destacada = true are returned — never falls back to
-// non-featured stores, per product requirement.
+// galLabel returns the human-friendly gallery name for a tienda's gal field.
+func galLabel(gal string) string {
+	switch gal {
+	case "sur":
+		return "Torre Flamenco"
+	case "norte", "":
+		return "Placa Comercial"
+	}
+	return "Placa Comercial"
+}
+
+// toTiendaCards maps internal tienda records into the view-model cards used
+// by the home-page fragments.
+func toTiendaCards(stores []tienda) []fragmentsView.TiendaCard {
+	cards := make([]fragmentsView.TiendaCard, 0, len(stores))
+	for _, t := range stores {
+		local := ""
+		if t.Local != "" {
+			local = galLabel(t.Gal) + " · " + t.Local
+		} else {
+			local = galLabel(t.Gal)
+		}
+		cards = append(cards, fragmentsView.TiendaCard{
+			ID:     t.ID,
+			Slug:   t.Slug,
+			Nombre: t.Nombre,
+			Cat:    catLabel(t.Cat),
+			Logo:   t.Logo,
+			Local:  local,
+		})
+	}
+	return cards
+}
+
+// TiendasDestacadas — GET /fragments/tiendas-destacadas.
+// Renders up to 8 featured store cards using the new design system.
 func TiendasDestacadas(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		all := fetchTiendas(pb, "status = 'publicado'", "-destacada,nombre", 200, 0)
-		var sb strings.Builder
-		count := 0
+		featured := make([]tienda, 0, 8)
 		for _, t := range all {
 			if !t.Destacada {
 				continue
 			}
-			sb.WriteString(renderIndexCard(t, count))
-			count++
-			if count >= 6 {
+			featured = append(featured, t)
+			if len(featured) >= 8 {
 				break
 			}
 		}
-		if sb.Len() == 0 {
-			sb.WriteString(`<p style="grid-column:1/-1;text-align:center;color:#6B6B6B">No hay tiendas destacadas aún.</p>`)
-		}
-		c.Set("Content-Type", "text/html; charset=utf-8")
-		return c.SendString(sb.String())
+		return helpers.Render(c, fragmentsView.TiendasDestacadas(toTiendaCards(featured)))
 	}
 }
 
-// TiendasMarquee returns the inline HTML for the home marquee ticker.
-// Lists every published store name twice (duplicated for the CSS loop).
+// TiendasMarquee — GET /fragments/tiendas-marquee.
+// Renders a horizontally scrolling marquee of up to 30 published stores.
 func TiendasMarquee(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		stores := fetchTiendas(pb, "status = 'publicado'", "nombre", 500, 0)
-		var sb strings.Builder
-		writeRun := func() {
-			for _, t := range stores {
-				sb.WriteString(`<span class="mq-item">`)
-				sb.WriteString(template.HTMLEscapeString(t.Nombre))
-				sb.WriteString(`<span class="mq-dot"></span></span>`)
-			}
-		}
-		if len(stores) > 0 {
-			writeRun()
-			writeRun()
-		}
-		c.Set("Content-Type", "text/html; charset=utf-8")
-		return c.SendString(sb.String())
+		stores := fetchTiendas(pb, "status = 'publicado'", "nombre", 30, 0)
+		return helpers.Render(c, fragmentsView.TiendasMarquee(toTiendaCards(stores)))
 	}
 }
 
