@@ -1,0 +1,114 @@
+package admin
+
+import "fmt"
+
+type LocalRow struct {
+	ID      string
+	Nombre  string
+	Galeria string
+	Numero  string
+	Estado  string
+	M2      float64
+}
+
+type LocalesPageData struct {
+	Rows []LocalRow
+}
+
+templ LocalesPage(d LocalesPageData) {
+	@localesPageBody(d)
+}
+
+templ localesPageBody(d LocalesPageData) {
+	<div>
+		<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+			<h2 style="font-size:1.1rem;font-weight:800">Locales Disponibles</h2>
+			<button class="topbar-btn topbar-btn-primary"
+				hx-get="/admin/locales/new"
+				hx-target="#modal-container" hx-swap="innerHTML">
+				<span class="material-symbols-outlined" style="font-size:14px">add</span> Nuevo local
+			</button>
+		</div>
+		<div class="card">
+			<div class="card-header">
+				<h3 class="card-title">Locales</h3>
+				<span style="font-size:.76rem;color:var(--text-muted)">{ fmt.Sprintf("%d registros", len(d.Rows)) }</span>
+			</div>
+			<div style="overflow-x:auto">
+				<table>
+					<thead>
+						<tr>
+							<th>Nombre</th>
+							<th>Galería</th>
+							<th>N°</th>
+							<th>m²</th>
+							<th>Estado</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody id="locales-tbody">
+						if len(d.Rows) == 0 {
+							<tr><td colspan="6" class="empty-state-cell">Sin locales — agrega uno con el botón de arriba</td></tr>
+						}
+						for _, row := range d.Rows {
+							@LocalTableRow(row)
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+}
+
+templ LocalTableRow(r LocalRow) {
+	<tr id={ "local-row-" + r.ID }>
+		<td style="font-weight:600">{ r.Nombre }</td>
+		<td>{ localGaleriaLabel(r.Galeria) }</td>
+		<td>{ r.Numero }</td>
+		<td>
+			if r.M2 > 0 {
+				{ fmt.Sprintf("%.1f m²", r.M2) }
+			}
+		</td>
+		<td>
+			<span class={ "badge", templ.KV("badge-success", r.Estado == "disponible"), templ.KV("badge-warning", r.Estado == "en-negociacion"), templ.KV("badge-neutral", r.Estado == "arrendado") }>
+				{ localEstadoLabel(r.Estado) }
+			</span>
+		</td>
+		<td style="white-space:nowrap">
+			<button class="btn-icon" title="Editar"
+				hx-get={ "/admin/locales/" + r.ID + "/edit" }
+				hx-target="#modal-container" hx-swap="innerHTML">
+				<span class="material-symbols-outlined">edit</span>
+			</button>
+			<button class="btn-icon btn-danger" title="Eliminar"
+				hx-delete={ "/admin/locales/" + r.ID }
+				hx-confirm={ "¿Eliminar el local " + r.Nombre + "?" }
+				hx-target={ "#local-row-" + r.ID } hx-swap="outerHTML swap:0.3s">
+				<span class="material-symbols-outlined">delete</span>
+			</button>
+		</td>
+	</tr>
+}
+
+func localGaleriaLabel(g string) string {
+	switch g {
+	case "placa-comercial":
+		return "Placa Comercial"
+	case "torre-flamenco":
+		return "Torre Flamenco"
+	}
+	return g
+}
+
+func localEstadoLabel(e string) string {
+	switch e {
+	case "disponible":
+		return "Disponible"
+	case "en-negociacion":
+		return "En negociación"
+	case "arrendado":
+		return "Arrendado"
+	}
+	return e
+}

@@ -50,10 +50,31 @@ func ComunicadosPageHandler(cfg *config.Config) fiber.Handler {
 	}
 }
 
-// LocalesPageHandler renders the public Locales Disponibles page.
-func LocalesPageHandler(cfg *config.Config) fiber.Handler {
+// LocalesPageHandler renders the public Locales Disponibles page with
+// server-side data (only locales with estado='disponible').
+func LocalesPageHandler(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return helpers.Render(c, public.Locales())
+		records, _ := pb.FindRecordsByFilter(
+			"locales_disponibles",
+			"estado = 'disponible'",
+			"galeria,numero,nombre",
+			100, 0,
+		)
+		items := make([]public.LocalPublico, 0, len(records))
+		for _, r := range records {
+			items = append(items, public.LocalPublico{
+				ID:          r.Id,
+				Nombre:      r.GetString("nombre"),
+				Galeria:     r.GetString("galeria"),
+				Numero:      r.GetString("numero"),
+				Piso:        r.GetString("piso"),
+				Descripcion: r.GetString("descripcion"),
+				PrecioRef:   r.GetString("precio_ref"),
+				ImagenURL:   r.GetString("imagen_url"),
+				M2:          r.GetFloat("m2"),
+			})
+		}
+		return helpers.Render(c, public.LocalesPublicPage(public.LocalesPublicData{Locales: items}))
 	}
 }
 

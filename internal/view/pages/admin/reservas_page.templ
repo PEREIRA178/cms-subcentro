@@ -1,0 +1,92 @@
+package admin
+
+import "fmt"
+
+type ReservaRow struct {
+	ID                string
+	Nombre            string
+	Email             string
+	Telefono          string
+	Estado            string
+	ContentBlockTitle string
+	CreatedAt         string
+	Cantidad          int
+}
+
+type ReservasPageData struct {
+	Rows []ReservaRow
+}
+
+templ ReservasPage(d ReservasPageData) {
+	@reservasPageBody(d)
+}
+
+templ reservasPageBody(d ReservasPageData) {
+	<div>
+		<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+			<h2 style="font-size:1.1rem;font-weight:800">Reservas</h2>
+			<span style="font-size:.78rem;color:var(--text-muted)">{ fmt.Sprintf("%d registros", len(d.Rows)) }</span>
+		</div>
+		<div class="card">
+			<div class="card-header">
+				<h3 class="card-title">Listado de reservas</h3>
+			</div>
+			<div style="overflow-x:auto">
+				<table>
+					<thead>
+						<tr>
+							<th>Fecha</th>
+							<th>Nombre</th>
+							<th>Email</th>
+							<th>Teléfono</th>
+							<th>Promoción / Evento</th>
+							<th>Cantidad</th>
+							<th>Estado</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody id="reservas-tbody">
+						if len(d.Rows) == 0 {
+							<tr><td colspan="8" class="empty-state-cell">Sin reservas registradas</td></tr>
+						}
+						for _, row := range d.Rows {
+							@ReservaTableRow(row)
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+}
+
+templ ReservaTableRow(r ReservaRow) {
+	<tr id={ "reserva-row-" + r.ID }>
+		<td style="font-size:.78rem;color:var(--text-muted);white-space:nowrap">{ r.CreatedAt }</td>
+		<td style="font-weight:600">{ r.Nombre }</td>
+		<td style="font-size:.82rem">{ r.Email }</td>
+		<td style="font-size:.82rem">{ r.Telefono }</td>
+		<td style="font-size:.82rem">{ r.ContentBlockTitle }</td>
+		<td style="text-align:center">
+			if r.Cantidad > 0 {
+				{ fmt.Sprintf("%d", r.Cantidad) }
+			}
+		</td>
+		<td>
+			<form hx-post={ "/admin/reservas/" + r.ID + "/estado" } hx-trigger="change" hx-swap="none" style="margin:0">
+				<select name="estado" style="padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface-2);font-size:.78rem">
+					<option value="pendiente" selected?={ r.Estado == "pendiente" || r.Estado == "" }>Pendiente</option>
+					<option value="confirmada" selected?={ r.Estado == "confirmada" }>Confirmada</option>
+					<option value="cancelada" selected?={ r.Estado == "cancelada" }>Cancelada</option>
+				</select>
+			</form>
+		</td>
+		<td style="white-space:nowrap">
+			<button class="btn-icon btn-danger" title="Eliminar"
+				hx-delete={ "/admin/reservas/" + r.ID }
+				hx-confirm="¿Eliminar esta reserva?"
+				hx-target={ "#reserva-row-" + r.ID } hx-swap="outerHTML swap:0.3s">
+				<span class="material-symbols-outlined">delete</span>
+			</button>
+		</td>
+	</tr>
+}

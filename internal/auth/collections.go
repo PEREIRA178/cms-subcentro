@@ -276,6 +276,85 @@ func ensureCollections(app core.App) error {
 		log.Printf("⚠️  Error seeding devices/playlists: %v", err)
 	}
 
+	// ── 19. LOCALES_DISPONIBLES ──
+	if err := ensureLocalesDisponibles(app); err != nil {
+		log.Printf("⚠️  Error creando locales_disponibles: %v", err)
+	}
+
+	// ── 20. RESERVAS ──
+	if err := ensureReservas(app); err != nil {
+		log.Printf("⚠️  Error creando reservas: %v", err)
+	}
+
+	return nil
+}
+
+// ensureLocalesDisponibles creates the 'locales_disponibles' collection if it
+// does not already exist. Idempotent.
+func ensureLocalesDisponibles(app core.App) error {
+	if _, err := app.FindCollectionByNameOrId("locales_disponibles"); err == nil {
+		return nil
+	}
+	col := core.NewBaseCollection("locales_disponibles")
+	col.Fields.Add(
+		&core.TextField{Name: "nombre", Required: true},
+		// placa-comercial | torre-flamenco
+		&core.SelectField{
+			Name:      "galeria",
+			Values:    []string{"placa-comercial", "torre-flamenco"},
+			MaxSelect: 1,
+		},
+		&core.TextField{Name: "numero"},
+		&core.TextField{Name: "piso"},
+		&core.NumberField{Name: "m2"},
+		&core.EditorField{Name: "descripcion"},
+		&core.TextField{Name: "precio_ref"},
+		// disponible | en-negociacion | arrendado
+		&core.SelectField{
+			Name:      "estado",
+			Values:    []string{"disponible", "en-negociacion", "arrendado"},
+			MaxSelect: 1,
+			Required:  true,
+		},
+		&core.TextField{Name: "imagen_url"},
+		&core.TextField{Name: "contacto_email"},
+		&core.TextField{Name: "contacto_tel"},
+	)
+	if err := app.Save(col); err != nil {
+		return err
+	}
+	log.Println("  ✅ Collection 'locales_disponibles' created")
+	return nil
+}
+
+// ensureReservas creates the 'reservas' collection if it does not already
+// exist. Tracks reservations made via the public site (typically tied to a
+// content_blocks PROMOCION). Idempotent.
+func ensureReservas(app core.App) error {
+	if _, err := app.FindCollectionByNameOrId("reservas"); err == nil {
+		return nil
+	}
+	col := core.NewBaseCollection("reservas")
+	col.Fields.Add(
+		&core.TextField{Name: "nombre", Required: true},
+		&core.TextField{Name: "email"},
+		&core.TextField{Name: "telefono"},
+		&core.NumberField{Name: "cantidad"},
+		&core.TextField{Name: "mensaje"},
+		// Soft reference to content_blocks (avoids hard relation dependency
+		// across migration ordering). Stores the content_blocks record id.
+		&core.TextField{Name: "content_block_id"},
+		// pendiente | confirmada | cancelada
+		&core.SelectField{
+			Name:      "estado",
+			Values:    []string{"pendiente", "confirmada", "cancelada"},
+			MaxSelect: 1,
+		},
+	)
+	if err := app.Save(col); err != nil {
+		return err
+	}
+	log.Println("  ✅ Collection 'reservas' created")
 	return nil
 }
 

@@ -84,8 +84,9 @@ func main() {
 	app.Get("/noticias", web.NoticiasPageHandler(cfg))
 	app.Get("/noticias.html", web.NoticiasPageHandler(cfg))
 	app.Get("/comunicados", web.ComunicadosPageHandler(cfg))
-	app.Get("/locales", web.LocalesPageHandler(cfg))
-	app.Get("/locales.html", web.LocalesPageHandler(cfg))
+	app.Get("/locales", web.LocalesPageHandler(cfg, pb))
+	app.Get("/locales.html", web.LocalesPageHandler(cfg, pb))
+	app.Get("/locales-disponibles", web.LocalesPageHandler(cfg, pb))
 	app.Get("/promociones", web.PromocionesPageHandler(cfg))
 	app.Get("/eventos.html", web.PromocionesPageHandler(cfg))
 
@@ -101,6 +102,9 @@ func main() {
 	frag.Get("/comunicados-page", fragments.ComunicadosCards(cfg, pb))
 	frag.Get("/promos", fragments.PromosCards(cfg, pb))
 	frag.Get("/promos-page", fragments.PromosCards(cfg, pb))
+	// Locales disponibles fragment (used by homepage embed and the public page)
+	frag.Get("/locales-disponibles", fragments.LocalesCards(cfg, pb))
+	frag.Get("/locales-cards", fragments.LocalesCards(cfg, pb))
 	frag.Get("/blog", fragments.Blog(cfg, pb))
 	// Tiendas fragments (Subcentro)
 	frag.Get("/tiendas", fragments.TiendasPage(cfg, pb))
@@ -220,6 +224,19 @@ func main() {
 	adm.Put("/tiendas/:id", admin.TiendaUpdate(cfg, pb))
 	adm.Delete("/tiendas/:id", admin.TiendaDelete(cfg, pb))
 	adm.Post("/tiendas/:id/publish", admin.TiendaToggleStatus(cfg, pb))
+
+	// Locales disponibles (CRUD)
+	adm.Get("/locales", admin.LocalesList(cfg, pb))
+	adm.Get("/locales/new", admin.LocalNew(cfg))
+	adm.Post("/locales", admin.LocalCreate(cfg, pb))
+	adm.Get("/locales/:id/edit", admin.LocalEdit(cfg, pb))
+	adm.Put("/locales/:id", admin.LocalUpdate(cfg, pb))
+	adm.Delete("/locales/:id", admin.LocalDelete(cfg, pb))
+
+	// Reservas (admin: list, change estado, delete)
+	adm.Get("/reservas", admin.ReservasList(cfg, pb))
+	adm.Post("/reservas/:id/estado", admin.ReservaUpdateEstado(cfg, pb))
+	adm.Delete("/reservas/:id", admin.ReservaDelete(cfg, pb))
 
 	app.Post("/webhook/whatsapp", web.WhatsAppWebhook(cfg))
 

@@ -1,0 +1,117 @@
+package admin
+
+import "cms-plazareal/internal/view/components"
+
+type LocalFormData struct {
+	ID            string
+	Nombre        string
+	Galeria       string
+	Numero        string
+	Piso          string
+	M2            string
+	Descripcion   string
+	PrecioRef     string
+	Estado        string
+	ImagenURL     string
+	ContactoEmail string
+	ContactoTel   string
+	ErrorMsg      string
+}
+
+templ LocalForm(d LocalFormData) {
+	@components.UploadFieldScript()
+	<div class="modal-header">
+		if d.ID == "" {
+			<h3 class="modal-title">Nuevo local</h3>
+		} else {
+			<h3 class="modal-title">Editar local</h3>
+		}
+		<button class="btn-icon"
+			hx-get="/admin/empty"
+			hx-target="#modal-container"
+			hx-swap="innerHTML"
+			title="Cerrar">
+			<span class="material-symbols-outlined">close</span>
+		</button>
+	</div>
+	if d.ErrorMsg != "" {
+		<div class="modal-body">
+			<div class="toast toast-error">{ d.ErrorMsg }</div>
+		</div>
+	}
+	<div class="modal-body" style="max-height:70vh;overflow-y:auto">
+		if d.ID == "" {
+			<form hx-post="/admin/locales" hx-swap="none">
+				@localFormFields(d)
+				<div class="modal-footer">
+					<button type="submit" class="topbar-btn topbar-btn-primary">Guardar</button>
+				</div>
+			</form>
+		} else {
+			<form hx-put={ "/admin/locales/" + d.ID } hx-swap="none">
+				@localFormFields(d)
+				<div class="modal-footer">
+					<button type="submit" class="topbar-btn topbar-btn-primary">Guardar</button>
+				</div>
+			</form>
+		}
+	</div>
+}
+
+templ localFormFields(d LocalFormData) {
+	<div class="form-group">
+		<label>Nombre / Descripción del local *</label>
+		<input type="text" name="nombre" value={ d.Nombre } required placeholder="Local 101 — Placa Comercial"/>
+	</div>
+	<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0 16px">
+		<div class="form-group">
+			<label>Galería</label>
+			<select name="galeria">
+				<option value="">— Seleccionar —</option>
+				<option value="placa-comercial" selected?={ d.Galeria == "placa-comercial" }>Placa Comercial</option>
+				<option value="torre-flamenco" selected?={ d.Galeria == "torre-flamenco" }>Torre Flamenco</option>
+			</select>
+		</div>
+		<div class="form-group">
+			<label>N°</label>
+			<input type="text" name="numero" value={ d.Numero } placeholder="101"/>
+		</div>
+		<div class="form-group">
+			<label>Piso</label>
+			<input type="text" name="piso" value={ d.Piso } placeholder="1"/>
+		</div>
+		<div class="form-group">
+			<label>m²</label>
+			<input type="number" name="m2" value={ d.M2 } step="0.1"/>
+		</div>
+	</div>
+	<div class="form-group">
+		<label>Descripción</label>
+		<textarea name="descripcion" rows="3">{ d.Descripcion }</textarea>
+	</div>
+	<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+		<div class="form-group">
+			<label>Precio referencial</label>
+			<input type="text" name="precio_ref" value={ d.PrecioRef } placeholder="UF 30 / mes"/>
+		</div>
+		<div class="form-group">
+			<label>Estado *</label>
+			<select name="estado" required>
+				<option value="disponible" selected?={ d.Estado == "disponible" || d.Estado == "" }>Disponible</option>
+				<option value="en-negociacion" selected?={ d.Estado == "en-negociacion" }>En negociación</option>
+				<option value="arrendado" selected?={ d.Estado == "arrendado" }>Arrendado</option>
+			</select>
+		</div>
+	</div>
+	@components.UploadField("imagen_url", d.ImagenURL, "Imagen del local")
+	<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+		<div class="form-group">
+			<label>Email contacto</label>
+			<input type="email" name="contacto_email" value={ d.ContactoEmail }/>
+		</div>
+		<div class="form-group">
+			<label>Teléfono contacto</label>
+			<input type="text" name="contacto_tel" value={ d.ContactoTel }/>
+		</div>
+	</div>
+}

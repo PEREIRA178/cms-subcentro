@@ -2093,3 +2093,228 @@ func ContentDelete(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler 
 		return c.SendString("")
 	}
 }
+
+// ── LOCALES DISPONIBLES (CRUD) ─────────────────────────────────────────────
+
+// localesSaveResponse closes the modal and refreshes the listing.
+func localesSaveResponse(c *fiber.Ctx, msg string) error {
+	return c.SendString(fmt.Sprintf(`<div class="toast toast-success" id="toast-area">%s
+<script>
+  var m=document.getElementById('modal-container'); if(m){m.replaceChildren();}
+  htmx.ajax('GET','/admin/locales',{target:'#content',swap:'innerHTML'});
+  setTimeout(function(){var t=document.getElementById('toast-area');if(t){t.replaceChildren();}},2000);
+</script></div>`, template.HTMLEscapeString(msg)))
+}
+
+// LocalesList renders the admin list of locales_disponibles.
+func LocalesList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		records, _ := pb.FindRecordsByFilter("locales_disponibles", "", "galeria,numero,nombre", 200, 0)
+		rows := make([]adminView.LocalRow, 0, len(records))
+		for _, r := range records {
+			rows = append(rows, adminView.LocalRow{
+				ID:      r.Id,
+				Nombre:  r.GetString("nombre"),
+				Galeria: r.GetString("galeria"),
+				Numero:  r.GetString("numero"),
+				Estado:  r.GetString("estado"),
+				M2:      r.GetFloat("m2"),
+			})
+		}
+		data := adminView.LocalesPageData{Rows: rows}
+		if c.Get("HX-Request") == "true" {
+			return helpers.Render(c, adminView.LocalesPage(data))
+		}
+		return helpers.Render(c, layout.Admin("Locales Disponibles", "locales", adminView.LocalesPage(data)))
+	}
+}
+
+// LocalNew returns the empty local form (modal).
+func LocalNew(cfg *config.Config) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		return helpers.Render(c, adminView.LocalForm(adminView.LocalFormData{
+			Estado: "disponible",
+		}))
+	}
+}
+
+// LocalEdit returns the populated local form (modal).
+func LocalEdit(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r, err := pb.FindRecordById("locales_disponibles", id)
+		if err != nil {
+			return c.Status(404).SendString(`<div class="toast toast-error">No encontrado</div>`)
+		}
+		m2Str := ""
+		if v := r.GetFloat("m2"); v > 0 {
+			m2Str = fmt.Sprintf("%g", v)
+		}
+		data := adminView.LocalFormData{
+			ID:            r.Id,
+			Nombre:        r.GetString("nombre"),
+			Galeria:       r.GetString("galeria"),
+			Numero:        r.GetString("numero"),
+			Piso:          r.GetString("piso"),
+			M2:            m2Str,
+			Descripcion:   r.GetString("descripcion"),
+			PrecioRef:     r.GetString("precio_ref"),
+			Estado:        r.GetString("estado"),
+			ImagenURL:     r.GetString("imagen_url"),
+			ContactoEmail: r.GetString("contacto_email"),
+			ContactoTel:   r.GetString("contacto_tel"),
+		}
+		return helpers.Render(c, adminView.LocalForm(data))
+	}
+}
+
+// setLocalFields applies form values to a local record.
+func setLocalFields(r *core.Record, c *fiber.Ctx) {
+	r.Set("nombre", strings.TrimSpace(c.FormValue("nombre")))
+	r.Set("galeria", c.FormValue("galeria"))
+	r.Set("numero", c.FormValue("numero"))
+	r.Set("piso", c.FormValue("piso"))
+	if v := strings.TrimSpace(c.FormValue("m2")); v != "" {
+		var f float64
+		if _, err := fmt.Sscanf(v, "%f", &f); err == nil {
+			r.Set("m2", f)
+		}
+	} else {
+		r.Set("m2", 0)
+	}
+	r.Set("descripcion", c.FormValue("descripcion"))
+	r.Set("precio_ref", c.FormValue("precio_ref"))
+	estado := c.FormValue("estado")
+	if estado == "" {
+		estado = "disponible"
+	}
+	r.Set("estado", estado)
+	r.Set("imagen_url", c.FormValue("imagen_url"))
+	r.Set("contacto_email", c.FormValue("contacto_email"))
+	r.Set("contacto_tel", c.FormValue("contacto_tel"))
+}
+
+// LocalCreate handles POST /admin/locales.
+func LocalCreate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		nombre := strings.TrimSpace(c.FormValue("nombre"))
+		if nombre == "" {
+			return c.SendString(`<div class="toast toast-error">El nombre es requerido</div>`)
+		}
+		col, err := pb.FindCollectionByNameOrId("locales_disponibles")
+		if err != nil {
+			return c.Status(500).SendString(`<div class="toast toast-error">Error de BD</div>`)
+		}
+		r := core.NewRecord(col)
+		setLocalFields(r, c)
+		if err := pb.Save(r); err != nil {
+			return c.SendString(`<div class="toast toast-error">Error: ` + template.HTMLEscapeString(err.Error()) + `</div>`)
+		}
+		return localesSaveResponse(c, "✅ Local creado")
+	}
+}
+
+// LocalUpdate handles PUT /admin/locales/:id.
+func LocalUpdate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r, err := pb.FindRecordById("locales_disponibles", id)
+		if err != nil {
+			return c.SendString(`<div class="toast toast-error">No encontrado</div>`)
+		}
+		setLocalFields(r, c)
+		if err := pb.Save(r); err != nil {
+			return c.SendString(`<div class="toast toast-error">Error actualizando</div>`)
+		}
+		return localesSaveResponse(c, "✅ Local actualizado")
+	}
+}
+
+// LocalDelete handles DELETE /admin/locales/:id.
+func LocalDelete(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r, err := pb.FindRecordById("locales_disponibles", id)
+		if err != nil {
+			return c.Status(404).SendString("")
+		}
+		if err := pb.Delete(r); err != nil {
+			return c.SendString(`<div class="toast toast-error">Error eliminando</div>`)
+		}
+		return c.SendString("")
+	}
+}
+
+// ── RESERVAS (admin: list + change estado + delete) ────────────────────────
+
+// ReservasList renders the admin list of reservas.
+func ReservasList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		records, _ := pb.FindRecordsByFilter("reservas", "", "-created", 200, 0)
+		rows := make([]adminView.ReservaRow, 0, len(records))
+		for _, r := range records {
+			cbTitle := ""
+			if id := r.GetString("content_block_id"); id != "" {
+				if cb, err := pb.FindRecordById("content_blocks", id); err == nil {
+					cbTitle = cb.GetString("title")
+				}
+			}
+			created := ""
+			if dt := r.GetDateTime("created"); !dt.IsZero() {
+				created = dt.Time().Format("2 Jan 2006 15:04")
+			}
+			rows = append(rows, adminView.ReservaRow{
+				ID:                r.Id,
+				Nombre:            r.GetString("nombre"),
+				Email:             r.GetString("email"),
+				Telefono:          r.GetString("telefono"),
+				Estado:            r.GetString("estado"),
+				ContentBlockTitle: cbTitle,
+				CreatedAt:         created,
+				Cantidad:          int(r.GetFloat("cantidad")),
+			})
+		}
+		data := adminView.ReservasPageData{Rows: rows}
+		if c.Get("HX-Request") == "true" {
+			return helpers.Render(c, adminView.ReservasPage(data))
+		}
+		return helpers.Render(c, layout.Admin("Reservas", "reservas", adminView.ReservasPage(data)))
+	}
+}
+
+// ReservaUpdateEstado handles POST /admin/reservas/:id/estado.
+func ReservaUpdateEstado(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r, err := pb.FindRecordById("reservas", id)
+		if err != nil {
+			return c.Status(404).SendString(`<div class="toast toast-error">No encontrada</div>`)
+		}
+		estado := c.FormValue("estado")
+		switch estado {
+		case "pendiente", "confirmada", "cancelada":
+			r.Set("estado", estado)
+		default:
+			return c.SendString(`<div class="toast toast-error">Estado inválido</div>`)
+		}
+		if err := pb.Save(r); err != nil {
+			return c.SendString(`<div class="toast toast-error">Error actualizando</div>`)
+		}
+		return c.SendString("")
+	}
+}
+
+// ReservaDelete handles DELETE /admin/reservas/:id.
+func ReservaDelete(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r, err := pb.FindRecordById("reservas", id)
+		if err != nil {
+			return c.Status(404).SendString("")
+		}
+		if err := pb.Delete(r); err != nil {
+			return c.SendString(`<div class="toast toast-error">Error eliminando</div>`)
+		}
+		return c.SendString("")
+	}
+}

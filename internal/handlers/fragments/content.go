@@ -78,6 +78,31 @@ func ComunicadosCards(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handl
 	}
 }
 
+// LocalesCards — GET /fragments/locales-disponibles.
+// Renders a card grid for locales with estado='disponible'.
+func LocalesCards(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		records, _ := pb.FindRecordsByFilter(
+			"locales_disponibles",
+			"estado = 'disponible'",
+			"galeria,numero,nombre",
+			100, 0,
+		)
+		items := make([]fragmentsView.LocalCard, 0, len(records))
+		for _, r := range records {
+			items = append(items, fragmentsView.LocalCard{
+				ID:        r.Id,
+				Nombre:    r.GetString("nombre"),
+				Galeria:   r.GetString("galeria"),
+				PrecioRef: r.GetString("precio_ref"),
+				ImagenURL: r.GetString("imagen_url"),
+				M2:        r.GetFloat("m2"),
+			})
+		}
+		return helpers.Render(c, fragmentsView.LocalesCards(items))
+	}
+}
+
 // PromosCards — GET /fragments/promos and /fragments/promos-page.
 func PromosCards(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
