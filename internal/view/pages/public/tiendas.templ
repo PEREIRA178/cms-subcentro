@@ -2,15 +2,29 @@ package public
 
 import "cms-plazareal/internal/view/layout"
 
-templ Tiendas() {
+type TiendasData struct {
+	SearchBgURL string
+}
+
+templ Tiendas(d TiendasData) {
 	@layout.Base("Tiendas", "tiendas") {
-		<div class="page-hero">
-			<div class="page-hero-inner">
-				<span class="page-hero-eyebrow">Plaza Real · Copiapó</span>
-				<h1 class="page-hero-title">Directorio de <em>Tiendas</em></h1>
-				<p class="page-hero-sub">Más de 100 tiendas, restaurantes y servicios. Busca por nombre o categoría.</p>
+		if d.SearchBgURL != "" {
+			<div class="page-hero" style={ "background:linear-gradient(rgba(10,10,10,.72),rgba(10,10,10,.86)),url(" + d.SearchBgURL + ") center/cover" }>
+				<div class="page-hero-inner">
+					<span class="page-hero-eyebrow">Plaza Real · Copiapó</span>
+					<h1 class="page-hero-title">Directorio de <em>Tiendas</em></h1>
+					<p class="page-hero-sub">Más de 100 tiendas, restaurantes y servicios. Busca por nombre o categoría.</p>
+				</div>
 			</div>
-		</div>
+		} else {
+			<div class="page-hero">
+				<div class="page-hero-inner">
+					<span class="page-hero-eyebrow">Plaza Real · Copiapó</span>
+					<h1 class="page-hero-title">Directorio de <em>Tiendas</em></h1>
+					<p class="page-hero-sub">Más de 100 tiendas, restaurantes y servicios. Busca por nombre o categoría.</p>
+				</div>
+			</div>
+		}
 		<div class="section">
 			<div class="container">
 				<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:28px">

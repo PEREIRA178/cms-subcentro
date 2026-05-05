@@ -2574,3 +2574,49 @@ func ReportsExport(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler 
 		return c.SendString(sb.String())
 	}
 }
+
+// ── SITE SETTINGS ─────────────────────────────────────────────────────────────
+
+// SettingsPageHandler renders the global site settings admin page.
+// Loads the current values for hero_bg_url and search_bg_url so the upload
+// widgets can show existing previews.
+func SettingsPageHandler(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		data := adminView.SettingsPageData{
+			HeroBgURL:   helpers.GetSetting(pb, "hero_bg_url"),
+			SearchBgURL: helpers.GetSetting(pb, "search_bg_url"),
+		}
+		content := adminView.SettingsPage(data)
+		if c.Get("HX-Request") == "true" {
+			return helpers.Render(c, content)
+		}
+		return helpers.Render(c, layout.Admin("Ajustes", "settings", content))
+	}
+}
+
+// SettingsUpdate processes the admin settings form submission. Saves
+// hero_bg_url and search_bg_url via helpers.SetSetting (creates the records on
+// first save). Returns the form HTML with a success or error toast.
+func SettingsUpdate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		heroBg := strings.TrimSpace(c.FormValue("hero_bg_url"))
+		searchBg := strings.TrimSpace(c.FormValue("search_bg_url"))
+		var errMsg string
+		if err := helpers.SetSetting(pb, "hero_bg_url", heroBg); err != nil {
+			errMsg = "Error guardando hero_bg_url: " + err.Error()
+		}
+		if err := helpers.SetSetting(pb, "search_bg_url", searchBg); err != nil {
+			errMsg = "Error guardando search_bg_url: " + err.Error()
+		}
+		success := ""
+		if errMsg == "" {
+			success = "Ajustes guardados correctamente."
+		}
+		return helpers.Render(c, adminView.SettingsPage(adminView.SettingsPageData{
+			HeroBgURL:   heroBg,
+			SearchBgURL: searchBg,
+			SuccessMsg:  success,
+			ErrorMsg:    errMsg,
+		}))
+	}
+}

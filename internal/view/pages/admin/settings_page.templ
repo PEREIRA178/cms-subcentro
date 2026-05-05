@@ -1,0 +1,47 @@
+package admin
+
+import "cms-plazareal/internal/view/components"
+
+type SettingsPageData struct {
+	HeroBgURL   string
+	SearchBgURL string
+	SuccessMsg  string
+	ErrorMsg    string
+}
+
+templ SettingsPage(d SettingsPageData) {
+	@components.UploadFieldScript()
+	<div>
+		<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+			<h2 style="font-size:1.1rem;font-weight:800">Ajustes del sitio</h2>
+		</div>
+		<form id="settings-form-area"
+			hx-post="/admin/settings"
+			hx-target="#settings-form-area"
+			hx-swap="outerHTML">
+			if d.SuccessMsg != "" {
+				<div class="toast toast-success" style="margin-bottom:16px">{ d.SuccessMsg }</div>
+			}
+			if d.ErrorMsg != "" {
+				<div class="toast toast-error" style="margin-bottom:16px">{ d.ErrorMsg }</div>
+			}
+			<div class="card" style="padding:24px;display:flex;flex-direction:column;gap:24px">
+				<section>
+					<h3 style="font-size:.92rem;font-weight:800;margin-bottom:6px">Página principal</h3>
+					<p style="color:var(--text-muted);font-size:.78rem;margin-bottom:12px">Imagen de fondo del hero en la página de inicio.</p>
+					@components.UploadField("hero_bg_url", d.HeroBgURL, "Fondo hero — Inicio")
+				</section>
+				<section>
+					<h3 style="font-size:.92rem;font-weight:800;margin-bottom:6px">Buscador de tiendas</h3>
+					<p style="color:var(--text-muted);font-size:.78rem;margin-bottom:12px">Imagen de fondo del hero en la página /buscador-tiendas.</p>
+					@components.UploadField("search_bg_url", d.SearchBgURL, "Fondo hero — Buscador")
+				</section>
+				<div style="display:flex;justify-content:flex-end;gap:10px">
+					<button type="submit" class="topbar-btn topbar-btn-primary">
+						<span class="material-symbols-outlined" style="font-size:14px">save</span> Guardar ajustes
+					</button>
+				</div>
+			</div>
+		</form>
+	</div>
+}

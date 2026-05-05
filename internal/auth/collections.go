@@ -296,6 +296,30 @@ func ensureCollections(app core.App) error {
 		log.Printf("⚠️  Error creando leads: %v", err)
 	}
 
+	// ── 23. SITE_SETTINGS ──
+	if err := ensureSiteSettings(app); err != nil {
+		log.Printf("⚠️  Error creando site_settings: %v", err)
+	}
+
+	return nil
+}
+
+// ensureSiteSettings creates the 'site_settings' collection used to store
+// global key/value site configuration (e.g. hero_bg_url, search_bg_url).
+// Idempotent.
+func ensureSiteSettings(app core.App) error {
+	if _, err := app.FindCollectionByNameOrId("site_settings"); err == nil {
+		return nil
+	}
+	col := core.NewBaseCollection("site_settings")
+	col.Fields.Add(
+		&core.TextField{Name: "key", Required: true},
+		&core.TextField{Name: "value"},
+	)
+	if err := app.Save(col); err != nil {
+		return err
+	}
+	log.Println("  ✅ Collection 'site_settings' created")
 	return nil
 }
 

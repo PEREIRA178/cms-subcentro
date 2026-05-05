@@ -23,16 +23,22 @@ type noticiaData struct {
 }
 
 // IndexHandler renders the public home page using the templ Index() component.
-func IndexHandler(cfg *config.Config) fiber.Handler {
+// Reads the optional hero background URL from site_settings (key=hero_bg_url).
+func IndexHandler(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return helpers.Render(c, public.Index())
+		return helpers.Render(c, public.Index(public.IndexData{
+			HeroBgURL: helpers.GetSetting(pb, "hero_bg_url"),
+		}))
 	}
 }
 
 // TiendasPageHandler renders the public Tiendas index page.
-func TiendasPageHandler(cfg *config.Config) fiber.Handler {
+// Reads the optional hero background URL from site_settings (key=search_bg_url).
+func TiendasPageHandler(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return helpers.Render(c, public.Tiendas())
+		return helpers.Render(c, public.Tiendas(public.TiendasData{
+			SearchBgURL: helpers.GetSetting(pb, "search_bg_url"),
+		}))
 	}
 }
 

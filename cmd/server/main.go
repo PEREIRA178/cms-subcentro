@@ -81,10 +81,10 @@ func main() {
 	realtime.SetHubInstance(hub)
 
 	// ── PUBLIC WEB ──
-	app.Get("/", web.IndexHandler(cfg))
-	app.Get("/index.html", web.IndexHandler(cfg))
-	app.Get("/buscador-tiendas", web.TiendasPageHandler(cfg))
-	app.Get("/buscador-tiendas.html", web.TiendasPageHandler(cfg))
+	app.Get("/", web.IndexHandler(cfg, pb))
+	app.Get("/index.html", web.IndexHandler(cfg, pb))
+	app.Get("/buscador-tiendas", web.TiendasPageHandler(cfg, pb))
+	app.Get("/buscador-tiendas.html", web.TiendasPageHandler(cfg, pb))
 	app.Get("/tiendas/:slug", web.TiendaDetailHandler(cfg, pb))
 	app.Get("/noticias", web.NoticiasPageHandler(cfg))
 	app.Get("/noticias.html", web.NoticiasPageHandler(cfg))
@@ -226,6 +226,10 @@ func main() {
 	// Reports / Analytics
 	adm.Get("/reports", middleware.RoleRequired("superadmin", "director"), admin.ReportsPageHandler(cfg, pb))
 	adm.Get("/reports/export", middleware.RoleRequired("superadmin", "director"), admin.ReportsExport(cfg, pb))
+
+	// Site Settings
+	adm.Get("/settings", middleware.RoleRequired("superadmin", "director"), admin.SettingsPageHandler(cfg, pb))
+	adm.Post("/settings", middleware.RoleRequired("superadmin", "director"), admin.SettingsUpdate(cfg, pb))
 
 	// Tiendas
 	adm.Get("/tiendas", admin.TiendasList(cfg, pb))

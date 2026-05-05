@@ -320,7 +320,29 @@ func AdminSidebar(activePage string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\"><span class=\"material-symbols-outlined\">bar_chart</span>Informes</a><div class=\"sidebar-footer\"><form hx-post=\"/admin/logout\" hx-swap=\"none\"><button type=\"submit\" class=\"sidebar-link\" style=\"width:100%;border:none;cursor:pointer\"><span class=\"material-symbols-outlined\">logout</span>Cerrar sesión</button></form></div></aside>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\"><span class=\"material-symbols-outlined\">bar_chart</span>Informes</a> ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var25 = []any{"sidebar-link", templ.KV("active", activePage == "settings")}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var25...)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<a href=\"/admin/settings\" class=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var26 string
+		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var25).String())
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/layout/admin.templ`, Line: 1, Col: 0}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\"><span class=\"material-symbols-outlined\">tune</span>Ajustes</a><div class=\"sidebar-footer\"><form hx-post=\"/admin/logout\" hx-swap=\"none\"><button type=\"submit\" class=\"sidebar-link\" style=\"width:100%;border:none;cursor:pointer\"><span class=\"material-symbols-outlined\">logout</span>Cerrar sesión</button></form></div></aside>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

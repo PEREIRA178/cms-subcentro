@@ -69,6 +69,9 @@ templ AdminSidebar(activePage string) {
 		<a href="/admin/reports" class={ "sidebar-link", templ.KV("active", activePage == "reports") }>
 			<span class="material-symbols-outlined">bar_chart</span>Informes
 		</a>
+		<a href="/admin/settings" class={ "sidebar-link", templ.KV("active", activePage == "settings") }>
+			<span class="material-symbols-outlined">tune</span>Ajustes
+		</a>
 		<div class="sidebar-footer">
 			<form hx-post="/admin/logout" hx-swap="none">
 				<button type="submit" class="sidebar-link" style="width:100%;border:none;cursor:pointer">

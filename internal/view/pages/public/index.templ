@@ -2,15 +2,30 @@ package public
 
 import "cms-plazareal/internal/view/layout"
 
-templ Index() {
+type IndexData struct {
+	HeroBgURL string
+}
+
+templ Index(d IndexData) {
 	@layout.Base("Inicio", "inicio") {
 		<section style="padding-top:68px">
-			<div id="hero-carousel"
-				hx-get="/fragments/hero"
-				hx-trigger="load"
-				hx-swap="innerHTML">
-				<div style="min-height:600px;background:var(--ink-2)"></div>
-			</div>
+			if d.HeroBgURL != "" {
+				<div style={ "background-image:linear-gradient(rgba(10,10,10,.6),rgba(10,10,10,.85)),url(" + d.HeroBgURL + ");background-size:cover;background-position:center;min-height:600px" }>
+					<div id="hero-carousel"
+						hx-get="/fragments/hero"
+						hx-trigger="load"
+						hx-swap="innerHTML">
+						<div style="min-height:600px"></div>
+					</div>
+				</div>
+			} else {
+				<div id="hero-carousel"
+					hx-get="/fragments/hero"
+					hx-trigger="load"
+					hx-swap="innerHTML">
+					<div style="min-height:600px;background:var(--ink-2)"></div>
+				</div>
+			}
 		</section>
 		<section class="section" style="background:var(--surface)">
 			<div class="container">

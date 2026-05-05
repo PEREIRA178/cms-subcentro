@@ -10,7 +10,11 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "cms-plazareal/internal/view/layout"
 
-func Tiendas() templ.Component {
+type TiendasData struct {
+	SearchBgURL string
+}
+
+func Tiendas(d TiendasData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -43,7 +47,31 @@ func Tiendas() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"page-hero\"><div class=\"page-hero-inner\"><span class=\"page-hero-eyebrow\">Plaza Real · Copiapó</span><h1 class=\"page-hero-title\">Directorio de <em>Tiendas</em></h1><p class=\"page-hero-sub\">Más de 100 tiendas, restaurantes y servicios. Busca por nombre o categoría.</p></div></div><div class=\"section\"><div class=\"container\"><div style=\"display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:28px\"><div style=\"position:relative;flex:1;min-width:240px\"><span class=\"material-symbols-outlined\" style=\"position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:18px\">search</span> <input id=\"tienda-search\" type=\"text\" placeholder=\"Buscar tienda...\" style=\"width:100%;padding:11px 16px 11px 42px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--white);font-family:var(--font-body);font-size:.9rem;outline:none\" hx-get=\"/fragments/tiendas\" hx-trigger=\"keyup changed delay:300ms\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" name=\"q\" hx-include=\"[name='cat'],[name='gal']\"></div><div style=\"display:flex;flex-wrap:wrap;gap:8px\"><button class=\"chip active\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"\">Todas</button> <button class=\"chip\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"tiendas\">Moda</button> <button class=\"chip\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"restaurantes\">Restaurantes</button> <button class=\"chip\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"farmacias\">Farmacias</button> <button class=\"chip\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"salud\">Salud</button> <button class=\"chip\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"tecnologia\">Tecnología</button> <button class=\"chip\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"servicios\">Servicios</button></div><select name=\"gal\" style=\"padding:10px 14px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--white);font-family:var(--font-body);font-size:.84rem;outline:none\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='cat']\"><option value=\"\">Todas las galerías</option> <option value=\"placa-comercial\">Placa Comercial</option> <option value=\"torre-flamenco\">Torre Flamenco</option></select></div><div id=\"tiendas-grid\" hx-get=\"/fragments/tiendas\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><div style=\"display:flex;align-items:center;gap:8px;color:var(--muted);padding:40px 0\"><span class=\"material-symbols-outlined loading-spin\">progress_activity</span> Cargando tiendas...</div></div></div></div>")
+			if d.SearchBgURL != "" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"page-hero\" style=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var3 string
+				templ_7745c5c3_Var3, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background:linear-gradient(rgba(10,10,10,.72),rgba(10,10,10,.86)),url(" + d.SearchBgURL + ") center/cover")
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/public/tiendas.templ`, Line: 12, Col: 141}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><div class=\"page-hero-inner\"><span class=\"page-hero-eyebrow\">Plaza Real · Copiapó</span><h1 class=\"page-hero-title\">Directorio de <em>Tiendas</em></h1><p class=\"page-hero-sub\">Más de 100 tiendas, restaurantes y servicios. Busca por nombre o categoría.</p></div></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"page-hero\"><div class=\"page-hero-inner\"><span class=\"page-hero-eyebrow\">Plaza Real · Copiapó</span><h1 class=\"page-hero-title\">Directorio de <em>Tiendas</em></h1><p class=\"page-hero-sub\">Más de 100 tiendas, restaurantes y servicios. Busca por nombre o categoría.</p></div></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " <div class=\"section\"><div class=\"container\"><div style=\"display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:28px\"><div style=\"position:relative;flex:1;min-width:240px\"><span class=\"material-symbols-outlined\" style=\"position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:18px\">search</span> <input id=\"tienda-search\" type=\"text\" placeholder=\"Buscar tienda...\" style=\"width:100%;padding:11px 16px 11px 42px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--white);font-family:var(--font-body);font-size:.9rem;outline:none\" hx-get=\"/fragments/tiendas\" hx-trigger=\"keyup changed delay:300ms\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" name=\"q\" hx-include=\"[name='cat'],[name='gal']\"></div><div style=\"display:flex;flex-wrap:wrap;gap:8px\"><button class=\"chip active\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"\">Todas</button> <button class=\"chip\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"tiendas\">Moda</button> <button class=\"chip\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"restaurantes\">Restaurantes</button> <button class=\"chip\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"farmacias\">Farmacias</button> <button class=\"chip\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"salud\">Salud</button> <button class=\"chip\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"tecnologia\">Tecnología</button> <button class=\"chip\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='gal']\" name=\"cat\" value=\"servicios\">Servicios</button></div><select name=\"gal\" style=\"padding:10px 14px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--white);font-family:var(--font-body);font-size:.84rem;outline:none\" hx-get=\"/fragments/tiendas\" hx-target=\"#tiendas-grid\" hx-swap=\"innerHTML\" hx-include=\"[name='q'],[name='cat']\"><option value=\"\">Todas las galerías</option> <option value=\"placa-comercial\">Placa Comercial</option> <option value=\"torre-flamenco\">Torre Flamenco</option></select></div><div id=\"tiendas-grid\" hx-get=\"/fragments/tiendas\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><div style=\"display:flex;align-items:center;gap:8px;color:var(--muted);padding:40px 0\"><span class=\"material-symbols-outlined loading-spin\">progress_activity</span> Cargando tiendas...</div></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
