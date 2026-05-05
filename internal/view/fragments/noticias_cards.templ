@@ -1,0 +1,31 @@
+package fragments
+
+type NoticiaCard struct {
+	ID          string
+	Title       string
+	Description string
+	ImageURL    string
+	PublishedAt string
+}
+
+templ NoticiasCards(items []NoticiaCard) {
+	if len(items) == 0 {
+		<p style="text-align:center;color:var(--muted);padding:40px 0">Aún no hay noticias publicadas.</p>
+	}
+	<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px">
+		for _, n := range items {
+			<article class="glass-card" style="overflow:hidden;display:flex;flex-direction:column">
+				if n.ImageURL != "" {
+					<img src={ n.ImageURL } alt={ n.Title } style="width:100%;height:180px;object-fit:cover" loading="lazy"/>
+				}
+				<div style="padding:18px 20px;flex:1;display:flex;flex-direction:column;gap:6px">
+					if n.PublishedAt != "" {
+						<time style="font-size:.74rem;color:var(--muted)">{ n.PublishedAt }</time>
+					}
+					<h3 style="font-size:1.05rem;font-weight:800">{ n.Title }</h3>
+					<p style="color:var(--muted);font-size:.86rem;line-height:1.55;flex:1">{ n.Description }</p>
+				</div>
+			</article>
+		}
+	</div>
+}

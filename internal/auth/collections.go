@@ -293,6 +293,14 @@ func migrateContentBlocks(app core.App) {
 			log.Printf("  ✅ content_blocks: added field '%s'", name)
 		}
 	}
+	// Date fields for publish window (published_at, expires_at).
+	for _, name := range []string{"published_at", "expires_at"} {
+		if col.Fields.GetByName(name) == nil {
+			col.Fields.Add(&core.DateField{Name: name})
+			changed = true
+			log.Printf("  ✅ content_blocks: added field '%s'", name)
+		}
+	}
 	if changed {
 		if err := app.Save(col); err != nil {
 			log.Printf("⚠️  content_blocks migration error: %v", err)

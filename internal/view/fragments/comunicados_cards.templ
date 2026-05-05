@@ -1,0 +1,25 @@
+package fragments
+
+type ComunicadoCard struct {
+	ID          string
+	Title       string
+	Description string
+	PublishedAt string
+}
+
+templ ComunicadosCards(items []ComunicadoCard) {
+	if len(items) == 0 {
+		<p style="text-align:center;color:var(--muted);padding:40px 0">Sin comunicados.</p>
+	}
+	<div style="display:flex;flex-direction:column;gap:14px">
+		for _, c := range items {
+			<article class="glass-card" style="padding:20px 24px;display:flex;flex-direction:column;gap:6px">
+				if c.PublishedAt != "" {
+					<time style="font-size:.74rem;color:var(--muted)">{ c.PublishedAt }</time>
+				}
+				<h3 style="font-size:1rem;font-weight:800">{ c.Title }</h3>
+				<p style="color:var(--muted);font-size:.86rem;line-height:1.6">{ c.Description }</p>
+			</article>
+		}
+	</div>
+}

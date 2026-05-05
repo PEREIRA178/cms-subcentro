@@ -1,0 +1,92 @@
+package admin
+
+import "fmt"
+
+type ContentRow struct {
+	ID          string
+	Title       string
+	Category    string
+	Status      string
+	Featured    bool
+	PublishedAt string
+}
+
+type ContentPageData struct {
+	Category string
+	Title    string
+	Rows     []ContentRow
+}
+
+templ ContentPage(d ContentPageData) {
+	@contentPageBody(d)
+}
+
+templ contentPageBody(d ContentPageData) {
+	<div>
+		<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+			<h2 style="font-size:1.1rem;font-weight:800">{ d.Title }</h2>
+			<button class="topbar-btn topbar-btn-primary"
+				hx-get={ "/admin/content/new?cat=" + d.Category }
+				hx-target="#modal-container" hx-swap="innerHTML">
+				<span class="material-symbols-outlined" style="font-size:14px">add</span> Nuevo
+			</button>
+		</div>
+		<div class="card">
+			<div class="card-header">
+				<h3 class="card-title">{ d.Category }</h3>
+				<span style="font-size:.76rem;color:var(--text-muted)">{ fmt.Sprintf("%d registros", len(d.Rows)) }</span>
+			</div>
+			<div style="overflow-x:auto">
+				<table>
+					<thead>
+						<tr>
+							<th>Título</th>
+							<th>Estado</th>
+							<th>Destacado</th>
+							<th>Publicado</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody id="content-tbody">
+						if len(d.Rows) == 0 {
+							<tr><td colspan="5" class="empty-state-cell">Sin registros — agrega uno con el botón de arriba</td></tr>
+						}
+						for _, row := range d.Rows {
+							@ContentTableRow(row)
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+}
+
+templ ContentTableRow(r ContentRow) {
+	<tr id={ "content-row-" + r.ID }>
+		<td style="font-weight:600">{ r.Title }</td>
+		<td>
+			<span class={ "badge", templ.KV("badge-publicado", r.Status == "publicado"), templ.KV("badge-borrador", r.Status == "borrador") }>
+				{ r.Status }
+			</span>
+		</td>
+		<td>
+			if r.Featured {
+				<span class="material-symbols-outlined" style="font-size:16px;color:var(--lime);vertical-align:-2px">star</span>
+			}
+		</td>
+		<td style="color:var(--text-muted);font-size:.78rem">{ r.PublishedAt }</td>
+		<td style="white-space:nowrap">
+			<button class="btn-icon" title="Editar"
+				hx-get={ "/admin/content/" + r.ID + "/edit" }
+				hx-target="#modal-container" hx-swap="innerHTML">
+				<span class="material-symbols-outlined">edit</span>
+			</button>
+			<button class="btn-icon btn-danger" title="Eliminar"
+				hx-delete={ "/admin/content/" + r.ID }
+				hx-confirm="¿Eliminar este registro?"
+				hx-target={ "#content-row-" + r.ID } hx-swap="outerHTML swap:0.3s">
+				<span class="material-symbols-outlined">delete</span>
+			</button>
+		</td>
+	</tr>
+}

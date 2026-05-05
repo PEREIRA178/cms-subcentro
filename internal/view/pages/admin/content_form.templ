@@ -1,0 +1,100 @@
+package admin
+
+import "cms-plazareal/internal/view/components"
+
+type ContentFormData struct {
+	ID          string
+	Category    string
+	Title       string
+	Description string
+	Body        string
+	ImageURL    string
+	Status      string
+	Featured    bool
+	PublishedAt string
+	ExpiresAt   string
+	ErrorMsg    string
+}
+
+templ ContentForm(d ContentFormData) {
+	@components.UploadFieldScript()
+	<div class="modal-header">
+		if d.ID == "" {
+			<h3 class="modal-title">Nuevo { d.Category }</h3>
+		} else {
+			<h3 class="modal-title">Editar { d.Category }</h3>
+		}
+		<button class="btn-icon"
+			hx-get="/admin/empty"
+			hx-target="#modal-container"
+			hx-swap="innerHTML"
+			title="Cerrar">
+			<span class="material-symbols-outlined">close</span>
+		</button>
+	</div>
+	if d.ErrorMsg != "" {
+		<div class="modal-body">
+			<div class="toast toast-error">{ d.ErrorMsg }</div>
+		</div>
+	}
+	<div class="modal-body" style="max-height:70vh;overflow-y:auto">
+		if d.ID == "" {
+			<form hx-post="/admin/content" hx-swap="none">
+				<input type="hidden" name="category" value={ d.Category }/>
+				@contentFormFields(d)
+				<div class="modal-footer">
+					<button type="submit" class="topbar-btn topbar-btn-primary">Guardar</button>
+				</div>
+			</form>
+		} else {
+			<form hx-put={ "/admin/content/" + d.ID } hx-target={ "#content-row-" + d.ID } hx-swap="outerHTML">
+				<input type="hidden" name="category" value={ d.Category }/>
+				@contentFormFields(d)
+				<div class="modal-footer">
+					<button type="submit" class="topbar-btn topbar-btn-primary">Guardar</button>
+				</div>
+			</form>
+		}
+	</div>
+}
+
+templ contentFormFields(d ContentFormData) {
+	<div class="form-group">
+		<label>Título *</label>
+		<input type="text" name="title" value={ d.Title } required/>
+	</div>
+	<div class="form-group">
+		<label>Descripción / Resumen</label>
+		<textarea name="description" rows="2">{ d.Description }</textarea>
+	</div>
+	<div class="form-group">
+		<label>Contenido completo (HTML opcional)</label>
+		<textarea name="body" rows="6">{ d.Body }</textarea>
+	</div>
+	@components.UploadField("image_url", d.ImageURL, "Imagen")
+	<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+		<div class="form-group">
+			<label>Estado</label>
+			<select name="status">
+				<option value="borrador" selected?={ d.Status == "borrador" || d.Status == "" }>Borrador</option>
+				<option value="publicado" selected?={ d.Status == "publicado" }>Publicado</option>
+			</select>
+		</div>
+		<div class="form-group">
+			<label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:20px">
+				<input type="checkbox" name="featured" value="true" checked?={ d.Featured }/>
+				Destacado
+			</label>
+		</div>
+		<div class="form-group">
+			<label>Publicado desde</label>
+			<input type="datetime-local" name="published_at" value={ d.PublishedAt }/>
+		</div>
+		if d.Category == "PROMOCION" {
+			<div class="form-group">
+				<label>Expira</label>
+				<input type="datetime-local" name="expires_at" value={ d.ExpiresAt }/>
+			</div>
+		}
+	</div>
+}

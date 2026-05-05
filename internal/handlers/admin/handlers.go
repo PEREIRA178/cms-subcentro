@@ -1885,3 +1885,211 @@ func sanitizeFilename(name string) string {
 	r := strings.NewReplacer(" ", "-", "(", "", ")", "", "[", "", "]", "")
 	return r.Replace(name)
 }
+
+// ── CONTENT BLOCKS (NOTICIA / COMUNICADO / PROMOCION) ──────────────────────────
+
+// contentTitleByCategory returns the human-readable title for a category code.
+func contentTitleByCategory(category string) string {
+	switch category {
+	case "NOTICIA":
+		return "Noticias"
+	case "COMUNICADO":
+		return "Comunicados"
+	case "PROMOCION":
+		return "Promociones"
+	}
+	return category
+}
+
+// contentActivePage returns the sidebar active key for a category code.
+func contentActivePage(category string) string {
+	switch category {
+	case "NOTICIA":
+		return "noticias"
+	case "COMUNICADO":
+		return "comunicados"
+	case "PROMOCION":
+		return "promociones"
+	}
+	return "noticias"
+}
+
+// contentDateForRow renders a friendly date for the table row.
+func contentDateForRow(r *core.Record) string {
+	if dt := r.GetDateTime("published_at"); !dt.IsZero() {
+		return dt.Time().Format("2 Jan 2006 15:04")
+	}
+	if dt := r.GetDateTime("date"); !dt.IsZero() {
+		return dt.Time().Format("2 Jan 2006")
+	}
+	return ""
+}
+
+// contentDateForInput renders the datetime-local value (YYYY-MM-DDTHH:MM).
+func contentDateForInput(r *core.Record, field string) string {
+	if dt := r.GetDateTime(field); !dt.IsZero() {
+		return dt.Time().Format("2006-01-02T15:04")
+	}
+	return ""
+}
+
+// ContentList renders the admin list for a single category.
+func ContentList(cfg *config.Config, pb *pocketbase.PocketBase, category string) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		filter := fmt.Sprintf("category = '%s'", category)
+		records, _ := pb.FindRecordsByFilter("content_blocks", filter, "-published_at,-date,-created", 200, 0)
+		rows := make([]adminView.ContentRow, 0, len(records))
+		for _, r := range records {
+			rows = append(rows, adminView.ContentRow{
+				ID:          r.Id,
+				Title:       r.GetString("title"),
+				Category:    r.GetString("category"),
+				Status:      r.GetString("status"),
+				Featured:    r.GetBool("featured"),
+				PublishedAt: contentDateForRow(r),
+			})
+		}
+		data := adminView.ContentPageData{
+			Category: category,
+			Title:    contentTitleByCategory(category),
+			Rows:     rows,
+		}
+		if c.Get("HX-Request") == "true" {
+			return helpers.Render(c, adminView.ContentPage(data))
+		}
+		return helpers.Render(c, layout.Admin(data.Title, contentActivePage(category), adminView.ContentPage(data)))
+	}
+}
+
+// ContentNew returns the empty form (modal).
+func ContentNew(cfg *config.Config) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		category := strings.ToUpper(strings.TrimSpace(c.Query("cat", "NOTICIA")))
+		switch category {
+		case "NOTICIA", "COMUNICADO", "PROMOCION":
+		default:
+			category = "NOTICIA"
+		}
+		return helpers.Render(c, adminView.ContentForm(adminView.ContentFormData{
+			Category: category,
+			Status:   "borrador",
+		}))
+	}
+}
+
+// ContentEdit returns the populated form (modal).
+func ContentEdit(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r, err := pb.FindRecordById("content_blocks", id)
+		if err != nil {
+			return c.Status(404).SendString(`<div class="toast toast-error">No encontrado</div>`)
+		}
+		data := adminView.ContentFormData{
+			ID:          r.Id,
+			Category:    r.GetString("category"),
+			Title:       r.GetString("title"),
+			Description: r.GetString("description"),
+			Body:        r.GetString("body"),
+			ImageURL:    r.GetString("image_url"),
+			Status:      r.GetString("status"),
+			Featured:    r.GetBool("featured"),
+			PublishedAt: contentDateForInput(r, "published_at"),
+			ExpiresAt:   contentDateForInput(r, "expires_at"),
+		}
+		return helpers.Render(c, adminView.ContentForm(data))
+	}
+}
+
+// setContentFields applies form values to a record.
+func setContentFields(r *core.Record, c *fiber.Ctx) {
+	r.Set("title", strings.TrimSpace(c.FormValue("title")))
+	r.Set("description", c.FormValue("description"))
+	r.Set("body", c.FormValue("body"))
+	r.Set("image_url", c.FormValue("image_url"))
+	category := strings.ToUpper(strings.TrimSpace(c.FormValue("category")))
+	switch category {
+	case "NOTICIA", "COMUNICADO", "PROMOCION":
+		r.Set("category", category)
+	}
+	status := c.FormValue("status")
+	if status == "" {
+		status = "borrador"
+	}
+	r.Set("status", status)
+	r.Set("featured", c.FormValue("featured") == "true" || c.FormValue("featured") == "on")
+	if v := strings.TrimSpace(c.FormValue("published_at")); v != "" {
+		// HTML datetime-local: 2006-01-02T15:04
+		if t, err := time.Parse("2006-01-02T15:04", v); err == nil {
+			r.Set("published_at", t)
+		}
+	}
+	if v := strings.TrimSpace(c.FormValue("expires_at")); v != "" {
+		if t, err := time.Parse("2006-01-02T15:04", v); err == nil {
+			r.Set("expires_at", t)
+		}
+	}
+}
+
+// contentSaveResponse mirrors the toast pattern used by tiendas/multimedia
+// handlers: closes the modal, refreshes the listing in #content, and
+// auto-clears the toast after 2s.
+func contentSaveResponse(c *fiber.Ctx, msg, listURL string) error {
+	return c.SendString(fmt.Sprintf(`<div class="toast toast-success" id="toast-area">%s
+<script>
+  var m=document.getElementById('modal-container'); if(m){m.replaceChildren();}
+  htmx.ajax('GET','%s',{target:'#content',swap:'innerHTML'});
+  setTimeout(function(){var t=document.getElementById('toast-area');if(t){t.replaceChildren();}},2000);
+</script></div>`, template.HTMLEscapeString(msg), template.HTMLEscapeString(listURL)))
+}
+
+// ContentCreate handles POST /admin/content.
+func ContentCreate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		title := strings.TrimSpace(c.FormValue("title"))
+		if title == "" {
+			return c.SendString(`<div class="toast toast-error">El título es requerido</div>`)
+		}
+		col, err := pb.FindCollectionByNameOrId("content_blocks")
+		if err != nil {
+			return c.Status(500).SendString(`<div class="toast toast-error">Error de BD</div>`)
+		}
+		r := core.NewRecord(col)
+		setContentFields(r, c)
+		if err := pb.Save(r); err != nil {
+			return c.SendString(`<div class="toast toast-error">Error: ` + template.HTMLEscapeString(err.Error()) + `</div>`)
+		}
+		return contentSaveResponse(c, "✅ Registro creado", "/admin/content?cat="+r.GetString("category"))
+	}
+}
+
+// ContentUpdate handles PUT /admin/content/:id.
+func ContentUpdate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r, err := pb.FindRecordById("content_blocks", id)
+		if err != nil {
+			return c.SendString(`<div class="toast toast-error">No encontrado</div>`)
+		}
+		setContentFields(r, c)
+		if err := pb.Save(r); err != nil {
+			return c.SendString(`<div class="toast toast-error">Error actualizando</div>`)
+		}
+		return contentSaveResponse(c, "✅ Registro actualizado", "/admin/content?cat="+r.GetString("category"))
+	}
+}
+
+// ContentDelete handles DELETE /admin/content/:id.
+func ContentDelete(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r, err := pb.FindRecordById("content_blocks", id)
+		if err != nil {
+			return c.Status(404).SendString("")
+		}
+		if err := pb.Delete(r); err != nil {
+			return c.SendString(`<div class="toast toast-error">Error eliminando</div>`)
+		}
+		return c.SendString("")
+	}
+}

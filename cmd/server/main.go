@@ -93,10 +93,15 @@ func main() {
 	frag := app.Group("/fragments")
 	frag.Get("/hero", fragments.HeroCarousel(cfg, pb))
 	frag.Get("/eventos", fragments.Eventos(cfg, pb))
-	frag.Get("/noticias", fragments.Noticias(cfg, pb))
-	frag.Get("/comunicados", fragments.Comunicados(cfg, pb))
+	// Content blocks (NOTICIA / COMUNICADO / PROMOCION) — templ-rendered cards
+	frag.Get("/noticias", fragments.NoticiasCards(cfg, pb))
+	frag.Get("/noticias-page", fragments.NoticiasCards(cfg, pb))
+	frag.Get("/comunicados", fragments.ComunicadosCards(cfg, pb))
+	frag.Get("/comunicados-cards", fragments.ComunicadosCards(cfg, pb))
+	frag.Get("/comunicados-page", fragments.ComunicadosCards(cfg, pb))
+	frag.Get("/promos", fragments.PromosCards(cfg, pb))
+	frag.Get("/promos-page", fragments.PromosCards(cfg, pb))
 	frag.Get("/blog", fragments.Blog(cfg, pb))
-	frag.Get("/noticias-page", fragments.NoticiasPage(cfg, pb))
 	// Tiendas fragments (Subcentro)
 	frag.Get("/tiendas", fragments.TiendasPage(cfg, pb))
 	frag.Get("/tiendas-destacadas", fragments.TiendasDestacadas(cfg, pb))
@@ -166,6 +171,20 @@ func main() {
 	adm.Get("/news/:id/edit", admin.NewsEdit(cfg, pb))
 	adm.Put("/news/:id", admin.NewsUpdate(cfg, pb))
 	adm.Delete("/news/:id", admin.NewsDelete(cfg, pb))
+
+	// Content blocks (NOTICIA / COMUNICADO / PROMOCION) — templ CRUD
+	adm.Get("/noticias", admin.ContentList(cfg, pb, "NOTICIA"))
+	adm.Get("/comunicados", admin.ContentList(cfg, pb, "COMUNICADO"))
+	adm.Get("/promociones", admin.ContentList(cfg, pb, "PROMOCION"))
+	adm.Get("/content", func(c *fiber.Ctx) error {
+		cat := c.Query("cat", "NOTICIA")
+		return admin.ContentList(cfg, pb, cat)(c)
+	})
+	adm.Get("/content/new", admin.ContentNew(cfg))
+	adm.Get("/content/:id/edit", admin.ContentEdit(cfg, pb))
+	adm.Post("/content", admin.ContentCreate(cfg, pb))
+	adm.Put("/content/:id", admin.ContentUpdate(cfg, pb))
+	adm.Delete("/content/:id", admin.ContentDelete(cfg, pb))
 
 	// Playlists
 	adm.Get("/playlists", admin.PlaylistList(cfg, pb))
