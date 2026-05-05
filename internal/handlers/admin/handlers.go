@@ -28,9 +28,9 @@ func LoginPage(cfg *config.Config) fiber.Handler {
 	}
 }
 
-func LoginSubmit(cfg *config.Config) fiber.Handler {
+func LoginSubmit(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		email := c.FormValue("email")
+		email := strings.TrimSpace(c.FormValue("email"))
 		password := c.FormValue("password")
 		remember := c.FormValue("remember") == "on"
 
@@ -40,38 +40,54 @@ func LoginSubmit(cfg *config.Config) fiber.Handler {
 			)
 		}
 
-		if email == cfg.AdminEmail && password == cfg.AdminPassword {
-			token, err := auth.GenerateToken(cfg, "admin-id", email, "superadmin", "Administrador")
-			if err != nil {
-				return c.Status(500).SendString(`<div class="toast toast-error">Error generando sesión</div>`)
-			}
-			expiry := 24 * time.Hour
-			if remember {
-				expiry = 72 * time.Hour
-			}
-			c.Cookie(&fiber.Cookie{
-				Name:     "csl_token",
-				Value:    token,
-				Expires:  time.Now().Add(expiry),
-				HTTPOnly: true,
-				Secure:   cfg.Env == "production",
-				SameSite: "Lax",
-				Path:     "/",
-			})
-			c.Set("HX-Redirect", "/admin/dashboard")
-			return c.SendString("")
+		record, err := pb.FindAuthRecordByEmail("users", email)
+		if err != nil || record == nil {
+			return c.Status(fiber.StatusUnauthorized).SendString(
+				`<div class="toast toast-error">Credenciales incorrectas</div>`,
+			)
 		}
 
-		return c.Status(fiber.StatusUnauthorized).SendString(
-			`<div class="toast toast-error">Credenciales incorrectas</div>`,
-		)
+		if !record.ValidatePassword(password) {
+			return c.Status(fiber.StatusUnauthorized).SendString(
+				`<div class="toast toast-error">Credenciales incorrectas</div>`,
+			)
+		}
+
+		role := record.GetString("role")
+		if role == "" {
+			role = "viewer"
+		}
+		nombre := record.GetString("nombre")
+		if nombre == "" {
+			nombre = record.GetString("name")
+		}
+
+		token, err := auth.GenerateToken(cfg, record.Id, record.GetString("email"), role, nombre)
+		if err != nil {
+			return c.Status(500).SendString(`<div class="toast toast-error">Error generando sesión</div>`)
+		}
+		expiry := 24 * time.Hour
+		if remember {
+			expiry = 72 * time.Hour
+		}
+		c.Cookie(&fiber.Cookie{
+			Name:     "pr_token",
+			Value:    token,
+			Expires:  time.Now().Add(expiry),
+			HTTPOnly: true,
+			Secure:   cfg.Env == "production",
+			SameSite: "Lax",
+			Path:     "/",
+		})
+		c.Set("HX-Redirect", "/admin/dashboard")
+		return c.SendString("")
 	}
 }
 
 func Logout() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		c.Cookie(&fiber.Cookie{
-			Name:    "csl_token",
+			Name:    "pr_token",
 			Value:   "",
 			Expires: time.Now().Add(-time.Hour),
 			Path:    "/",
@@ -1162,24 +1178,147 @@ func DeviceAssignPlaylist(cfg *config.Config, pb *pocketbase.PocketBase) fiber.H
 
 // ── USERS ──
 
-func UserList(cfg *config.Config) fiber.Handler {
+func userNombre(r *core.Record) string {
+	n := r.GetString("nombre")
+	if n == "" {
+		n = r.GetString("name")
+	}
+	return n
+}
+
+func currentUID(c *fiber.Ctx) string {
+	if v, ok := c.Locals("user_id").(string); ok {
+		return v
+	}
+	if v, ok := c.Locals("userID").(string); ok {
+		return v
+	}
+	return ""
+}
+
+func UsersList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendFile("./internal/templates/admin/pages/users.html")
+		records, _ := pb.FindRecordsByFilter("users", "", "email", 200, 0)
+		rows := make([]adminView.UserRow, 0, len(records))
+		for _, r := range records {
+			rows = append(rows, adminView.UserRow{
+				ID:    r.Id,
+				Email: r.GetString("email"),
+				Name:  userNombre(r),
+				Role:  r.GetString("role"),
+			})
+		}
+		data := adminView.UsersPageData{Rows: rows, CurrentUID: currentUID(c)}
+		if c.Get("HX-Request") == "true" {
+			return helpers.Render(c, adminView.UsersPage(data))
+		}
+		return helpers.Render(c, layout.Admin("Usuarios", "users", adminView.UsersPage(data)))
 	}
 }
-func UserCreate(cfg *config.Config) fiber.Handler {
+
+func UserNew(cfg *config.Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendString(`<div class="toast toast-success">Usuario creado</div>`)
+		return helpers.Render(c, adminView.UserForm(adminView.UserFormData{Role: "editor"}))
 	}
 }
-func UserUpdate(cfg *config.Config) fiber.Handler {
+
+func UserEdit(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendString(`<div class="toast toast-success">Usuario actualizado</div>`)
+		id := c.Params("id")
+		r, err := pb.FindRecordById("users", id)
+		if err != nil {
+			return c.Status(404).SendString(`<div class="toast toast-error">Usuario no encontrado</div>`)
+		}
+		data := adminView.UserFormData{
+			ID:    r.Id,
+			Email: r.GetString("email"),
+			Name:  userNombre(r),
+			Role:  r.GetString("role"),
+		}
+		return helpers.Render(c, adminView.UserForm(data))
 	}
 }
-func UserDelete(cfg *config.Config) fiber.Handler {
+
+func UserCreate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendString(`<div class="toast toast-success">Usuario eliminado</div>`)
+		email := strings.TrimSpace(c.FormValue("email"))
+		password := c.FormValue("password")
+		passwordConfirm := c.FormValue("passwordConfirm")
+		name := strings.TrimSpace(c.FormValue("name"))
+		role := strings.TrimSpace(c.FormValue("role"))
+
+		if email == "" || password == "" || role == "" {
+			return c.Status(400).SendString(`<div class="toast toast-error">Email, contraseña y rol son requeridos</div>`)
+		}
+		if password != passwordConfirm {
+			return c.Status(400).SendString(`<div class="toast toast-error">Las contraseñas no coinciden</div>`)
+		}
+
+		col, err := pb.FindCollectionByNameOrId("users")
+		if err != nil {
+			return c.Status(500).SendString(`<div class="toast toast-error">Error de BD</div>`)
+		}
+		r := core.NewRecord(col)
+		r.Set("email", email)
+		r.Set("password", password)
+		r.Set("passwordConfirm", passwordConfirm)
+		r.Set("nombre", name)
+		r.Set("name", name)
+		r.Set("role", role)
+		r.Set("activo", true)
+		r.Set("verified", true)
+		if err := pb.Save(r); err != nil {
+			return c.Status(400).SendString(`<div class="toast toast-error">Error: ` + template.HTMLEscapeString(err.Error()) + `</div>`)
+		}
+		c.Set("HX-Redirect", "/admin/users")
+		return c.SendString("")
+	}
+}
+
+func UserUpdate(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r, err := pb.FindRecordById("users", id)
+		if err != nil {
+			return c.Status(404).SendString(`<div class="toast toast-error">Usuario no encontrado</div>`)
+		}
+		email := strings.TrimSpace(c.FormValue("email"))
+		name := strings.TrimSpace(c.FormValue("name"))
+		role := strings.TrimSpace(c.FormValue("role"))
+		if email != "" {
+			r.Set("email", email)
+		}
+		r.Set("nombre", name)
+		r.Set("name", name)
+		if role != "" {
+			r.Set("role", role)
+		}
+		if err := pb.Save(r); err != nil {
+			return c.Status(400).SendString(`<div class="toast toast-error">Error: ` + template.HTMLEscapeString(err.Error()) + `</div>`)
+		}
+		return helpers.Render(c, adminView.UserTableRow(adminView.UserRow{
+			ID:    r.Id,
+			Email: r.GetString("email"),
+			Name:  userNombre(r),
+			Role:  r.GetString("role"),
+		}, currentUID(c)))
+	}
+}
+
+func UserDelete(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		if id == currentUID(c) {
+			return c.Status(400).SendString(`<div class="toast toast-error">No puedes eliminar tu propio usuario</div>`)
+		}
+		r, err := pb.FindRecordById("users", id)
+		if err != nil {
+			return c.Status(404).SendString("")
+		}
+		if err := pb.Delete(r); err != nil {
+			return c.SendString(`<div class="toast toast-error">Error eliminando</div>`)
+		}
+		return c.SendString("")
 	}
 }
 

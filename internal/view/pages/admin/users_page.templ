@@ -1,0 +1,77 @@
+package admin
+
+type UserRow struct {
+	ID    string
+	Email string
+	Name  string
+	Role  string
+}
+
+type UsersPageData struct {
+	Rows       []UserRow
+	CurrentUID string
+}
+
+templ UsersPage(d UsersPageData) {
+	<div>
+		<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+			<h2 style="font-size:1.1rem;font-weight:800">Usuarios</h2>
+			<button class="topbar-btn topbar-btn-primary"
+				hx-get="/admin/users/new"
+				hx-target="#modal-container" hx-swap="innerHTML">
+				<span class="material-symbols-outlined" style="font-size:14px">person_add</span> Nuevo usuario
+			</button>
+		</div>
+		<div id="toast-area"></div>
+		<div class="card">
+			<div class="card-header">
+				<h3 class="card-title">Listado</h3>
+			</div>
+			<div style="overflow-x:auto">
+				<table>
+					<thead>
+						<tr>
+							<th>Email</th>
+							<th>Nombre</th>
+							<th>Rol</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody id="users-tbody">
+						if len(d.Rows) == 0 {
+							<tr><td colspan="4" class="empty-state-cell">Sin usuarios</td></tr>
+						}
+						for _, row := range d.Rows {
+							@UserTableRow(row, d.CurrentUID)
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+}
+
+templ UserTableRow(u UserRow, currentUID string) {
+	<tr id={ "user-row-" + u.ID }>
+		<td>{ u.Email }</td>
+		<td style="font-weight:600">{ u.Name }</td>
+		<td>
+			<span class={ "badge", "badge-" + u.Role }>{ u.Role }</span>
+		</td>
+		<td style="white-space:nowrap">
+			<button class="btn-icon" title="Editar"
+				hx-get={ "/admin/users/" + u.ID + "/edit" }
+				hx-target="#modal-container" hx-swap="innerHTML">
+				<span class="material-symbols-outlined">edit</span>
+			</button>
+			if u.ID != currentUID {
+				<button class="btn-icon btn-danger" title="Eliminar"
+					hx-delete={ "/admin/users/" + u.ID }
+					hx-confirm={ "¿Eliminar usuario " + u.Email + "?" }
+					hx-target={ "#user-row-" + u.ID } hx-swap="outerHTML swap:0.3s">
+					<span class="material-symbols-outlined">person_remove</span>
+				</button>
+			}
+		</td>
+	</tr>
+}

@@ -15,7 +15,7 @@ func AuthRequired(cfg *config.Config) fiber.Handler {
 		var tokenStr string
 
 		// 1. Check cookie first (browser sessions)
-		tokenStr = c.Cookies("csl_token")
+		tokenStr = c.Cookies("pr_token")
 
 		// 2. Fallback to Authorization header (API calls)
 		if tokenStr == "" {
@@ -37,7 +37,7 @@ func AuthRequired(cfg *config.Config) fiber.Handler {
 		claims, err := auth.ValidateToken(cfg, tokenStr)
 		if err != nil {
 			// Clear invalid cookie
-			c.ClearCookie("csl_token")
+			c.ClearCookie("pr_token")
 			if c.Get("HX-Request") == "true" {
 				c.Set("HX-Redirect", "/admin/login")
 				return c.Status(fiber.StatusUnauthorized).SendString("")
@@ -47,6 +47,7 @@ func AuthRequired(cfg *config.Config) fiber.Handler {
 
 		// Store user info in context
 		c.Locals("user_id", claims.UserID)
+		c.Locals("userID", claims.UserID)
 		c.Locals("user_email", claims.Email)
 		c.Locals("user_role", claims.Role)
 		c.Locals("user_nombre", claims.Nombre)

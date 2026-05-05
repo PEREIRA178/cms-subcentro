@@ -1,0 +1,81 @@
+package admin
+
+type UserFormData struct {
+	ID       string
+	Email    string
+	Name     string
+	Role     string
+	ErrorMsg string
+}
+
+templ UserForm(d UserFormData) {
+	<div class="modal-header">
+		if d.ID == "" {
+			<h3 class="modal-title">Nuevo usuario</h3>
+		} else {
+			<h3 class="modal-title">Editar { d.Email }</h3>
+		}
+		<button class="btn-icon"
+			hx-get="/admin/empty"
+			hx-target="#modal-container"
+			hx-swap="innerHTML"
+			title="Cerrar">
+			<span class="material-symbols-outlined">close</span>
+		</button>
+	</div>
+	if d.ErrorMsg != "" {
+		<div class="modal-body">
+			<div class="toast toast-error">{ d.ErrorMsg }</div>
+		</div>
+	}
+	<div class="modal-body">
+		if d.ID == "" {
+			<form hx-post="/admin/users" hx-swap="none">
+				@userFormFields(d)
+				<div class="modal-footer">
+					<button type="submit" class="topbar-btn topbar-btn-primary">Crear usuario</button>
+				</div>
+			</form>
+		} else {
+			<form hx-put={ "/admin/users/" + d.ID } hx-target={ "#user-row-" + d.ID } hx-swap="outerHTML">
+				@userFormFields(d)
+				<div class="modal-footer">
+					<button type="submit" class="topbar-btn topbar-btn-primary">Guardar cambios</button>
+				</div>
+			</form>
+		}
+	</div>
+}
+
+templ userFormFields(d UserFormData) {
+	<div class="form-group">
+		<label>Email *</label>
+		<input type="email" name="email" value={ d.Email } required/>
+	</div>
+	<div class="form-group">
+		<label>Nombre</label>
+		<input type="text" name="name" value={ d.Name }/>
+	</div>
+	if d.ID == "" {
+		<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+			<div class="form-group">
+				<label>Contraseña *</label>
+				<input type="password" name="password" required minlength="8"/>
+			</div>
+			<div class="form-group">
+				<label>Confirmar contraseña *</label>
+				<input type="password" name="passwordConfirm" required minlength="8"/>
+			</div>
+		</div>
+	}
+	<div class="form-group">
+		<label>Rol *</label>
+		<select name="role" required>
+			<option value="viewer" selected?={ d.Role == "viewer" }>Viewer</option>
+			<option value="editor" selected?={ d.Role == "editor" || d.Role == "" }>Editor</option>
+			<option value="admin" selected?={ d.Role == "admin" }>Admin</option>
+			<option value="director" selected?={ d.Role == "director" }>Director</option>
+			<option value="superadmin" selected?={ d.Role == "superadmin" }>Superadmin</option>
+		</select>
+	</div>
+}

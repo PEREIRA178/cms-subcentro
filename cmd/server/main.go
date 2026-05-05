@@ -134,7 +134,7 @@ func main() {
 
 	// ── ADMIN ──
 	app.Get("/admin/login", admin.LoginPage(cfg))
-	app.Post("/admin/login", admin.LoginSubmit(cfg))
+	app.Post("/admin/login", admin.LoginSubmit(cfg, pb))
 	app.Post("/admin/logout", admin.Logout())
 
 	adm := app.Group("/admin", middleware.AuthRequired(cfg))
@@ -209,10 +209,12 @@ func main() {
 	adm.Post("/devices/:id/assign-playlist", admin.DeviceAssignPlaylist(cfg, pb))
 
 	// Users
-	adm.Get("/users", middleware.RoleRequired("superadmin", "director"), admin.UserList(cfg))
-	adm.Post("/users", middleware.RoleRequired("superadmin", "director"), admin.UserCreate(cfg))
-	adm.Put("/users/:id", middleware.RoleRequired("superadmin", "director"), admin.UserUpdate(cfg))
-	adm.Delete("/users/:id", middleware.RoleRequired("superadmin"), admin.UserDelete(cfg))
+	adm.Get("/users", middleware.RoleRequired("superadmin"), admin.UsersList(cfg, pb))
+	adm.Get("/users/new", middleware.RoleRequired("superadmin"), admin.UserNew(cfg))
+	adm.Get("/users/:id/edit", middleware.RoleRequired("superadmin"), admin.UserEdit(cfg, pb))
+	adm.Post("/users", middleware.RoleRequired("superadmin"), admin.UserCreate(cfg, pb))
+	adm.Put("/users/:id", middleware.RoleRequired("superadmin"), admin.UserUpdate(cfg, pb))
+	adm.Delete("/users/:id", middleware.RoleRequired("superadmin"), admin.UserDelete(cfg, pb))
 
 	adm.Get("/whatsapp-logs", admin.WhatsAppLogs(cfg))
 
