@@ -1,4 +1,5 @@
 # PocketBase runtime files
+pb_data/*.db
 pb_data/*.db-shm
 pb_data/*.db-wal
 pb_data/logs/
@@ -6,6 +7,7 @@ pb_data/logs/
 # Build output
 /cms-plazareal
 /jcp-gestioninmobiliaria
+/scraper
 /tmp/
 
 # Go build cache
