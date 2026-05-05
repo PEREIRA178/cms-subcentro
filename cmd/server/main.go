@@ -71,6 +71,11 @@ func main() {
 		CacheDuration: cfg.StaticCacheDuration,
 	})
 
+	// ── Analytics: record public page views ──
+	// Skips /admin, /frag, /fragments, /static, /api/, /ws, and any 4xx/5xx.
+	// Fail-open: never blocks or fails a request.
+	app.Use(middleware.TrackPageView(cfg, pb))
+
 	hub := realtime.NewHub()
 	go hub.Run()
 	realtime.SetHubInstance(hub)
@@ -217,6 +222,10 @@ func main() {
 	adm.Delete("/users/:id", middleware.RoleRequired("superadmin"), admin.UserDelete(cfg, pb))
 
 	adm.Get("/whatsapp-logs", admin.WhatsAppLogs(cfg))
+
+	// Reports / Analytics
+	adm.Get("/reports", middleware.RoleRequired("superadmin", "director"), admin.ReportsPageHandler(cfg, pb))
+	adm.Get("/reports/export", middleware.RoleRequired("superadmin", "director"), admin.ReportsExport(cfg, pb))
 
 	// Tiendas
 	adm.Get("/tiendas", admin.TiendasList(cfg, pb))

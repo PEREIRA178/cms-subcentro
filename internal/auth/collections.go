@@ -286,6 +286,62 @@ func ensureCollections(app core.App) error {
 		log.Printf("⚠️  Error creando reservas: %v", err)
 	}
 
+	// ── 21. PAGE_VIEWS ──
+	if err := ensurePageViews(app); err != nil {
+		log.Printf("⚠️  Error creando page_views: %v", err)
+	}
+
+	// ── 22. LEADS ──
+	if err := ensureLeads(app); err != nil {
+		log.Printf("⚠️  Error creando leads: %v", err)
+	}
+
+	return nil
+}
+
+// ensurePageViews creates the 'page_views' collection used by the analytics
+// tracking middleware. Idempotent.
+func ensurePageViews(app core.App) error {
+	if _, err := app.FindCollectionByNameOrId("page_views"); err == nil {
+		return nil
+	}
+	col := core.NewBaseCollection("page_views")
+	col.Fields.Add(
+		&core.TextField{Name: "path", Required: true},
+		&core.TextField{Name: "referrer"},
+		&core.TextField{Name: "user_agent"},
+		&core.TextField{Name: "ip"},
+	)
+	if err := app.Save(col); err != nil {
+		return err
+	}
+	log.Println("  ✅ Collection 'page_views' created")
+	return nil
+}
+
+// ensureLeads creates the 'leads' collection used to capture potential
+// renters interested in available locales. Idempotent.
+func ensureLeads(app core.App) error {
+	if _, err := app.FindCollectionByNameOrId("leads"); err == nil {
+		return nil
+	}
+	col := core.NewBaseCollection("leads")
+	col.Fields.Add(
+		&core.TextField{Name: "nombre", Required: true},
+		&core.TextField{Name: "email"},
+		&core.TextField{Name: "telefono"},
+		&core.TextField{Name: "mensaje"},
+		&core.TextField{Name: "local_id"},
+		&core.SelectField{
+			Name:      "estado",
+			Values:    []string{"nuevo", "contactado", "descartado", "cerrado"},
+			MaxSelect: 1,
+		},
+	)
+	if err := app.Save(col); err != nil {
+		return err
+	}
+	log.Println("  ✅ Collection 'leads' created")
 	return nil
 }
 

@@ -8,10 +8,12 @@ import (
 	"cms-plazareal/internal/view/layout"
 	adminView "cms-plazareal/internal/view/pages/admin"
 	"context"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
+	"sort"
 	"strings"
 	"time"
 
@@ -109,32 +111,36 @@ func Dashboard(cfg *config.Config) fiber.Handler {
 }
 
 // DashboardStats renders stat cards as an HTMX fragment.
+//
+// Real-data implementation (Task 09):
+//   - Counts tiendas publicadas, locales disponibles, reservas pendientes.
+//   - Counts page views for "today" (since 00:00) and last 7 days.
+//   - Counts leads created in the last 30 days.
+//
+// Uses FindRecordsByFilter + len() (works across PB versions). Errors are
+// silently swallowed so the dashboard always renders.
 func DashboardStats(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		data := adminView.DashboardStatsData{}
+		tiendas, _ := pb.FindRecordsByFilter("tiendas", "status = 'publicado'", "", 1000, 0)
+		locales, _ := pb.FindRecordsByFilter("locales_disponibles", "estado = 'disponible'", "", 500, 0)
+		reservas, _ := pb.FindRecordsByFilter("reservas", "estado = 'pendiente'", "", 500, 0)
 
-		// Tiendas publicadas
-		tiendas, _ := pb.FindRecordsByFilter("tiendas", "status='publicado'", "", 1000, 0)
-		data.TiendasPublicadas = len(tiendas)
+		today := time.Now().Format("2006-01-02")
+		weekAgo := time.Now().AddDate(0, 0, -7).Format("2006-01-02")
+		monthAgo := time.Now().AddDate(0, -1, 0).Format("2006-01-02")
 
-		// Locales disponibles (collection may not exist yet)
-		if _, err := pb.FindCollectionByNameOrId("locales"); err == nil {
-			locales, _ := pb.FindRecordsByFilter("locales", "status='disponible'", "", 1000, 0)
-			data.LocalesDisponibles = len(locales)
-		}
+		visHoy, _ := pb.FindRecordsByFilter("page_views", "created >= '"+today+"'", "", 50000, 0)
+		visSem, _ := pb.FindRecordsByFilter("page_views", "created >= '"+weekAgo+"'", "", 100000, 0)
+		leads, _ := pb.FindRecordsByFilter("leads", "created >= '"+monthAgo+"'", "", 5000, 0)
 
-		// Reservas pendientes (collection may not exist yet)
-		if _, err := pb.FindCollectionByNameOrId("reservas"); err == nil {
-			reservas, _ := pb.FindRecordsByFilter("reservas", "status='pendiente'", "", 1000, 0)
-			data.ReservasPendientes = len(reservas)
-		}
-
-		// Visits/leads — placeholder values until analytics wired up (Tasks 06-09)
-		data.VisitasHoy = 0
-		data.VisitasSemana = 0
-		data.NuevosLeads = 0
-
-		return helpers.Render(c, adminView.DashboardStats(data))
+		return helpers.Render(c, adminView.DashboardStats(adminView.DashboardStatsData{
+			TiendasPublicadas:  len(tiendas),
+			LocalesDisponibles: len(locales),
+			ReservasPendientes: len(reservas),
+			VisitasHoy:         len(visHoy),
+			VisitasSemana:      len(visSem),
+			NuevosLeads:        len(leads),
+		}))
 	}
 }
 
@@ -2455,5 +2461,116 @@ func ReservaDelete(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler 
 			return c.SendString(`<div class="toast toast-error">Error eliminando</div>`)
 		}
 		return c.SendString("")
+	}
+}
+
+// ── REPORTS / ANALYTICS ──
+
+// ReportsPageHandler renders the analytics overview page (Task 09).
+//
+// Aggregates real data from page_views and leads:
+//   - Visits in last 7 / 30 days
+//   - Top pages in the last 30 days (by raw count, sorted desc, top 20)
+//   - Total leads + leads created in the last 30 days
+func ReportsPageHandler(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		weekAgo := time.Now().AddDate(0, 0, -7).Format("2006-01-02")
+		monthAgo := time.Now().AddDate(0, -1, 0).Format("2006-01-02")
+
+		visSem, _ := pb.FindRecordsByFilter("page_views", "created >= '"+weekAgo+"'", "", 100000, 0)
+		visMes, _ := pb.FindRecordsByFilter("page_views", "created >= '"+monthAgo+"'", "", 500000, 0)
+
+		// Aggregate top pages (last 30 days) in-memory.
+		counts := make(map[string]int, len(visMes))
+		for _, r := range visMes {
+			path := r.GetString("path")
+			if path == "" {
+				continue
+			}
+			counts[path]++
+		}
+		top := make([]adminView.TopPage, 0, len(counts))
+		for p, n := range counts {
+			top = append(top, adminView.TopPage{Path: p, Count: n})
+		}
+		sort.Slice(top, func(i, j int) bool { return top[i].Count > top[j].Count })
+		if len(top) > 20 {
+			top = top[:20]
+		}
+
+		allLeads, _ := pb.FindRecordsByFilter("leads", "", "", 100000, 0)
+		newLeads, _ := pb.FindRecordsByFilter("leads", "created >= '"+monthAgo+"'", "", 5000, 0)
+
+		data := adminView.ReportsPageData{
+			TotalVisitasSemana: len(visSem),
+			TotalVisitasMes:    len(visMes),
+			TopPages:           top,
+			TotalLeads:         len(allLeads),
+			LeadsNuevos:        len(newLeads),
+		}
+
+		if c.Get("HX-Request") == "true" {
+			return helpers.Render(c, adminView.ReportsPage(data))
+		}
+		return helpers.Render(c, layout.Admin("Informes", "reports", adminView.ReportsPage(data)))
+	}
+}
+
+// ReportsExport streams CSV downloads for either page_views or leads.
+//
+// Query: ?type=page_views | ?type=leads (default: page_views)
+// Sets Content-Type: text/csv and a Content-Disposition attachment with a
+// timestamped filename. Caps export at 100k rows for safety.
+func ReportsExport(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		t := c.Query("type", "page_views")
+		stamp := time.Now().Format("20060102-150405")
+
+		c.Set("Content-Type", "text/csv; charset=utf-8")
+		c.Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s-%s.csv"`, t, stamp))
+
+		var sb strings.Builder
+		w := csv.NewWriter(&sb)
+
+		switch t {
+		case "leads":
+			_ = w.Write([]string{"id", "created", "nombre", "email", "telefono", "local_id", "estado", "mensaje"})
+			records, _ := pb.FindRecordsByFilter("leads", "", "-created", 100000, 0)
+			for _, r := range records {
+				created := ""
+				if dt := r.GetDateTime("created"); !dt.IsZero() {
+					created = dt.Time().Format(time.RFC3339)
+				}
+				_ = w.Write([]string{
+					r.Id,
+					created,
+					r.GetString("nombre"),
+					r.GetString("email"),
+					r.GetString("telefono"),
+					r.GetString("local_id"),
+					r.GetString("estado"),
+					r.GetString("mensaje"),
+				})
+			}
+		default: // page_views
+			_ = w.Write([]string{"id", "created", "path", "referrer", "user_agent", "ip"})
+			records, _ := pb.FindRecordsByFilter("page_views", "", "-created", 100000, 0)
+			for _, r := range records {
+				created := ""
+				if dt := r.GetDateTime("created"); !dt.IsZero() {
+					created = dt.Time().Format(time.RFC3339)
+				}
+				_ = w.Write([]string{
+					r.Id,
+					created,
+					r.GetString("path"),
+					r.GetString("referrer"),
+					r.GetString("user_agent"),
+					r.GetString("ip"),
+				})
+			}
+		}
+		w.Flush()
+		return c.SendString(sb.String())
 	}
 }

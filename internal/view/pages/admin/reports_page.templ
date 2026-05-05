@@ -1,0 +1,94 @@
+package admin
+
+import "fmt"
+
+type TopPage struct {
+	Path  string
+	Count int
+}
+
+type ReportsPageData struct {
+	TotalVisitasSemana int
+	TotalVisitasMes    int
+	TopPages           []TopPage
+	TotalLeads         int
+	LeadsNuevos        int
+}
+
+templ ReportsPage(d ReportsPageData) {
+	@reportsPageBody(d)
+}
+
+templ reportsPageBody(d ReportsPageData) {
+	<div>
+		<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+			<h2 style="font-size:1.1rem;font-weight:800">Informes</h2>
+			<div style="display:flex;gap:10px">
+				<a href="/admin/reports/export?type=page_views" class="topbar-btn topbar-btn-outline">
+					<span class="material-symbols-outlined" style="font-size:14px">download</span>
+					Visitas CSV
+				</a>
+				<a href="/admin/reports/export?type=leads" class="topbar-btn topbar-btn-outline">
+					<span class="material-symbols-outlined" style="font-size:14px">download</span>
+					Leads CSV
+				</a>
+			</div>
+		</div>
+		<div class="stats-grid">
+			<div class="stat-card">
+				<div class="stat-card-icon" style="background:rgba(6,160,224,.1)">
+					<span class="material-symbols-outlined" style="color:var(--blue)">trending_up</span>
+				</div>
+				<div class="stat-card-value">{ fmt.Sprintf("%d", d.TotalVisitasSemana) }</div>
+				<div class="stat-card-label">Visitas (7 días)</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-card-icon" style="background:rgba(6,160,224,.07)">
+					<span class="material-symbols-outlined" style="color:var(--blue)">calendar_month</span>
+				</div>
+				<div class="stat-card-value">{ fmt.Sprintf("%d", d.TotalVisitasMes) }</div>
+				<div class="stat-card-label">Visitas (30 días)</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-card-icon" style="background:rgba(45,179,122,.1)">
+					<span class="material-symbols-outlined" style="color:#2db37a">contact_mail</span>
+				</div>
+				<div class="stat-card-value">{ fmt.Sprintf("%d", d.TotalLeads) }</div>
+				<div class="stat-card-label">Leads totales</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-card-icon" style="background:rgba(45,179,122,.07)">
+					<span class="material-symbols-outlined" style="color:#2db37a">person_add</span>
+				</div>
+				<div class="stat-card-value">{ fmt.Sprintf("%d", d.LeadsNuevos) }</div>
+				<div class="stat-card-label">Leads nuevos (30d)</div>
+			</div>
+		</div>
+		<div class="card" style="margin-top:24px">
+			<div class="card-header">
+				<h3 class="card-title">Páginas más visitadas (últimos 30 días)</h3>
+			</div>
+			<div style="overflow-x:auto">
+				<table>
+					<thead>
+						<tr>
+							<th>Ruta</th>
+							<th>Visitas</th>
+						</tr>
+					</thead>
+					<tbody>
+						if len(d.TopPages) == 0 {
+							<tr><td colspan="2" class="empty-state-cell">Aún no hay datos de visitas</td></tr>
+						}
+						for _, p := range d.TopPages {
+							<tr>
+								<td style="font-family:monospace;font-size:.82rem">{ p.Path }</td>
+								<td>{ fmt.Sprintf("%d", p.Count) }</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+}
