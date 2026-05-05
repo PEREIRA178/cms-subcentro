@@ -120,152 +120,50 @@ func fetchTiendas(pb *pocketbase.PocketBase, filter, sort string, limit, offset 
 	return out
 }
 
-// renderTiendaCard returns the HTML card for the buscador grid.
-func renderTiendaCard(t tienda, i int) string {
-	delay := (i % 24) * 35
-	logoSrc := t.Logo
-	if logoSrc == "" {
-		logoSrc = fmt.Sprintf("https://picsum.photos/seed/%s/320/148", t.Slug)
-	}
-	galBadge := "Placa Comercial"
-	if t.Gal == "sur" {
-		galBadge = "Torre Flamenco"
-	}
-	featured := ""
-	if t.Destacada {
-		featured = `<span class="c-badge"><span class="material-symbols-outlined">grade</span>Destacado</span>`
-	}
-	tagsStr := ""
-	if len(t.Tags) > 0 {
-		tagsStr = strings.Join(t.Tags, " · ")
-	}
-	catDisp := catLabel(t.Cat)
-
-	return fmt.Sprintf(`<a href="tienda-individual.html?tienda=%s" class="s-card" role="listitem" aria-label="Ver %s" style="animation-delay:%dms">
-  <div class="c-top">
-    <img src="%s" alt="Logo %s" loading="lazy" onerror="this.src='https://picsum.photos/seed/%s/320/148'">
-    <span class="c-gal">%s</span>%s
-  </div>
-  <div class="c-body">
-    <div class="c-name">%s</div>
-    <div class="c-cat">%s</div>
-    <div class="c-foot"><span class="c-tag">%s</span><span class="c-arr">→</span></div>
-  </div>
-</a>`,
-		template.HTMLEscapeString(t.Slug),
-		template.HTMLEscapeString(t.Nombre),
-		delay,
-		template.HTMLEscapeString(logoSrc),
-		template.HTMLEscapeString(t.Nombre),
-		template.HTMLEscapeString(t.Slug),
-		galBadge, featured,
-		template.HTMLEscapeString(t.Nombre),
-		template.HTMLEscapeString(tagsStr),
-		template.HTMLEscapeString(catDisp),
-	)
-}
-
-// TiendasPage serves the HTMX fragment for buscador-tiendas.html card grid.
+// TiendasPage serves the HTMX fragment for the buscador grid.
+// Returns up to 200 published stores filtered by q/cat/gal query params,
+// rendered through the templ-based TiendasGrid view.
 func TiendasPage(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		catFilter := c.Query("cat")
-		galFilter := c.Query("gal")
 		q := strings.TrimSpace(c.Query("q"))
-		pageNum := 1
-		if p := c.QueryInt("page", 1); p > 0 {
-			pageNum = p
-		}
-		const pageSize = 24
+		cat := strings.TrimSpace(c.Query("cat"))
+		gal := strings.TrimSpace(c.Query("gal"))
 
-		pbFilter := "status = 'publicado'"
-		if catFilter != "" && catFilter != "all" {
-			pbFilter += fmt.Sprintf(" && cat = '%s'", escapeFilter(catFilter))
-		}
-		if galFilter != "" && galFilter != "all" {
-			pbFilter += fmt.Sprintf(" && gal = '%s'", escapeFilter(galFilter))
-		}
+		parts := []string{"status = 'publicado'"}
 		if q != "" {
 			esc := escapeFilter(q)
-			pbFilter += fmt.Sprintf(" && (nombre ~ '%s' || tags ~ '%s' || cat ~ '%s')", esc, esc, esc)
+			parts = append(parts, fmt.Sprintf("(nombre ~ '%s' || tags ~ '%s')", esc, esc))
+		}
+		if cat != "" && cat != "all" {
+			parts = append(parts, fmt.Sprintf("cat = '%s'", escapeFilter(cat)))
+		}
+		if gal != "" && gal != "all" {
+			parts = append(parts, fmt.Sprintf("gal = '%s'", escapeFilter(gal)))
+		}
+		filter := strings.Join(parts, " && ")
+
+		records, _ := pb.FindRecordsByFilter("tiendas", filter, "-destacada,nombre", 200, 0)
+		items := make([]fragmentsView.TiendaGridItem, 0, len(records))
+		for _, r := range records {
+			slug := r.GetString("slug")
+			if slug == "" {
+				slug = r.Id
+			}
+			items = append(items, fragmentsView.TiendaGridItem{
+				ID:     r.Id,
+				Slug:   slug,
+				Nombre: r.GetString("nombre"),
+				Cat:    r.GetString("cat"),
+				Gal:    r.GetString("gal"),
+				Local:  r.GetString("local"),
+				Logo:   r.GetString("logo"),
+				Desc:   r.GetString("desc"),
+				Tags:   splitCSV(r.GetString("tags")),
+			})
 		}
 
-		offset := (pageNum - 1) * pageSize
-		stores := fetchTiendas(pb, pbFilter, "", pageSize+1, offset)
-
-		hasMore := len(stores) > pageSize
-		if hasMore {
-			stores = stores[:pageSize]
-		}
-
-		if len(stores) == 0 {
-			c.Set("Content-Type", "text/html; charset=utf-8")
-			return c.SendString(`<div id="empty" style="display:block;text-align:center;padding:72px 24px;max-width:360px;margin:0 auto"><div style="font-size:3.5rem;margin-bottom:16px;opacity:.45">🔍</div><h3 style="font-family:'Montserrat',sans-serif;font-size:1.3rem;font-weight:900;margin-bottom:6px">Sin resultados</h3><p style="font-size:.87rem;color:#6B6B6B">Intenta con otro término o quita los filtros.</p></div>`)
-		}
-
-		var sb strings.Builder
-		for i, t := range stores {
-			sb.WriteString(renderTiendaCard(t, offset+i))
-		}
-
-		if hasMore {
-			nextPage := pageNum + 1
-			sb.WriteString(fmt.Sprintf(`<div id="load-more-trigger" style="grid-column:1/-1;text-align:center;padding:16px 0">
-  <button id="lmBtn"
-    hx-get="/fragments/tiendas?cat=%s&gal=%s&q=%s&page=%d"
-    hx-target="#grid"
-    hx-swap="beforeend"
-    hx-on::after-request="document.getElementById('load-more-trigger')?.remove()"
-    style="background:#0E0E0E;color:#fff;font-family:'Geist',sans-serif;font-weight:700;font-size:.95rem;padding:15px 44px;border-radius:100px;border:none;cursor:pointer">
-    ⬇ Cargar más
-  </button>
-</div>`,
-				template.URLQueryEscaper(catFilter),
-				template.URLQueryEscaper(galFilter),
-				template.URLQueryEscaper(q),
-				nextPage,
-			))
-		}
-
-		c.Set("Content-Type", "text/html; charset=utf-8")
-		return c.SendString(sb.String())
+		return helpers.Render(c, fragmentsView.TiendasGrid(items))
 	}
-}
-
-// renderIndexCard renders an s-card for the home page featured section.
-func renderIndexCard(t tienda, i int) string {
-	logoSrc := t.Logo
-	if logoSrc == "" {
-		logoSrc = fmt.Sprintf("https://picsum.photos/seed/%s/320/160", t.Slug)
-	}
-	galBadge := "Placa Comercial"
-	if t.Gal == "sur" {
-		galBadge = "Torre Flamenco"
-	}
-	featured := ""
-	if t.Destacada {
-		featured = `<span class="s-badge"><span class="material-symbols-outlined">grade</span>Destacado</span>`
-	}
-	tag := catLabel(t.Cat)
-	return fmt.Sprintf(`<a href="tienda-individual.html?tienda=%s" class="s-card">
-  <div class="s-card-top">
-    <img src="%s" alt="Logo %s" loading="lazy" onerror="this.src='https://picsum.photos/seed/%s/320/160'">
-    <span class="s-gallery">%s</span>%s
-  </div>
-  <div class="s-card-body">
-    <div class="s-card-name">%s</div>
-    <div class="s-card-cat">%s</div>
-    <div class="s-card-foot"><span class="s-card-tag">%s</span><span class="s-card-arr">→</span></div>
-  </div>
-</a>`,
-		template.HTMLEscapeString(t.Slug),
-		template.HTMLEscapeString(logoSrc),
-		template.HTMLEscapeString(t.Nombre),
-		template.HTMLEscapeString(t.Slug),
-		galBadge, featured,
-		template.HTMLEscapeString(t.Nombre),
-		template.HTMLEscapeString(t.Desc),
-		tag,
-	)
 }
 
 // galLabel returns the human-friendly gallery name for a tienda's gal field.
