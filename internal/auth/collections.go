@@ -268,6 +268,9 @@ func ensureCollections(app core.App) error {
 	// ── 17. Migrate multimedia: add start_time field ──
 	migrateMultimediaStartTime(app)
 
+	// ── 17b. Migrate tiendas: add status_horario + hero_bg fields ──
+	migrateTiendasStatusHorario(app)
+
 	// ── 18. Seed devices, playlists and playlist items ──
 	if err := SeedDevicesAndPlaylists(app); err != nil {
 		log.Printf("⚠️  Error seeding devices/playlists: %v", err)
@@ -418,6 +421,36 @@ func migrateMultimediaStartTime(app core.App) {
 		return
 	}
 	log.Println("  ✅ multimedia: added field 'start_time'")
+}
+
+// migrateTiendasStatusHorario adds the 'status_horario' SelectField and the
+// 'hero_bg' field to the tiendas collection. Used by the public detail page
+// to compute open/closed/solo-reserva chips and to render the hero background.
+func migrateTiendasStatusHorario(app core.App) {
+	col, err := app.FindCollectionByNameOrId("tiendas")
+	if err != nil {
+		return
+	}
+	changed := false
+	if col.Fields.GetByName("status_horario") == nil {
+		col.Fields.Add(&core.SelectField{
+			Name:      "status_horario",
+			Values:    []string{"normal", "solo-reserva", "cerrado-temporal"},
+			MaxSelect: 1,
+		})
+		changed = true
+		log.Println("  ✅ tiendas: added field 'status_horario'")
+	}
+	if col.Fields.GetByName("hero_bg") == nil {
+		col.Fields.Add(&core.TextField{Name: "hero_bg"})
+		changed = true
+		log.Println("  ✅ tiendas: added field 'hero_bg'")
+	}
+	if changed {
+		if err := app.Save(col); err != nil {
+			log.Printf("⚠️  tiendas migration error: %v", err)
+		}
+	}
 }
 
 // ── Device & playlist seeder ───────────────────────────────────────────────────

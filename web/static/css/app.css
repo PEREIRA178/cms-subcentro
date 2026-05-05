@@ -217,3 +217,7 @@ footer a:hover { color: #fff; }
   .navbar-links { display: none; }
   .navbar-burger { display: flex; }
 }
+
+/* ── TIENDA DETAIL — open/closed status chip (Amendment A2) ── */
+.status-open    { background: rgba(44,190,80,0.18);  color: #2cbe50; border: 1px solid rgba(44,190,80,0.35); }
+.status-closed  { background: rgba(215,16,85,0.15);  color: #d71055; border: 1px solid rgba(215,16,85,0.30); }

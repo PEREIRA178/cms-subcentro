@@ -1,0 +1,61 @@
+package public
+
+import "cms-plazareal/internal/view/layout"
+
+templ Tiendas() {
+	@layout.Base("Tiendas", "tiendas") {
+		<div class="page-hero">
+			<div class="page-hero-inner">
+				<span class="page-hero-eyebrow">Plaza Real · Copiapó</span>
+				<h1 class="page-hero-title">Directorio de <em>Tiendas</em></h1>
+				<p class="page-hero-sub">Más de 100 tiendas, restaurantes y servicios. Busca por nombre o categoría.</p>
+			</div>
+		</div>
+		<div class="section">
+			<div class="container">
+				<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:28px">
+					<div style="position:relative;flex:1;min-width:240px">
+						<span class="material-symbols-outlined" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:18px">search</span>
+						<input
+							id="tienda-search"
+							type="text"
+							placeholder="Buscar tienda..."
+							style="width:100%;padding:11px 16px 11px 42px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--white);font-family:var(--font-body);font-size:.9rem;outline:none"
+							hx-get="/fragments/tiendas"
+							hx-trigger="keyup changed delay:300ms"
+							hx-target="#tiendas-grid"
+							hx-swap="innerHTML"
+							name="q"
+							hx-include="[name='cat'],[name='gal']"
+						/>
+					</div>
+					<div style="display:flex;flex-wrap:wrap;gap:8px">
+						<button class="chip active" hx-get="/fragments/tiendas" hx-target="#tiendas-grid" hx-swap="innerHTML" hx-include="[name='q'],[name='gal']" name="cat" value="">Todas</button>
+						<button class="chip" hx-get="/fragments/tiendas" hx-target="#tiendas-grid" hx-swap="innerHTML" hx-include="[name='q'],[name='gal']" name="cat" value="tiendas">Moda</button>
+						<button class="chip" hx-get="/fragments/tiendas" hx-target="#tiendas-grid" hx-swap="innerHTML" hx-include="[name='q'],[name='gal']" name="cat" value="restaurantes">Restaurantes</button>
+						<button class="chip" hx-get="/fragments/tiendas" hx-target="#tiendas-grid" hx-swap="innerHTML" hx-include="[name='q'],[name='gal']" name="cat" value="farmacias">Farmacias</button>
+						<button class="chip" hx-get="/fragments/tiendas" hx-target="#tiendas-grid" hx-swap="innerHTML" hx-include="[name='q'],[name='gal']" name="cat" value="salud">Salud</button>
+						<button class="chip" hx-get="/fragments/tiendas" hx-target="#tiendas-grid" hx-swap="innerHTML" hx-include="[name='q'],[name='gal']" name="cat" value="tecnologia">Tecnología</button>
+						<button class="chip" hx-get="/fragments/tiendas" hx-target="#tiendas-grid" hx-swap="innerHTML" hx-include="[name='q'],[name='gal']" name="cat" value="servicios">Servicios</button>
+					</div>
+					<select name="gal"
+						style="padding:10px 14px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--white);font-family:var(--font-body);font-size:.84rem;outline:none"
+						hx-get="/fragments/tiendas" hx-target="#tiendas-grid" hx-swap="innerHTML" hx-include="[name='q'],[name='cat']">
+						<option value="">Todas las galerías</option>
+						<option value="placa-comercial">Placa Comercial</option>
+						<option value="torre-flamenco">Torre Flamenco</option>
+					</select>
+				</div>
+				<div id="tiendas-grid"
+					hx-get="/fragments/tiendas"
+					hx-trigger="load"
+					hx-swap="innerHTML">
+					<div style="display:flex;align-items:center;gap:8px;color:var(--muted);padding:40px 0">
+						<span class="material-symbols-outlined loading-spin">progress_activity</span>
+						Cargando tiendas...
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+}

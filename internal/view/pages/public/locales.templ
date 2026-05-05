@@ -1,0 +1,61 @@
+package public
+
+import "cms-plazareal/internal/view/layout"
+
+templ Locales() {
+	@layout.Base("Locales Disponibles", "locales") {
+		<div class="page-hero">
+			<div class="page-hero-inner">
+				<span class="page-hero-eyebrow">Plaza Real · Arriendo</span>
+				<h1 class="page-hero-title">Locales <em>Disponibles</em></h1>
+				<p class="page-hero-sub">Espacios comerciales disponibles para arriendo en Plaza Real.</p>
+			</div>
+		</div>
+		<div class="section">
+			<div class="container">
+				<div id="locales-grid"
+					hx-get="/fragments/locales-disponibles"
+					hx-trigger="load"
+					hx-swap="innerHTML">
+					<div style="display:flex;align-items:center;gap:8px;color:var(--muted);padding:40px 0">
+						<span class="material-symbols-outlined loading-spin">progress_activity</span>
+						Cargando locales...
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+}
+
+templ Promociones() {
+	@layout.Base("Eventos y Promociones", "promociones") {
+		<div class="page-hero">
+			<div class="page-hero-inner">
+				<span class="page-hero-eyebrow">Plaza Real · Agenda</span>
+				<h1 class="page-hero-title">Eventos y <em>Promociones</em></h1>
+				<p class="page-hero-sub">Descubre eventos, ofertas y campañas especiales del mall y sus tiendas.</p>
+			</div>
+		</div>
+		<div class="section">
+			<div class="container">
+				<div id="promos-grid"
+					hx-get="/fragments/promos-page"
+					hx-trigger="load"
+					hx-swap="innerHTML">
+					<div style="display:flex;align-items:center;gap:8px;color:var(--muted);padding:40px 0">
+						<span class="material-symbols-outlined loading-spin">progress_activity</span>
+						Cargando promociones...
+					</div>
+				</div>
+			</div>
+		</div>
+		<dialog id="reserva-modal" style="border:none;border-radius:20px;padding:0;width:min(540px,95vw);background:var(--white);box-shadow:0 24px 80px rgba(0,0,0,.28)">
+			<div id="reserva-modal-inner" style="padding:32px"></div>
+		</dialog>
+		<script>
+			document.getElementById('reserva-modal').addEventListener('click', function(e) {
+				if (e.target === this) this.close();
+			});
+		</script>
+	}
+}

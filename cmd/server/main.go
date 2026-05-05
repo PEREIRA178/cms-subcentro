@@ -76,11 +76,18 @@ func main() {
 	realtime.SetHubInstance(hub)
 
 	// ── PUBLIC WEB ──
-	app.Get("/", web.PageHandler(cfg, "index"))
-	app.Get("/index.html", web.PageHandler(cfg, "index"))
-	app.Get("/buscador-tiendas.html", web.PageHandler(cfg, "buscador-tiendas"))
-	app.Get("/tienda-individual.html", web.PageHandler(cfg, "tienda-individual"))
-	app.Get("/noticias.html", web.PageHandler(cfg, "noticias"))
+	app.Get("/", web.IndexHandler(cfg))
+	app.Get("/index.html", web.IndexHandler(cfg))
+	app.Get("/buscador-tiendas", web.TiendasPageHandler(cfg))
+	app.Get("/buscador-tiendas.html", web.TiendasPageHandler(cfg))
+	app.Get("/tiendas/:slug", web.TiendaDetailHandler(cfg, pb))
+	app.Get("/noticias", web.NoticiasPageHandler(cfg))
+	app.Get("/noticias.html", web.NoticiasPageHandler(cfg))
+	app.Get("/comunicados", web.ComunicadosPageHandler(cfg))
+	app.Get("/locales", web.LocalesPageHandler(cfg))
+	app.Get("/locales.html", web.LocalesPageHandler(cfg))
+	app.Get("/promociones", web.PromocionesPageHandler(cfg))
+	app.Get("/eventos.html", web.PromocionesPageHandler(cfg))
 
 	// ── HTMX FRAGMENTS ──
 	frag := app.Group("/fragments")

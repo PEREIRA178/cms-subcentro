@@ -1,0 +1,202 @@
+package public
+
+import (
+	"cms-plazareal/internal/view/layout"
+	"fmt"
+)
+
+type TiendaDetailData struct {
+	ID          string
+	Nombre      string
+	Cat         string
+	Gal         string
+	Local       string
+	Logo        string
+	Tags        []string
+	Desc        string
+	About       string
+	About2      string
+	Pay         string
+	Photos      []string
+	Whatsapp    string
+	Telefono    string
+	HorarioLV   string
+	HorarioSab  string
+	HorarioDom  string
+	HeroBg      string
+	IsOpen      bool
+	StatusLabel string
+	Similar     []SimilarTienda
+}
+
+type SimilarTienda struct {
+	Slug   string
+	Nombre string
+	Logo   string
+	Cat    string
+}
+
+templ tiendaHero(t TiendaDetailData) {
+	if t.HeroBg != "" {
+		<div class="tienda-hero" style={ "padding-top:68px;background-image:linear-gradient(rgba(10,10,10,.72),rgba(10,10,10,.86)),url(" + t.HeroBg + ");background-size:cover;background-position:center" }>
+			@tiendaHeroInner(t)
+		</div>
+	} else {
+		<div class="tienda-hero" style="padding-top:68px;background:var(--ink-2)">
+			@tiendaHeroInner(t)
+		</div>
+	}
+}
+
+templ tiendaHeroInner(t TiendaDetailData) {
+	<div class="container" style="padding-top:32px;padding-bottom:32px">
+		<div style="font-size:.76rem;color:rgba(255,255,255,.45);margin-bottom:20px">
+			<a href="/index.html" style="color:rgba(255,255,255,.45)">Inicio</a>
+			<span style="margin:0 8px">/</span>
+			<a href="/buscador-tiendas" style="color:rgba(255,255,255,.45)">Tiendas</a>
+			<span style="margin:0 8px">/</span>
+			<span style="color:rgba(255,255,255,.7)">{ t.Nombre }</span>
+		</div>
+		<div style="display:flex;align-items:flex-start;gap:28px;flex-wrap:wrap">
+			if t.Logo != "" {
+				<img src={ t.Logo } alt={ t.Nombre } style="width:90px;height:90px;border-radius:16px;object-fit:cover;border:1px solid rgba(255,255,255,.1)"/>
+			} else {
+				<div style="width:90px;height:90px;border-radius:16px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center">
+					<span class="material-symbols-outlined" style="font-size:36px;color:rgba(255,255,255,.3)">storefront</span>
+				</div>
+			}
+			<div>
+				<span class="badge badge-info" style="margin-bottom:10px">{ t.Cat }</span>
+				<h1 class="display" style="font-size:clamp(1.8rem,4vw,3rem);color:#fff;margin-bottom:8px">{ t.Nombre }</h1>
+				<p style="color:rgba(255,255,255,.55)">
+					<span class="material-symbols-outlined" style="font-size:15px;vertical-align:-3px">location_on</span>
+					{ t.Local }
+					if t.Gal != "" {
+						{ " · " + galLabel(t.Gal) }
+					}
+				</p>
+				<span class={ "status-chip", templ.KV("status-open", t.IsOpen), templ.KV("status-closed", !t.IsOpen) } style="display:inline-block;padding:4px 12px;border-radius:9999px;font-size:.74rem;font-weight:700;margin-top:10px">
+					{ t.StatusLabel }
+				</span>
+			</div>
+		</div>
+	</div>
+}
+
+templ TiendaDetail(t TiendaDetailData) {
+	@layout.Base(t.Nombre, "tiendas") {
+		@tiendaHero(t)
+		<div class="section">
+			<div class="container">
+				<div style="display:grid;grid-template-columns:2fr 1fr;gap:32px;align-items:start">
+					<div>
+						if len(t.Photos) > 0 {
+							<div style="margin-bottom:32px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+								for _, photo := range t.Photos {
+									<img src={ photo } alt={ t.Nombre } style="border-radius:12px;height:160px;object-fit:cover;width:100%"/>
+								}
+							</div>
+						}
+						if t.About != "" {
+							<div class="glass-card" style="padding:24px;margin-bottom:20px">
+								<h3 style="font-size:.9rem;font-weight:700;margin-bottom:12px;color:var(--muted)">SOBRE LA TIENDA</h3>
+								<p style="line-height:1.7;color:var(--ink)">{ t.About }</p>
+							</div>
+						}
+						if t.About2 != "" {
+							<div class="glass-card" style="padding:24px;margin-bottom:20px">
+								<p style="line-height:1.7;color:var(--ink)">{ t.About2 }</p>
+							</div>
+						}
+					</div>
+					<div style="display:flex;flex-direction:column;gap:16px">
+						if t.HorarioLV != "" {
+							<div class="glass-card" style="padding:20px">
+								<h3 style="font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Horarios</h3>
+								<div style="display:flex;flex-direction:column;gap:8px;font-size:.85rem">
+									<div style="display:flex;justify-content:space-between">
+										<span style="color:var(--muted)">Lun–Vie</span>
+										<span style="font-weight:600">{ t.HorarioLV }</span>
+									</div>
+									if t.HorarioSab != "" {
+										<div style="display:flex;justify-content:space-between">
+											<span style="color:var(--muted)">Sábado</span>
+											<span style="font-weight:600">{ t.HorarioSab }</span>
+										</div>
+									}
+									if t.HorarioDom != "" {
+										<div style="display:flex;justify-content:space-between">
+											<span style="color:var(--muted)">Domingo</span>
+											<span style="font-weight:600">{ t.HorarioDom }</span>
+										</div>
+									}
+								</div>
+							</div>
+						}
+						if t.Whatsapp != "" || t.Telefono != "" {
+							<div class="glass-card" style="padding:20px">
+								<h3 style="font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Contacto</h3>
+								if t.Whatsapp != "" {
+									<a href={ templ.SafeURL("https://wa.me/" + t.Whatsapp) } target="_blank"
+										class="btn-primary" style="width:100%;justify-content:center;margin-bottom:10px"
+										hx-post="/api/leads" hx-vals={ fmt.Sprintf(`{"tipo":"whatsapp","tienda_id":"%s"}`, t.ID) } hx-swap="none">
+										<span class="material-symbols-outlined" style="font-size:16px">chat</span>
+										WhatsApp
+									</a>
+								}
+								if t.Telefono != "" {
+									<p style="font-size:.85rem;text-align:center;color:var(--muted)">{ t.Telefono }</p>
+								}
+							</div>
+						}
+						if len(t.Tags) > 0 {
+							<div class="glass-card" style="padding:20px">
+								<h3 style="font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Tags</h3>
+								<div style="display:flex;flex-wrap:wrap;gap:6px">
+									for _, tag := range t.Tags {
+										<span class="chip" style="font-size:.72rem;padding:5px 12px">{ tag }</span>
+									}
+								</div>
+							</div>
+						}
+						if t.Pay != "" {
+							<div class="glass-card" style="padding:20px">
+								<h3 style="font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Medios de pago</h3>
+								<p style="font-size:.85rem;line-height:1.6">{ t.Pay }</p>
+							</div>
+						}
+					</div>
+				</div>
+				if len(t.Similar) > 0 {
+					<div style="margin-top:48px;border-top:1px solid var(--border);padding-top:40px">
+						<h3 class="display" style="font-size:1.4rem;margin-bottom:24px">También te puede interesar</h3>
+						<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px">
+							for _, s := range t.Similar {
+								<a href={ templ.SafeURL("/tiendas/" + s.Slug) } class="glass-card" style="padding:16px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .18s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+									if s.Logo != "" {
+										<img src={ s.Logo } alt={ s.Nombre } style="width:56px;height:56px;border-radius:10px;object-fit:cover"/>
+									} else {
+										<div style="width:56px;height:56px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center">
+											<span class="material-symbols-outlined" style="color:var(--muted)">storefront</span>
+										</div>
+									}
+									<p style="font-size:.82rem;font-weight:600">{ s.Nombre }</p>
+								</a>
+							}
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	}
+}
+
+func galLabel(gal string) string {
+	switch gal {
+	case "placa-comercial":
+		return "Placa Comercial"
+	case "torre-flamenco":
+		return "Torre Flamenco"
+	}
+	return gal
+}

@@ -1,0 +1,53 @@
+package public
+
+import "cms-plazareal/internal/view/layout"
+
+templ Noticias() {
+	@layout.Base("Noticias", "noticias") {
+		<div class="page-hero">
+			<div class="page-hero-inner">
+				<span class="page-hero-eyebrow">Plaza Real · Copiapó</span>
+				<h1 class="page-hero-title">Noticias y <em>Prensa</em></h1>
+				<p class="page-hero-sub">Actualidad, novedades y cobertura de prensa del centro comercial Plaza Real.</p>
+			</div>
+		</div>
+		<div class="section">
+			<div class="container">
+				<div id="noticias-grid"
+					hx-get="/fragments/noticias-page"
+					hx-trigger="load"
+					hx-swap="innerHTML">
+					<div style="display:flex;align-items:center;gap:8px;color:var(--muted);padding:40px 0">
+						<span class="material-symbols-outlined loading-spin">progress_activity</span>
+						Cargando noticias...
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+}
+
+templ Comunicados() {
+	@layout.Base("Comunicados", "comunicados") {
+		<div class="page-hero">
+			<div class="page-hero-inner">
+				<span class="page-hero-eyebrow">Plaza Real · Comunidad</span>
+				<h1 class="page-hero-title">Comunicados <em>Oficiales</em></h1>
+				<p class="page-hero-sub">Información relevante para la comunidad de locatarios y visitantes.</p>
+			</div>
+		</div>
+		<div class="section">
+			<div class="container">
+				<div id="comunicados-grid"
+					hx-get="/fragments/comunicados-page"
+					hx-trigger="load"
+					hx-swap="innerHTML">
+					<div style="display:flex;align-items:center;gap:8px;color:var(--muted);padding:40px 0">
+						<span class="material-symbols-outlined loading-spin">progress_activity</span>
+						Cargando comunicados...
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+}
