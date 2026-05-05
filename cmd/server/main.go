@@ -134,6 +134,11 @@ func main() {
 	adm.Get("/dashboard", admin.Dashboard(cfg))
 	adm.Get("/dashboard/stats", admin.DashboardStats(cfg, pb))
 
+	// Empty endpoint used to safely close modals via HTMX
+	adm.Get("/empty", func(c *fiber.Ctx) error {
+		return c.SendString("")
+	})
+
 	// R2 upload (drag-drop image upload endpoint used by UploadField widget)
 	adm.Post("/upload", middleware.RoleRequired("superadmin", "director", "admin", "editor"), admin.UploadFile(cfg, r2Client))
 

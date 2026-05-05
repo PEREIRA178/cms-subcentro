@@ -3,7 +3,10 @@ package admin
 import (
 	"cms-plazareal/internal/auth"
 	"cms-plazareal/internal/config"
+	"cms-plazareal/internal/helpers"
 	"cms-plazareal/internal/services/r2"
+	"cms-plazareal/internal/view/layout"
+	adminView "cms-plazareal/internal/view/pages/admin"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -21,7 +24,7 @@ import (
 
 func LoginPage(cfg *config.Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendFile("./internal/templates/admin/pages/login.html")
+		return helpers.Render(c, adminView.Login(""))
 	}
 }
 
@@ -82,52 +85,40 @@ func Logout() fiber.Handler {
 
 func Dashboard(cfg *config.Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendFile("./internal/templates/admin/pages/dashboard.html")
+		if c.Get("HX-Request") == "true" {
+			return helpers.Render(c, adminView.Dashboard())
+		}
+		return helpers.Render(c, layout.Admin("Dashboard", "dashboard", adminView.Dashboard()))
 	}
 }
 
-// DashboardStats renders stat cards for tiendas.
+// DashboardStats renders stat cards as an HTMX fragment.
 func DashboardStats(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		all, _ := pb.FindRecordsByFilter("tiendas", "", "", 1000, 0)
-		total := len(all)
-		publicadas, destacadas, restaurantes, farmacias := 0, 0, 0, 0
-		for _, r := range all {
-			if r.GetString("status") == "publicado" {
-				publicadas++
-			}
-			if r.GetBool("destacada") {
-				destacadas++
-			}
-			switch r.GetString("cat") {
-			case "restaurantes":
-				restaurantes++
-			case "farmacias":
-				farmacias++
-			}
+		data := adminView.DashboardStatsData{}
+
+		// Tiendas publicadas
+		tiendas, _ := pb.FindRecordsByFilter("tiendas", "status='publicado'", "", 1000, 0)
+		data.TiendasPublicadas = len(tiendas)
+
+		// Locales disponibles (collection may not exist yet)
+		if _, err := pb.FindCollectionByNameOrId("locales"); err == nil {
+			locales, _ := pb.FindRecordsByFilter("locales", "status='disponible'", "", 1000, 0)
+			data.LocalesDisponibles = len(locales)
 		}
-		html := fmt.Sprintf(`<div class="stat-card accent">
-  <div class="stat-card-label">Tiendas totales</div>
-  <div class="stat-card-value">%d</div>
-  <div class="stat-card-delta">%d publicadas · %d borradores</div>
-</div>
-<div class="stat-card">
-  <div class="stat-card-label">Destacadas</div>
-  <div class="stat-card-value">%d</div>
-  <div class="stat-card-delta">con badge especial</div>
-</div>
-<div class="stat-card">
-  <div class="stat-card-label">Restaurantes</div>
-  <div class="stat-card-value">%d</div>
-  <div class="stat-card-delta">gastronomía</div>
-</div>
-<div class="stat-card">
-  <div class="stat-card-label">Farmacias</div>
-  <div class="stat-card-value">%d</div>
-  <div class="stat-card-delta">salud</div>
-</div>`, total, publicadas, total-publicadas, destacadas, restaurantes, farmacias)
-		c.Set("Content-Type", "text/html; charset=utf-8")
-		return c.SendString(html)
+
+		// Reservas pendientes (collection may not exist yet)
+		if _, err := pb.FindCollectionByNameOrId("reservas"); err == nil {
+			reservas, _ := pb.FindRecordsByFilter("reservas", "status='pendiente'", "", 1000, 0)
+			data.ReservasPendientes = len(reservas)
+		}
+
+		// Visits/leads — placeholder values until analytics wired up (Tasks 06-09)
+		data.VisitasHoy = 0
+		data.VisitasSemana = 0
+		data.NuevosLeads = 0
+
+		return helpers.Render(c, adminView.DashboardStats(data))
 	}
 }
 
@@ -1204,68 +1195,43 @@ func WhatsAppLogs(cfg *config.Config) fiber.Handler {
 
 func TiendasList(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		if c.Query("fragment") != "rows" {
-			if c.Get("HX-Request") != "true" {
-				return c.SendFile("./internal/templates/admin/pages/dashboard.html")
+		records, _ := pb.FindRecordsByFilter("tiendas", "", "nombre", 200, 0)
+		rows := make([]adminView.TiendaRow, 0, len(records))
+		for _, r := range records {
+			gal := r.GetString("gal")
+			// Normalize legacy 'norte'/'sur' values to new slugs
+			switch gal {
+			case "norte":
+				gal = "placa-comercial"
+			case "sur":
+				gal = "torre-flamenco"
 			}
-			return c.SendFile("./internal/templates/admin/pages/tiendas.html")
+			rows = append(rows, adminView.TiendaRow{
+				ID:        r.Id,
+				Nombre:    r.GetString("nombre"),
+				Cat:       r.GetString("cat"),
+				Gal:       gal,
+				Local:     r.GetString("local"),
+				Destacada: r.GetBool("destacada"),
+				Status:    r.GetString("status"),
+			})
 		}
-		records, err := pb.FindRecordsByFilter("tiendas", "", "nombre", 200, 0)
-		var sb strings.Builder
-		if err != nil {
-			sb.WriteString(fmt.Sprintf(`<tr><td colspan="6" style="text-align:center;padding:32px;color:#B71C1C">Error: %s</td></tr>`, template.HTMLEscapeString(err.Error())))
-		} else if len(records) == 0 {
-			sb.WriteString(`<tr class="empty-row"><td colspan="6" style="text-align:center;padding:32px;color:var(--md-outline)">Sin tiendas — agrega una con el botón de arriba</td></tr>`)
-		} else {
-			for _, r := range records {
-				status := r.GetString("status")
-				badgeClass := "badge-warning"
-				if status == "publicado" {
-					badgeClass = "badge-success"
-				}
-				dest := ""
-				if r.GetBool("destacada") {
-					dest = `<span class="badge badge-info" style="font-size:10px">⭐</span>`
-				}
-				nivelLabel := "Placa Comercial"
-				if r.GetString("gal") == "sur" {
-					nivelLabel = "Torre Flamenco"
-				}
-				sb.WriteString(fmt.Sprintf(`<tr>
-          <td>%s %s</td>
-          <td>%s</td>
-          <td>%s</td>
-          <td>%s</td>
-          <td><span class="badge %s">%s</span></td>
-          <td style="white-space:nowrap">
-            <button class="topbar-btn topbar-btn-outline" style="padding:4px 10px;font-size:12px"
-              hx-get="/admin/tiendas/%s/edit" hx-target="#modal-container" hx-swap="innerHTML">Editar</button>
-            <button class="topbar-btn" style="padding:4px 10px;font-size:12px;background:#E8F5E9;color:#1B5E20;border:none;cursor:pointer"
-              hx-post="/admin/tiendas/%s/publish" hx-target="#toast-area" hx-swap="innerHTML">%s</button>
-            <button class="topbar-btn" style="padding:4px 10px;font-size:12px;background:#FDECEA;color:#B71C1C;border:none;cursor:pointer"
-              hx-delete="/admin/tiendas/%s" hx-confirm="¿Eliminar esta tienda?" hx-target="closest tr" hx-swap="outerHTML swap:300ms">Eliminar</button>
-          </td></tr>`,
-					template.HTMLEscapeString(r.GetString("nombre")), dest,
-					template.HTMLEscapeString(r.GetString("cat")),
-					template.HTMLEscapeString(nivelLabel),
-					template.HTMLEscapeString(r.GetString("local")),
-					badgeClass, template.HTMLEscapeString(status),
-					r.Id, r.Id,
-					map[bool]string{true: "Despublicar", false: "Publicar"}[status == "publicado"],
-					r.Id,
-				))
-			}
+		data := adminView.TiendasPageData{Rows: rows}
+
+		if c.Get("HX-Request") == "true" {
+			return helpers.Render(c, adminView.TiendasPage(data))
 		}
-		c.Set("Content-Type", "text/html; charset=utf-8")
-		return c.SendString(sb.String())
+		return helpers.Render(c, layout.Admin("Tiendas", "tiendas", adminView.TiendasPage(data)))
 	}
 }
 
 func TiendaForm(cfg *config.Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		html := tiendaFormHTML("", "", "", "tiendas", "norte", "", "", "", "", "", "", "", "", "", "", "", "4.5", "9:00 – 21:00", "10:00 – 20:00", "Cerrado", "publicado", false)
-		c.Set("Content-Type", "text/html; charset=utf-8")
-		return c.SendString(html)
+		return helpers.Render(c, adminView.TiendaForm(adminView.TiendaFormData{
+			Status: "borrador",
+			Gal:    "placa-comercial",
+			Cat:    "tiendas",
+		}))
 	}
 }
 
@@ -1300,32 +1266,39 @@ func TiendaEdit(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
 		if err != nil {
 			return c.Status(404).SendString(`<div class="toast toast-error">No encontrado</div>`)
 		}
-		html := tiendaFormHTML(
-			r.Id,
-			r.GetString("nombre"),
-			r.GetString("slug"),
-			r.GetString("cat"),
-			r.GetString("gal"),
-			r.GetString("local"),
-			r.GetString("logo"),
-			r.GetString("tags"),
-			r.GetString("desc"),
-			r.GetString("about"),
-			r.GetString("about2"),
-			r.GetString("pay"),
-			r.GetString("photos"),
-			r.GetString("similar"),
-			r.GetString("whatsapp"),
-			r.GetString("telefono"),
-			r.GetString("rating"),
-			r.GetString("horario_lv"),
-			r.GetString("horario_sab"),
-			r.GetString("horario_dom"),
-			r.GetString("status"),
-			r.GetBool("destacada"),
-		)
-		c.Set("Content-Type", "text/html; charset=utf-8")
-		return c.SendString(html)
+		gal := r.GetString("gal")
+		switch gal {
+		case "norte":
+			gal = "placa-comercial"
+		case "sur":
+			gal = "torre-flamenco"
+		}
+		data := adminView.TiendaFormData{
+			ID:            r.Id,
+			Nombre:        r.GetString("nombre"),
+			Slug:          r.GetString("slug"),
+			Cat:           r.GetString("cat"),
+			Gal:           gal,
+			Local:         r.GetString("local"),
+			Logo:          r.GetString("logo"),
+			HeroBg:        r.GetString("hero_bg"),
+			Tags:          r.GetString("tags"),
+			Desc:          r.GetString("desc"),
+			About:         r.GetString("about"),
+			About2:        r.GetString("about2"),
+			Pay:           r.GetString("pay"),
+			Photos:        r.GetString("photos"),
+			Similar:       r.GetString("similar"),
+			Whatsapp:      r.GetString("whatsapp"),
+			Telefono:      r.GetString("telefono"),
+			HorarioLV:     r.GetString("horario_lv"),
+			HorarioSab:    r.GetString("horario_sab"),
+			HorarioDom:    r.GetString("horario_dom"),
+			StatusHorario: r.GetString("status_horario"),
+			Status:        r.GetString("status"),
+			Destacada:     r.GetBool("destacada"),
+		}
+		return helpers.Render(c, adminView.TiendaForm(data))
 	}
 }
 
@@ -1394,6 +1367,7 @@ func setTiendaFields(r *core.Record, c *fiber.Ctx) {
 	r.Set("gal", c.FormValue("gal"))
 	r.Set("local", c.FormValue("local"))
 	r.Set("logo", c.FormValue("logo"))
+	r.Set("hero_bg", c.FormValue("hero_bg"))
 	r.Set("tags", c.FormValue("tags"))
 	r.Set("desc", c.FormValue("desc"))
 	r.Set("about", c.FormValue("about"))
@@ -1407,6 +1381,7 @@ func setTiendaFields(r *core.Record, c *fiber.Ctx) {
 	r.Set("horario_lv", c.FormValue("horario_lv"))
 	r.Set("horario_sab", c.FormValue("horario_sab"))
 	r.Set("horario_dom", c.FormValue("horario_dom"))
+	r.Set("status_horario", c.FormValue("status_horario"))
 	r.Set("status", c.FormValue("status"))
 	r.Set("destacada", c.FormValue("destacada") == "on")
 }

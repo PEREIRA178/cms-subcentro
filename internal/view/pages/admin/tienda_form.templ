@@ -1,0 +1,163 @@
+package admin
+
+import "cms-plazareal/internal/view/components"
+
+type TiendaFormData struct {
+	ID            string
+	Nombre        string
+	Slug          string
+	Cat           string
+	Gal           string
+	Local         string
+	Logo          string
+	HeroBg        string
+	Tags          string
+	Desc          string
+	About         string
+	About2        string
+	Pay           string
+	Photos        string
+	Similar       string
+	Whatsapp      string
+	Telefono      string
+	HorarioLV     string
+	HorarioSab    string
+	HorarioDom    string
+	StatusHorario string
+	Status        string
+	Destacada     bool
+}
+
+templ TiendaForm(d TiendaFormData) {
+	@components.UploadFieldScript()
+	<div class="modal-header">
+		if d.ID == "" {
+			<h3 class="modal-title">Nueva tienda</h3>
+		} else {
+			<h3 class="modal-title">Editar: { d.Nombre }</h3>
+		}
+		<button class="btn-icon"
+			hx-get="/admin/empty"
+			hx-target="#modal-container"
+			hx-swap="innerHTML"
+			title="Cerrar">
+			<span class="material-symbols-outlined">close</span>
+		</button>
+	</div>
+	<div class="modal-body" style="max-height:70vh;overflow-y:auto">
+		if d.ID == "" {
+			<form hx-post="/admin/tiendas" hx-target="#toast-area" hx-swap="innerHTML">
+				@tiendaFormFields(d)
+				<div class="modal-footer">
+					<button type="submit" class="topbar-btn topbar-btn-primary">Crear tienda</button>
+				</div>
+			</form>
+		} else {
+			<form hx-put={ "/admin/tiendas/" + d.ID } hx-target="#toast-area" hx-swap="innerHTML">
+				@tiendaFormFields(d)
+				<div class="modal-footer">
+					<button type="submit" class="topbar-btn topbar-btn-primary">Guardar cambios</button>
+				</div>
+			</form>
+		}
+	</div>
+	<div id="toast-area" style="padding:0 24px 16px"></div>
+}
+
+templ tiendaFormFields(d TiendaFormData) {
+	<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+		<div class="form-group" style="grid-column:span 2">
+			<label>Nombre *</label>
+			<input type="text" name="nombre" value={ d.Nombre } required/>
+		</div>
+		<div class="form-group">
+			<label>Slug *</label>
+			<input type="text" name="slug" value={ d.Slug } required placeholder="nombre-tienda"/>
+		</div>
+		<div class="form-group">
+			<label>Local (ej: Local 10)</label>
+			<input type="text" name="local" value={ d.Local }/>
+		</div>
+		<div class="form-group">
+			<label>Categoría</label>
+			<select name="cat">
+				<option value="tiendas" selected?={ d.Cat == "tiendas" }>Moda &amp; Tiendas</option>
+				<option value="restaurantes" selected?={ d.Cat == "restaurantes" }>Restaurantes</option>
+				<option value="farmacias" selected?={ d.Cat == "farmacias" }>Farmacias</option>
+				<option value="salud" selected?={ d.Cat == "salud" }>Salud &amp; Belleza</option>
+				<option value="tecnologia" selected?={ d.Cat == "tecnologia" }>Tecnología</option>
+				<option value="servicios" selected?={ d.Cat == "servicios" }>Servicios</option>
+			</select>
+		</div>
+		<div class="form-group">
+			<label>Galería</label>
+			<select name="gal">
+				<option value="placa-comercial" selected?={ d.Gal == "placa-comercial" }>Placa Comercial</option>
+				<option value="torre-flamenco" selected?={ d.Gal == "torre-flamenco" }>Torre Flamenco</option>
+			</select>
+		</div>
+	</div>
+	@components.UploadField("logo", d.Logo, "Logo")
+	@components.UploadField("hero_bg", d.HeroBg, "Imagen de fondo hero (opcional)")
+	<div class="form-group" style="margin-top:12px">
+		<label>Descripción corta</label>
+		<textarea name="desc" rows="2">{ d.Desc }</textarea>
+	</div>
+	<div class="form-group">
+		<label>Sobre la tienda</label>
+		<textarea name="about" rows="3">{ d.About }</textarea>
+	</div>
+	<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+		<div class="form-group">
+			<label>WhatsApp (ej: 56912345678)</label>
+			<input type="text" name="whatsapp" value={ d.Whatsapp }/>
+		</div>
+		<div class="form-group">
+			<label>Teléfono</label>
+			<input type="text" name="telefono" value={ d.Telefono }/>
+		</div>
+		<div class="form-group">
+			<label>Horario Lun–Vie</label>
+			<input type="text" name="horario_lv" value={ d.HorarioLV } placeholder="9:00 – 21:00"/>
+		</div>
+		<div class="form-group">
+			<label>Horario Sábado</label>
+			<input type="text" name="horario_sab" value={ d.HorarioSab }/>
+		</div>
+		<div class="form-group">
+			<label>Horario Domingo</label>
+			<input type="text" name="horario_dom" value={ d.HorarioDom }/>
+		</div>
+		<div class="form-group">
+			<label>Estado de apertura</label>
+			<select name="status_horario">
+				<option value="normal" selected?={ d.StatusHorario == "normal" || d.StatusHorario == "" }>Calculado por horario</option>
+				<option value="solo-reserva" selected?={ d.StatusHorario == "solo-reserva" }>Solo con reserva</option>
+				<option value="cerrado-temporal" selected?={ d.StatusHorario == "cerrado-temporal" }>Cerrado temporalmente</option>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label>Tags (separados por coma)</label>
+		<input type="text" name="tags" value={ d.Tags } placeholder="Moda, Dama, Casual"/>
+	</div>
+	<div class="form-group">
+		<label>Medios de pago</label>
+		<input type="text" name="pay" value={ d.Pay } placeholder="Efectivo · Tarjetas"/>
+	</div>
+	<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+		<div class="form-group">
+			<label>Estado</label>
+			<select name="status">
+				<option value="publicado" selected?={ d.Status == "publicado" }>Publicado</option>
+				<option value="borrador" selected?={ d.Status == "borrador" || d.Status == "" }>Borrador</option>
+			</select>
+		</div>
+		<div class="form-group">
+			<label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:20px">
+				<input type="checkbox" name="destacada" value="on" checked?={ d.Destacada }/>
+				Tienda destacada
+			</label>
+		</div>
+	</div>
+}

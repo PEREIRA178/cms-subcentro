@@ -1,0 +1,138 @@
+package admin
+
+import (
+	"fmt"
+	"strings"
+)
+
+type TiendaRow struct {
+	ID        string
+	Nombre    string
+	Cat       string
+	Gal       string
+	Local     string
+	Destacada bool
+	Status    string
+}
+
+type TiendasPageData struct {
+	Rows []TiendaRow
+}
+
+templ TiendasPage(d TiendasPageData) {
+	<div>
+		<div class="card" style="margin-bottom:20px;padding:16px 20px">
+			<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+				<input id="t-search" type="text" placeholder="Buscar por nombre..."
+					style="flex:1;min-width:200px;padding:8px 12px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-family:var(--font-body);font-size:.84rem;outline:none"
+					oninput="filterTiendaRows()"/>
+				<select id="t-cat" onchange="filterTiendaRows()"
+					style="padding:8px 12px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:.84rem;outline:none">
+					<option value="">Todas las categorías</option>
+					<option value="tiendas">Moda &amp; Tiendas</option>
+					<option value="restaurantes">Restaurantes</option>
+					<option value="farmacias">Farmacias</option>
+					<option value="salud">Salud &amp; Belleza</option>
+					<option value="tecnologia">Tecnología</option>
+					<option value="servicios">Servicios</option>
+				</select>
+				<select id="t-gal" onchange="filterTiendaRows()"
+					style="padding:8px 12px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:.84rem;outline:none">
+					<option value="">Todas las galerías</option>
+					<option value="placa-comercial">Placa Comercial</option>
+					<option value="torre-flamenco">Torre Flamenco</option>
+				</select>
+				<select id="t-status" onchange="filterTiendaRows()"
+					style="padding:8px 12px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-size:.84rem;outline:none">
+					<option value="">Todos los estados</option>
+					<option value="publicado">Publicado</option>
+					<option value="borrador">Borrador</option>
+				</select>
+				<button class="topbar-btn topbar-btn-primary"
+					hx-get="/admin/tiendas/new" hx-target="#modal-container" hx-swap="innerHTML">
+					<span class="material-symbols-outlined" style="font-size:14px">add</span> Nueva tienda
+				</button>
+			</div>
+		</div>
+		<div class="card">
+			<div class="card-header">
+				<h2 class="card-title">Tiendas</h2>
+				<span id="t-count" style="font-size:.76rem;color:var(--text-muted)">{ fmt.Sprintf("%d registros", len(d.Rows)) }</span>
+			</div>
+			<div style="overflow-x:auto">
+				<table>
+					<thead>
+						<tr>
+							<th>Nombre</th><th>Categoría</th><th>Galería</th><th>Local</th><th>Estado</th><th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody id="tiendas-tbody">
+						if len(d.Rows) == 0 {
+							<tr><td colspan="6" class="empty-state-cell">Sin tiendas — agrega una con el botón de arriba</td></tr>
+						}
+						for _, t := range d.Rows {
+							@TiendaTableRow(t)
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<script>
+		function filterTiendaRows() {
+			var q = document.getElementById('t-search').value.toLowerCase();
+			var cat = document.getElementById('t-cat').value.toLowerCase();
+			var gal = document.getElementById('t-gal').value.toLowerCase();
+			var status = document.getElementById('t-status').value.toLowerCase();
+			var visible = 0;
+			document.querySelectorAll('#tiendas-tbody tr[data-name]').forEach(function(tr) {
+				var show = tr.dataset.name.includes(q) &&
+					(cat === '' || tr.dataset.cat === cat) &&
+					(gal === '' || tr.dataset.gal === gal) &&
+					(status === '' || tr.dataset.status === status);
+				tr.style.display = show ? '' : 'none';
+				if (show) visible++;
+			});
+			var el = document.getElementById('t-count');
+			if (el) el.textContent = visible + ' registros';
+		}
+		</script>
+	</div>
+}
+
+templ TiendaTableRow(t TiendaRow) {
+	<tr data-name={ strings.ToLower(t.Nombre) } data-cat={ t.Cat } data-gal={ t.Gal } data-status={ t.Status }>
+		<td style="font-weight:600">
+			if t.Destacada {
+				<span class="material-symbols-outlined" style="font-size:14px;color:var(--lime);vertical-align:-2px">star</span>
+			}
+			{ t.Nombre }
+		</td>
+		<td>{ t.Cat }</td>
+		<td>{ galLabel(t.Gal) }</td>
+		<td>{ t.Local }</td>
+		<td><span class={ "badge badge-" + t.Status }>{ t.Status }</span></td>
+		<td style="white-space:nowrap">
+			<button class="btn-icon" title="Editar"
+				hx-get={ "/admin/tiendas/" + t.ID + "/edit" }
+				hx-target="#modal-container" hx-swap="innerHTML">
+				<span class="material-symbols-outlined">edit</span>
+			</button>
+			<button class="btn-icon btn-danger" title="Eliminar"
+				hx-delete={ "/admin/tiendas/" + t.ID }
+				hx-confirm={ "¿Eliminar tienda " + t.Nombre + "?" }
+				hx-target="closest tr" hx-swap="outerHTML swap:0.3s">
+				<span class="material-symbols-outlined">delete</span>
+			</button>
+		</td>
+	</tr>
+}
+
+func galLabel(gal string) string {
+	switch gal {
+	case "placa-comercial":
+		return "Placa Comercial"
+	case "torre-flamenco":
+		return "Torre Flamenco"
+	}
+	return gal
+}
