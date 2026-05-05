@@ -1,8 +1,8 @@
 package admin
 
 import (
-	"jcp-gestioninmobiliaria/internal/auth"
-	"jcp-gestioninmobiliaria/internal/config"
+	"cms-plazareal/internal/auth"
+	"cms-plazareal/internal/config"
 	"encoding/json"
 	"fmt"
 	"html/template"

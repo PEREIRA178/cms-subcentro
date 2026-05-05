@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"jcp-gestioninmobiliaria/internal/config"
+	"cms-plazareal/internal/config"
 
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"

@@ -6,7 +6,7 @@ import (
 	"html/template"
 	"strings"
 
-	"jcp-gestioninmobiliaria/internal/config"
+	"cms-plazareal/internal/config"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/pocketbase/pocketbase"

@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"strings"
 
-	"jcp-gestioninmobiliaria/internal/config"
-	"jcp-gestioninmobiliaria/internal/services"
+	"cms-plazareal/internal/config"
+	"cms-plazareal/internal/services"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/pocketbase/pocketbase"

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"jcp-gestioninmobiliaria/internal/config"
+	"cms-plazareal/internal/config"
 
 	"github.com/golang-jwt/jwt/v5"
 )

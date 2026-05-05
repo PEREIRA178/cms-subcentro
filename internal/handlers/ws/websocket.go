@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"jcp-gestioninmobiliaria/internal/realtime"
+	"cms-plazareal/internal/realtime"
 
 	"github.com/gofiber/websocket/v2"
 )

@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	"jcp-gestioninmobiliaria/internal/config"
+	"cms-plazareal/internal/config"
 )
 
 type Client struct {

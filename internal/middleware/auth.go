@@ -3,8 +3,8 @@ package middleware
 import (
 	"strings"
 
-	"jcp-gestioninmobiliaria/internal/auth"
-	"jcp-gestioninmobiliaria/internal/config"
+	"cms-plazareal/internal/auth"
+	"cms-plazareal/internal/config"
 
 	"github.com/gofiber/fiber/v2"
 )
