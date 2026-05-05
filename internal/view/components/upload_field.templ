@@ -1,0 +1,116 @@
+package components
+
+// UploadField renders a drag-drop file upload widget.
+// fieldName: the hidden input name that will receive the final URL (e.g. "logo")
+// currentURL: the existing URL to pre-populate (empty on create)
+// label: label shown above the widget
+templ UploadField(fieldName string, currentURL string, label string) {
+	<div class="upload-field" x-data={ "uploadWidget('" + fieldName + "')" }>
+		<label class="form-label">{ label }</label>
+		if currentURL != "" {
+			<div class="upload-preview" x-show="!previewURL">
+				<img :src="''" src={ currentURL } alt="Preview actual" class="upload-img-preview"/>
+				<span class="upload-preview-label">Imagen actual</span>
+			</div>
+		}
+		<div class="upload-preview" x-show="previewURL">
+			<img :src="previewURL" alt="Preview nueva" class="upload-img-preview"/>
+		</div>
+		<div
+			class="upload-dropzone"
+			:class="{ 'dragover': isDragging, 'uploading': isUploading }"
+			@dragover.prevent="isDragging = true"
+			@dragleave.prevent="isDragging = false"
+			@drop.prevent="handleDrop($event)"
+			@click="$refs.fileInput.click()"
+		>
+			<span class="material-symbols-outlined upload-icon" x-show="!isUploading">upload</span>
+			<span class="material-symbols-outlined upload-icon loading-spin" x-show="isUploading">progress_activity</span>
+			<p x-show="!isUploading">Arrastra una imagen o <strong>haz clic</strong></p>
+			<p x-show="isUploading">Subiendo...</p>
+			<p class="upload-hint">PNG, JPG, WEBP — máx. 10 MB</p>
+			<input
+				type="file"
+				x-ref="fileInput"
+				accept="image/*"
+				style="display:none"
+				@change="handleFileChange($event)"
+			/>
+		</div>
+		<input type="hidden" :name="fieldName" :value="urlValue" x-init="urlValue = currentVal"/>
+		<p x-show="errorMsg" class="upload-error" x-text="errorMsg"></p>
+		<p x-show="urlValue && !errorMsg" class="upload-success">
+			<span class="material-symbols-outlined" style="font-size:14px">check_circle</span>
+			Imagen lista
+		</p>
+	</div>
+}
+
+// UploadFieldScript should be included once per page that uses UploadField.
+templ UploadFieldScript() {
+	<script>
+	function uploadWidget(fieldName) {
+		return {
+			fieldName,
+			currentVal: document.querySelector(`[name="${fieldName}"]`)?.value || '',
+			urlValue: '',
+			previewURL: '',
+			isDragging: false,
+			isUploading: false,
+			errorMsg: '',
+
+			handleDrop(e) {
+				this.isDragging = false;
+				const file = e.dataTransfer.files[0];
+				if (file) this.upload(file);
+			},
+			handleFileChange(e) {
+				const file = e.target.files[0];
+				if (file) this.upload(file);
+			},
+			async upload(file) {
+				this.isUploading = true;
+				this.errorMsg = '';
+				const fd = new FormData();
+				fd.append('file', file);
+				try {
+					const res = await fetch('/admin/upload', { method: 'POST', body: fd });
+					const data = await res.json();
+					if (!res.ok) throw new Error(data.error || 'Upload failed');
+					this.urlValue = data.url;
+					this.previewURL = data.url;
+				} catch(e) {
+					this.errorMsg = e.message;
+				} finally {
+					this.isUploading = false;
+				}
+			}
+		};
+	}
+	</script>
+	<style>
+	.upload-field { display: flex; flex-direction: column; gap: 8px; }
+	.upload-dropzone {
+		border: 2px dashed var(--border-bright);
+		border-radius: var(--r-md);
+		padding: 24px 16px;
+		text-align: center;
+		cursor: pointer;
+		transition: all .15s;
+		color: var(--text-muted);
+	}
+	.upload-dropzone:hover, .upload-dropzone.dragover {
+		border-color: var(--red);
+		background: rgba(215,16,85,0.04);
+		color: var(--text);
+	}
+	.upload-dropzone.uploading { opacity: .6; pointer-events: none; }
+	.upload-icon { font-size: 28px; margin-bottom: 6px; }
+	.upload-hint { font-size: .72rem; margin-top: 4px; }
+	.upload-img-preview { max-height: 120px; border-radius: var(--r-md); object-fit: cover; margin-bottom: 4px; }
+	.upload-preview { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+	.upload-preview-label { font-size: .72rem; color: var(--text-muted); }
+	.upload-error { font-size: .78rem; color: var(--danger); display: flex; align-items: center; gap: 4px; }
+	.upload-success { font-size: .78rem; color: var(--success); display: flex; align-items: center; gap: 4px; }
+	</style>
+}

@@ -13,6 +13,7 @@ import (
 	"cms-plazareal/internal/handlers/ws"
 	"cms-plazareal/internal/middleware"
 	"cms-plazareal/internal/realtime"
+	"cms-plazareal/internal/services/r2"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -28,6 +29,11 @@ func main() {
 	pb := pocketbase.New()
 	auth.RegisterPBHooks(pb)
 	realtime.RegisterPBHooks(pb)
+
+	r2Client, err := r2.New(cfg)
+	if err != nil {
+		log.Printf("R2 client init failed (uploads disabled): %v", err)
+	}
 
 	go func() {
 		if err := pb.Start(); err != nil {
@@ -120,6 +126,9 @@ func main() {
 	adm.Get("/", admin.Dashboard(cfg))
 	adm.Get("/dashboard", admin.Dashboard(cfg))
 	adm.Get("/dashboard/stats", admin.DashboardStats(cfg, pb))
+
+	// R2 upload (drag-drop image upload endpoint used by UploadField widget)
+	adm.Post("/upload", middleware.RoleRequired("superadmin", "director", "admin", "editor"), admin.UploadFile(cfg, r2Client))
 
 	// Multimedia
 	adm.Get("/multimedia", admin.MultimediaList(cfg, pb))

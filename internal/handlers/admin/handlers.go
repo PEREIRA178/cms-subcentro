@@ -3,6 +3,8 @@ package admin
 import (
 	"cms-plazareal/internal/auth"
 	"cms-plazareal/internal/config"
+	"cms-plazareal/internal/services/r2"
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -1857,4 +1859,54 @@ func playlistEditorHTML(id, name, existingItemsJSON string) string {
 })();
 </script>`,
 		formAction, template.HTMLEscapeString(name), deleteBtn, existingItemsJSON)
+}
+
+// ── R2 UPLOAD ──
+
+// UploadFile recibe multipart/form-data con campo "file",
+// lo sube a R2 y devuelve {"url": "https://..."} como JSON.
+// POST /admin/upload
+func UploadFile(cfg *config.Config, r2Client *r2.Client) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		fh, err := c.FormFile("file")
+		if err != nil {
+			return c.Status(400).JSON(fiber.Map{"error": "no file provided"})
+		}
+
+		const maxSize = 10 << 20
+		if fh.Size > maxSize {
+			return c.Status(400).JSON(fiber.Map{"error": "file too large (max 10 MB)"})
+		}
+
+		f, err := fh.Open()
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "cannot open file"})
+		}
+		defer f.Close()
+
+		key := fmt.Sprintf("uploads/%s/%d-%s",
+			time.Now().Format("2006-01"),
+			time.Now().UnixMilli(),
+			sanitizeFilename(fh.Filename),
+		)
+
+		contentType := fh.Header.Get("Content-Type")
+		if contentType == "" {
+			contentType = "application/octet-stream"
+		}
+
+		url, err := r2Client.Upload(context.Background(), key, f, contentType)
+		if err != nil {
+			log.Printf("R2 upload error: %v", err)
+			return c.Status(500).JSON(fiber.Map{"error": "upload failed"})
+		}
+
+		return c.JSON(fiber.Map{"url": url})
+	}
+}
+
+func sanitizeFilename(name string) string {
+	name = strings.ToLower(name)
+	r := strings.NewReplacer(" ", "-", "(", "", ")", "", "[", "", "]", "")
+	return r.Replace(name)
 }
