@@ -17,13 +17,8 @@ import (
 type MessageType string
 
 const (
-	MsgPlaylistUpdate  MessageType = "playlist_update"
-	MsgMultimediaUpdate MessageType = "multimedia_update"
-	MsgEventUpdate     MessageType = "event_update"
-	MsgNewsUpdate      MessageType = "news_update"
-	MsgDeviceHeartbeat MessageType = "device_heartbeat"
-	MsgRefreshWeb      MessageType = "refresh_web"
-	MsgRefreshAll      MessageType = "refresh_all"
+	MsgRefreshWeb MessageType = "refresh_web"
+	MsgRefreshAll MessageType = "refresh_all"
 )
 
 type Message struct {
@@ -158,16 +153,6 @@ func (h *Hub) BroadcastWeb() {
 	})
 }
 
-// BroadcastToDevice sends a message to a specific device
-func (h *Hub) BroadcastToDevice(code string, msgType MessageType, payload interface{}) {
-	data, _ := json.Marshal(payload)
-	h.Broadcast(Message{
-		Type:    msgType,
-		Target:  code,
-		Payload: data,
-	})
-}
-
 // ══════════════════════════════════════════════════════
 //  POCKETBASE HOOKS — triggers broadcasts on data changes
 // ══════════════════════════════════════════════════════
@@ -176,20 +161,6 @@ var hubInstance *Hub
 
 func RegisterPBHooks(pb *pocketbase.PocketBase) {
 	pb.OnServe().BindFunc(func(se *core.ServeEvent) error {
-		// Multimedia changes → refresh all
-		se.App.OnRecordAfterCreateSuccess("multimedia").BindFunc(func(e *core.RecordEvent) error {
-			if hubInstance != nil {
-				hubInstance.BroadcastAll()
-			}
-			return e.Next()
-		})
-		se.App.OnRecordAfterUpdateSuccess("multimedia").BindFunc(func(e *core.RecordEvent) error {
-			if hubInstance != nil {
-				hubInstance.BroadcastAll()
-			}
-			return e.Next()
-		})
-
 		// content_blocks changes (events + news) → refresh all displays and web
 		se.App.OnRecordAfterCreateSuccess("content_blocks").BindFunc(func(e *core.RecordEvent) error {
 			if hubInstance != nil {
@@ -204,69 +175,6 @@ func RegisterPBHooks(pb *pocketbase.PocketBase) {
 			return e.Next()
 		})
 		se.App.OnRecordAfterDeleteSuccess("content_blocks").BindFunc(func(e *core.RecordEvent) error {
-			if hubInstance != nil {
-				hubInstance.BroadcastAll()
-			}
-			return e.Next()
-		})
-
-		// playlists changes → broadcast to every device using that playlist + web
-		se.App.OnRecordAfterUpdateSuccess("playlists").BindFunc(func(e *core.RecordEvent) error {
-			if hubInstance == nil {
-				return e.Next()
-			}
-			playlistID := e.Record.Id
-			devs, err := se.App.FindRecordsByFilter("devices",
-				"playlist_id = '"+playlistID+"'", "", 100, 0)
-			if err == nil {
-				for _, dev := range devs {
-					if code := dev.GetString("code"); code != "" {
-						hubInstance.BroadcastToDevice(code, MsgPlaylistUpdate, nil)
-					}
-				}
-			}
-			// Also refresh web in case web_hero uses this playlist
-			hubInstance.BroadcastWeb()
-			return e.Next()
-		})
-		se.App.OnRecordAfterCreateSuccess("playlists").BindFunc(func(e *core.RecordEvent) error {
-			if hubInstance != nil {
-				hubInstance.BroadcastAll()
-			}
-			return e.Next()
-		})
-		se.App.OnRecordAfterDeleteSuccess("playlists").BindFunc(func(e *core.RecordEvent) error {
-			if hubInstance != nil {
-				hubInstance.BroadcastAll()
-			}
-			return e.Next()
-		})
-
-		// devices changes → broadcast to that specific device so it reloads its playlist
-		se.App.OnRecordAfterUpdateSuccess("devices").BindFunc(func(e *core.RecordEvent) error {
-			if hubInstance == nil {
-				return e.Next()
-			}
-			if code := e.Record.GetString("code"); code != "" {
-				hubInstance.BroadcastToDevice(code, MsgPlaylistUpdate, nil)
-			}
-			return e.Next()
-		})
-
-		// Playlist changes → refresh affected devices
-		se.App.OnRecordAfterCreateSuccess("playlist_items").BindFunc(func(e *core.RecordEvent) error {
-			if hubInstance != nil {
-				hubInstance.BroadcastAll()
-			}
-			return e.Next()
-		})
-		se.App.OnRecordAfterUpdateSuccess("playlist_items").BindFunc(func(e *core.RecordEvent) error {
-			if hubInstance != nil {
-				hubInstance.BroadcastAll()
-			}
-			return e.Next()
-		})
-		se.App.OnRecordAfterDeleteSuccess("playlist_items").BindFunc(func(e *core.RecordEvent) error {
 			if hubInstance != nil {
 				hubInstance.BroadcastAll()
 			}
