@@ -55,13 +55,6 @@ templ AdminSidebar(activePage string) {
 		<a href="/admin/reservas" class={ "sidebar-link", templ.KV("active", activePage == "reservas") }>
 			<span class="material-symbols-outlined">event_seat</span>Reservas
 		</a>
-		<span class="sidebar-section-label">Media & Dispositivos</span>
-		<a href="/admin/multimedia" class={ "sidebar-link", templ.KV("active", activePage == "multimedia") }>
-			<span class="material-symbols-outlined">perm_media</span>Multimedia
-		</a>
-		<a href="/admin/devices" class={ "sidebar-link", templ.KV("active", activePage == "devices") }>
-			<span class="material-symbols-outlined">tv</span>Dispositivos
-		</a>
 		<span class="sidebar-section-label">Administración</span>
 		<a href="/admin/users" class={ "sidebar-link", templ.KV("active", activePage == "users") }>
 			<span class="material-symbols-outlined">manage_accounts</span>Usuarios
