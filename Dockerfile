@@ -19,7 +19,6 @@ WORKDIR /app
 
 COPY --from=builder /run-app /app/run-app
 COPY --from=builder /usr/src/app/web /app/web
-COPY --from=builder /usr/src/app/internal/templates /app/internal/templates
 
 RUN mkdir -p /app/web/static /app/pb_data
 
