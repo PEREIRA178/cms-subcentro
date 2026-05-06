@@ -5,7 +5,6 @@ import (
 
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/core"
-	"github.com/pocketbase/pocketbase/tools/types"
 )
 
 // RegisterPBHooks sets up PocketBase collections and auth hooks.
@@ -440,8 +439,6 @@ func seedContentBlocks(app core.App) error {
 	log.Printf("  ✅ Seeded %d content_blocks", len(all))
 	return nil
 }
-
-var _ = types.DateTime{}
 
 // ── New migrations ─────────────────────────────────────────────────────────────
 
