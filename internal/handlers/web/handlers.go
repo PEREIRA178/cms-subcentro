@@ -2,7 +2,6 @@ package web
 
 import (
 	"fmt"
-	"html/template"
 	"strings"
 	"time"
 
@@ -13,14 +12,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/pocketbase/pocketbase"
 )
-
-type noticiaData struct {
-	Title    string
-	Date     string
-	Category string
-	ImgHTML  template.HTML
-	BodyHTML template.HTML
-}
 
 // IndexHandler renders the public home page using the templ Index() component.
 // Reads the optional hero background URL from site_settings (key=hero_bg_url).
@@ -173,28 +164,6 @@ func PageHandler(cfg *config.Config, page string) fiber.Handler {
 	}
 }
 
-// DeviceDisplay serves the kiosk mode display for a horizontal/screen device
-func DeviceDisplay(cfg *config.Config) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		code := c.Params("code")
-		if code == "" {
-			return c.Status(404).SendString("Código de dispositivo inválido")
-		}
-		return c.SendFile("./internal/templates/devices/display.html")
-	}
-}
-
-// TotemDisplay serves the vertical totem kiosk for a totem device
-func TotemDisplay(cfg *config.Config) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		code := c.Params("code")
-		if code == "" {
-			return c.Status(404).SendString("Código de dispositivo inválido")
-		}
-		return c.SendFile("./internal/templates/devices/totem.html")
-	}
-}
-
 // RSSFeed generates an RSS feed from published events and news
 func RSSFeed(cfg *config.Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -223,79 +192,6 @@ func RSSFeed(cfg *config.Config) fiber.Handler {
 
 		c.Set("Content-Type", "application/rss+xml; charset=utf-8")
 		return c.SendString(rss)
-	}
-}
-
-// WhatsAppWebhook handles inbound WhatsApp messages
-func WhatsAppWebhook(cfg *config.Config) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return c.SendString("<Response></Response>")
-	}
-}
-
-// NoticiaHandler renders a single news article using the full site layout template.
-func NoticiaHandler(cfg *config.Config, pb *pocketbase.PocketBase) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		id := c.Params("id")
-		r, err := pb.FindRecordById("content_blocks", id)
-		if err != nil || r.GetString("status") != "publicado" {
-			return c.Redirect("/", fiber.StatusFound)
-		}
-		cat := r.GetString("category")
-		if cat != "NOTICIA" && cat != "AVISO" && cat != "PUBLICIDAD" {
-			return c.Redirect("/", fiber.StatusFound)
-		}
-		catLabel := map[string]string{
-			"NOTICIA":    "Noticia",
-			"AVISO":      "Aviso",
-			"PUBLICIDAD": "Publicidad",
-		}[cat]
-
-		title := r.GetString("title")
-		desc := r.GetString("description")
-		body := r.GetString("body")
-		imageURL := r.GetString("image_url")
-
-		dateStr := ""
-		if dt := r.GetDateTime("date"); !dt.IsZero() {
-			dateStr = dt.Time().Format("2 de January de 2006")
-		}
-
-		var imgHTML template.HTML
-		if imageURL != "" {
-			imgHTML = template.HTML(fmt.Sprintf(
-				`<div style="width:100%%;aspect-ratio:16/6;border-radius:18px;margin-bottom:40px;overflow:hidden"><img src="%s" style="width:100%%;height:100%%;object-fit:cover" alt="%s"/></div>`,
-				template.HTMLEscapeString(imageURL), template.HTMLEscapeString(title)))
-		} else {
-			imgHTML = `<div style="width:100%;aspect-ratio:16/6;background:linear-gradient(135deg,#d60d5222,#00a0e322);border-radius:18px;margin-bottom:40px;display:flex;align-items:center;justify-content:center;font-size:3.5rem">📰</div>`
-		}
-
-		src := body
-		if src == "" {
-			src = desc
-		}
-		var bodyParts []string
-		for _, p := range strings.Split(strings.TrimSpace(src), "\n\n") {
-			p = strings.TrimSpace(p)
-			if p != "" {
-				bodyParts = append(bodyParts, "<p>"+template.HTMLEscapeString(p)+"</p>")
-			}
-		}
-		bodyHTML := template.HTML(strings.Join(bodyParts, "\n"))
-
-		tmpl, err2 := template.ParseFiles("./internal/templates/web/noticia.html")
-		if err2 != nil {
-			return c.Status(500).SendString("Template error")
-		}
-
-		c.Set("Content-Type", "text/html; charset=utf-8")
-		return tmpl.ExecuteTemplate(c, "noticia.html", noticiaData{
-			Title:    title,
-			Date:     dateStr,
-			Category: catLabel,
-			ImgHTML:  imgHTML,
-			BodyHTML: bodyHTML,
-		})
 	}
 }
 
