@@ -24,7 +24,7 @@ const (
 type Message struct {
 	Type    MessageType    `json:"type"`
 	Payload json.RawMessage `json:"payload,omitempty"`
-	Target  string         `json:"target,omitempty"` // device code or "web" or "all"
+	Target  string         `json:"target,omitempty"` // "web" or "all"
 }
 
 // ══════════════════════════════════════════════════════
@@ -34,15 +34,13 @@ type Message struct {
 type ClientType string
 
 const (
-	ClientDevice ClientType = "device"
-	ClientWeb    ClientType = "web"
+	ClientWeb ClientType = "web"
 )
 
 type Client struct {
-	Conn       *websocket.Conn
-	Type       ClientType
-	DeviceCode string // only for device clients
-	Send       chan []byte
+	Conn *websocket.Conn
+	Type ClientType
+	Send chan []byte
 }
 
 // ══════════════════════════════════════════════════════
@@ -73,8 +71,8 @@ func (h *Hub) Run() {
 			h.mu.Lock()
 			h.clients[client] = true
 			h.mu.Unlock()
-			log.Printf("🔌 WS client connected: type=%s code=%s (total: %d)",
-				client.Type, client.DeviceCode, len(h.clients))
+			log.Printf("🔌 WS client connected: type=%s (total: %d)",
+				client.Type, len(h.clients))
 
 		case client := <-h.unregister:
 			h.mu.Lock()
@@ -83,7 +81,7 @@ func (h *Hub) Run() {
 				close(client.Send)
 			}
 			h.mu.Unlock()
-			log.Printf("🔌 WS client disconnected: type=%s code=%s", client.Type, client.DeviceCode)
+			log.Printf("🔌 WS client disconnected: type=%s", client.Type)
 
 		case msg := <-h.broadcast:
 			data, err := json.Marshal(msg)
@@ -101,9 +99,6 @@ func (h *Hub) Run() {
 					shouldSend = true
 				case "web":
 					shouldSend = client.Type == ClientWeb
-				default:
-					// Target is a specific device code
-					shouldSend = client.DeviceCode == msg.Target
 				}
 
 				if shouldSend {
