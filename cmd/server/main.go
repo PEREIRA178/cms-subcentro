@@ -6,7 +6,6 @@ import (
 
 	"cms-plazareal/internal/auth"
 	"cms-plazareal/internal/config"
-	apiHandlers "cms-plazareal/internal/handlers/api"
 	"cms-plazareal/internal/handlers/admin"
 	"cms-plazareal/internal/handlers/fragments"
 	"cms-plazareal/internal/handlers/web"
@@ -90,10 +89,8 @@ func main() {
 	app.Get("/noticias.html", web.NoticiasPageHandler(cfg))
 	app.Get("/comunicados", web.ComunicadosPageHandler(cfg))
 	app.Get("/locales", web.LocalesPageHandler(cfg, pb))
-	app.Get("/locales.html", web.LocalesPageHandler(cfg, pb))
 	app.Get("/locales-disponibles", web.LocalesPageHandler(cfg, pb))
 	app.Get("/promociones", web.PromocionesPageHandler(cfg))
-	app.Get("/eventos.html", web.PromocionesPageHandler(cfg))
 
 	// ── HTMX FRAGMENTS ──
 	frag := app.Group("/fragments")
@@ -117,24 +114,15 @@ func main() {
 	frag.Get("/tiendas-marquee", fragments.TiendasMarquee(cfg, pb))
 	frag.Get("/tienda/:key", fragments.TiendaDetail(cfg, pb))
 
-	app.Get("/noticias/:id", web.NoticiaHandler(cfg, pb))
 	app.Get("/rss.xml", web.RSSFeed(cfg))
 
-	// ── PUBLIC API ──
-	api := app.Group("/api")
-	api.Get("/devices/:code/playlist", apiHandlers.DevicePlaylist(cfg, pb))
-	api.Get("/events/upcoming", apiHandlers.UpcomingEvents(cfg, pb))
-
-	// ── DEVICE / WS ──
-	app.Get("/display/:code", web.DeviceDisplay(cfg))
-	app.Get("/totem/:code", web.TotemDisplay(cfg))
+	// ── WS ──
 	app.Use("/ws", func(c *fiber.Ctx) error {
 		if gows.IsWebSocketUpgrade(c) {
 			return c.Next()
 		}
 		return fiber.ErrUpgradeRequired
 	})
-	app.Get("/ws/device/:code", gows.New(ws.DeviceSocket(hub)))
 	app.Get("/ws/web", gows.New(ws.WebSocket(hub)))
 
 	// ── ADMIN ──
@@ -156,31 +144,6 @@ func main() {
 	// R2 upload (drag-drop image upload endpoint used by UploadField widget)
 	adm.Post("/upload", middleware.RoleRequired("superadmin", "director", "admin", "editor"), admin.UploadFile(cfg, r2Client))
 
-	// Multimedia
-	adm.Get("/multimedia", admin.MultimediaList(cfg, pb))
-	adm.Get("/multimedia/new", admin.MultimediaForm(cfg))
-	adm.Post("/multimedia", admin.MultimediaCreate(cfg, pb))
-	adm.Get("/multimedia/:id/edit", admin.MultimediaEdit(cfg, pb))
-	adm.Put("/multimedia/:id", admin.MultimediaUpdate(cfg, pb))
-	adm.Delete("/multimedia/:id", admin.MultimediaDelete(cfg, pb))
-
-	// Events (content_blocks excl. NOTICIA)
-	adm.Get("/events", admin.EventsList(cfg, pb))
-	adm.Get("/events/new", admin.EventForm(cfg))
-	adm.Post("/events", admin.EventCreate(cfg, pb))
-	adm.Get("/events/:id/edit", admin.EventEdit(cfg, pb))
-	adm.Put("/events/:id", admin.EventUpdate(cfg, pb))
-	adm.Delete("/events/:id", admin.EventDelete(cfg, pb))
-	adm.Post("/events/:id/publish", admin.EventPublish(cfg, pb))
-
-	// News (content_blocks category=NOTICIA)
-	adm.Get("/news", admin.NewsList(cfg, pb))
-	adm.Get("/news/new", admin.NewsForm(cfg))
-	adm.Post("/news", admin.NewsCreate(cfg, pb))
-	adm.Get("/news/:id/edit", admin.NewsEdit(cfg, pb))
-	adm.Put("/news/:id", admin.NewsUpdate(cfg, pb))
-	adm.Delete("/news/:id", admin.NewsDelete(cfg, pb))
-
 	// Content blocks (NOTICIA / COMUNICADO / PROMOCION) — templ CRUD
 	adm.Get("/noticias", admin.ContentList(cfg, pb, "NOTICIA"))
 	adm.Get("/comunicados", admin.ContentList(cfg, pb, "COMUNICADO"))
@@ -195,24 +158,6 @@ func main() {
 	adm.Put("/content/:id", admin.ContentUpdate(cfg, pb))
 	adm.Delete("/content/:id", admin.ContentDelete(cfg, pb))
 
-	// Playlists
-	adm.Get("/playlists", admin.PlaylistList(cfg, pb))
-	adm.Get("/playlists/new", admin.PlaylistForm(cfg, pb))
-	adm.Post("/playlists", admin.PlaylistCreate(cfg, pb))
-	adm.Get("/playlists/:id/edit", admin.PlaylistEdit(cfg, pb))
-	adm.Put("/playlists/:id", admin.PlaylistUpdate(cfg, pb))
-	adm.Delete("/playlists/:id", admin.PlaylistDelete(cfg, pb))
-	adm.Post("/playlists/:id/items/reorder", admin.PlaylistReorder(cfg, pb))
-
-	// Devices
-	adm.Get("/devices", admin.DeviceList(cfg, pb))
-	adm.Get("/devices/new", admin.DeviceForm(cfg, pb))
-	adm.Post("/devices", admin.DeviceCreate(cfg, pb))
-	adm.Get("/devices/:id/edit", admin.DeviceEdit(cfg, pb))
-	adm.Put("/devices/:id", admin.DeviceUpdate(cfg, pb))
-	adm.Delete("/devices/:id", admin.DeviceDelete(cfg, pb))
-	adm.Post("/devices/:id/assign-playlist", admin.DeviceAssignPlaylist(cfg, pb))
-
 	// Users
 	adm.Get("/users", middleware.RoleRequired("superadmin"), admin.UsersList(cfg, pb))
 	adm.Get("/users/new", middleware.RoleRequired("superadmin"), admin.UserNew(cfg))
@@ -220,8 +165,6 @@ func main() {
 	adm.Post("/users", middleware.RoleRequired("superadmin"), admin.UserCreate(cfg, pb))
 	adm.Put("/users/:id", middleware.RoleRequired("superadmin"), admin.UserUpdate(cfg, pb))
 	adm.Delete("/users/:id", middleware.RoleRequired("superadmin"), admin.UserDelete(cfg, pb))
-
-	adm.Get("/whatsapp-logs", admin.WhatsAppLogs(cfg))
 
 	// Reports / Analytics
 	adm.Get("/reports", middleware.RoleRequired("superadmin", "director"), admin.ReportsPageHandler(cfg, pb))
@@ -252,8 +195,6 @@ func main() {
 	adm.Get("/reservas", admin.ReservasList(cfg, pb))
 	adm.Post("/reservas/:id/estado", admin.ReservaUpdateEstado(cfg, pb))
 	adm.Delete("/reservas/:id", admin.ReservaDelete(cfg, pb))
-
-	app.Post("/webhook/whatsapp", web.WhatsAppWebhook(cfg))
 
 	port := cfg.Port
 	if port == "" {
