@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/pocketbase/pocketbase"
@@ -80,76 +79,6 @@ func ensureCollections(app core.App) error {
 			return err
 		}
 		log.Println("  ✅ Collection 'content_blocks' created")
-	}
-
-	// ── 4. MULTIMEDIA (legacy, kept for playlists) ──
-	if _, err := app.FindCollectionByNameOrId("multimedia"); err != nil {
-		col := core.NewBaseCollection("multimedia")
-		col.Fields.Add(
-			&core.TextField{Name: "filename", Required: true},
-			&core.URLField{Name: "url_r2"},
-			&core.TextField{Name: "type", Required: true},
-			&core.NumberField{Name: "size"},
-			&core.TextField{Name: "uploaded_by"},
-			&core.TextField{Name: "estado"},
-			&core.TextField{Name: "descripcion"},
-			&core.NumberField{Name: "duracion_segundos"},
-			&core.FileField{Name: "thumbnail", MaxSelect: 1, MaxSize: 5242880},
-		)
-		if err := app.Save(col); err != nil {
-			return err
-		}
-		log.Println("  ✅ Collection 'multimedia' created")
-	}
-
-	// ── 5. PLAYLISTS ──
-	if _, err := app.FindCollectionByNameOrId("playlists"); err != nil {
-		col := core.NewBaseCollection("playlists")
-		col.Fields.Add(
-			&core.TextField{Name: "name", Required: true},
-			&core.TextField{Name: "description"},
-			&core.TextField{Name: "status"},
-			&core.TextField{Name: "created_by"},
-		)
-		if err := app.Save(col); err != nil {
-			return err
-		}
-		log.Println("  ✅ Collection 'playlists' created")
-	}
-
-	// ── 6. PLAYLIST_ITEMS ──
-	if _, err := app.FindCollectionByNameOrId("playlist_items"); err != nil {
-		col := core.NewBaseCollection("playlist_items")
-		col.Fields.Add(
-			&core.TextField{Name: "playlist_id", Required: true},
-			&core.TextField{Name: "multimedia_id"},
-			&core.TextField{Name: "tipo"},
-			&core.NumberField{Name: "orden", Required: true},
-			&core.NumberField{Name: "duracion_segundos"},
-		)
-		if err := app.Save(col); err != nil {
-			return err
-		}
-		log.Println("  ✅ Collection 'playlist_items' created")
-	}
-
-	// ── 7. DEVICES ──
-	if _, err := app.FindCollectionByNameOrId("devices"); err != nil {
-		col := core.NewBaseCollection("devices")
-		col.Fields.Add(
-			&core.TextField{Name: "name", Required: true},
-			&core.TextField{Name: "type", Required: true},
-			&core.TextField{Name: "code", Required: true},
-			&core.TextField{Name: "layout"},
-			&core.TextField{Name: "ubicacion"},
-			&core.TextField{Name: "playlist_id"},
-			&core.TextField{Name: "status"},
-			&core.DateField{Name: "last_seen"},
-		)
-		if err := app.Save(col); err != nil {
-			return err
-		}
-		log.Println("  ✅ Collection 'devices' created")
 	}
 
 	// ── 8. FORM_RESPONSES ──
@@ -259,22 +188,8 @@ func ensureCollections(app core.App) error {
 	// ── 14. Migrate content_blocks: add template field ──
 	migrateContentBlocksTemplate(app)
 
-	// ── 15. Migrate devices: add current_view field ──
-	migrateDevicesCurrentView(app)
-
-	// ── 16. Migrate playlist_items: add content_block_id field ──
-	migratePlaylistItemsContentBlockID(app)
-
-	// ── 17. Migrate multimedia: add start_time field ──
-	migrateMultimediaStartTime(app)
-
 	// ── 17b. Migrate tiendas: add status_horario + hero_bg fields ──
 	migrateTiendasStatusHorario(app)
-
-	// ── 18. Seed devices, playlists and playlist items ──
-	if err := SeedDevicesAndPlaylists(app); err != nil {
-		log.Printf("⚠️  Error seeding devices/playlists: %v", err)
-	}
 
 	// ── 19. LOCALES_DISPONIBLES ──
 	if err := ensureLocalesDisponibles(app); err != nil {
@@ -545,51 +460,6 @@ func migrateContentBlocksTemplate(app core.App) {
 	log.Println("  ✅ content_blocks: added field 'template'")
 }
 
-// migrateDevicesCurrentView adds the 'current_view' field to devices
-// so the carousel can record which slide each device is displaying.
-func migrateDevicesCurrentView(app core.App) {
-	col, err := app.FindCollectionByNameOrId("devices")
-	if err != nil || col.Fields.GetByName("current_view") != nil {
-		return
-	}
-	col.Fields.Add(&core.TextField{Name: "current_view"})
-	if err := app.Save(col); err != nil {
-		log.Printf("⚠️  devices current_view migration: %v", err)
-		return
-	}
-	log.Println("  ✅ devices: added field 'current_view'")
-}
-
-// migratePlaylistItemsContentBlockID adds 'content_block_id' to playlist_items
-// so items of tipo="content_block" can reference a content_blocks record.
-func migratePlaylistItemsContentBlockID(app core.App) {
-	col, err := app.FindCollectionByNameOrId("playlist_items")
-	if err != nil || col.Fields.GetByName("content_block_id") != nil {
-		return
-	}
-	col.Fields.Add(&core.TextField{Name: "content_block_id"})
-	if err := app.Save(col); err != nil {
-		log.Printf("⚠️  playlist_items content_block_id migration: %v", err)
-		return
-	}
-	log.Println("  ✅ playlist_items: added field 'content_block_id'")
-}
-
-// migrateMultimediaStartTime adds 'start_time' (seconds) to multimedia
-// so video items can carry a seek position independent of the URL fragment.
-func migrateMultimediaStartTime(app core.App) {
-	col, err := app.FindCollectionByNameOrId("multimedia")
-	if err != nil || col.Fields.GetByName("start_time") != nil {
-		return
-	}
-	col.Fields.Add(&core.NumberField{Name: "start_time"})
-	if err := app.Save(col); err != nil {
-		log.Printf("⚠️  multimedia start_time migration: %v", err)
-		return
-	}
-	log.Println("  ✅ multimedia: added field 'start_time'")
-}
-
 // migrateTiendasStatusHorario adds the 'status_horario' SelectField and the
 // 'hero_bg' field to the tiendas collection. Used by the public detail page
 // to compute open/closed/solo-reserva chips and to render the hero background.
@@ -618,147 +488,6 @@ func migrateTiendasStatusHorario(app core.App) {
 			log.Printf("⚠️  tiendas migration error: %v", err)
 		}
 	}
-}
-
-// ── Device & playlist seeder ───────────────────────────────────────────────────
-
-// SeedDevicesAndPlaylists is idempotent: it skips entirely if a web_hero device
-// already exists. On first run it creates:
-//   - 1 web_hero device  ("Web Hero — Landing Pública")
-//   - 1 vertical totem   ("Totem Touch — Entrada Principal")
-//   - 1 playlist "Hero Principal 2026" with 3 items:
-//     slide 1 → content_block  (template: "hero-classic")
-//     slide 2 → image          (placeholder URL)
-//     slide 3 → video          (placeholder)
-//
-// All devices are assigned to that playlist.
-func SeedDevicesAndPlaylists(app core.App) error {
-	// Idempotency: skip if any web_hero device already exists.
-	existing, _ := app.FindRecordsByFilter("devices", "type = 'web_hero'", "", 1, 0)
-	if len(existing) > 0 {
-		return nil
-	}
-
-	// ── 1. Hero-classic content block ─────────────────────────────────────────
-	cbCol, err := app.FindCollectionByNameOrId("content_blocks")
-	if err != nil {
-		return fmt.Errorf("content_blocks collection not found: %w", err)
-	}
-	cb := core.NewRecord(cbCol)
-	cb.Set("title", "Plaza Real — Tu centro comercial en Copiapó")
-	cb.Set("description", "Más de 100 locales comerciales, restaurantes y servicios. Visítanos de lunes a domingo.")
-	cb.Set("category", "NOTICIA")
-	cb.Set("status", "publicado")
-	cb.Set("featured", true)
-	cb.Set("template", "hero-classic")
-	if err := app.Save(cb); err != nil {
-		return fmt.Errorf("save hero content_block: %w", err)
-	}
-
-	// ── 2. Hero slide image multimedia ────────────────────────────────────────
-	mmCol, err := app.FindCollectionByNameOrId("multimedia")
-	if err != nil {
-		return fmt.Errorf("multimedia collection not found: %w", err)
-	}
-	imgMM := core.NewRecord(mmCol)
-	imgMM.Set("filename", "plazareal-hero.jpg")
-	imgMM.Set("url_r2", "https://placehold.co/1200x675/00a0e3/ffffff?text=Plaza+Real")
-	imgMM.Set("type", "imagen")
-	imgMM.Set("estado", "publicado")
-	if err := app.Save(imgMM); err != nil {
-		return fmt.Errorf("save image multimedia: %w", err)
-	}
-
-	// ── 3. Video multimedia placeholder ───────────────────────────────────────
-	vidMM := core.NewRecord(mmCol)
-	vidMM.Set("filename", "plazareal-loop.mp4")
-	vidMM.Set("url_r2", "")
-	vidMM.Set("type", "video")
-	vidMM.Set("estado", "publicado")
-	vidMM.Set("start_time", 0.0)
-	if err := app.Save(vidMM); err != nil {
-		return fmt.Errorf("save video multimedia: %w", err)
-	}
-
-	// ── 4. Playlist ───────────────────────────────────────────────────────────
-	plCol, err := app.FindCollectionByNameOrId("playlists")
-	if err != nil {
-		return fmt.Errorf("playlists collection not found: %w", err)
-	}
-	pl := core.NewRecord(plCol)
-	pl.Set("name", "Hero Principal 2026")
-	pl.Set("description", "Playlist principal para la landing pública de Plaza Real")
-	pl.Set("status", "activa")
-	if err := app.Save(pl); err != nil {
-		return fmt.Errorf("save playlist: %w", err)
-	}
-
-	// ── 5. Playlist items ─────────────────────────────────────────────────────
-	piCol, err := app.FindCollectionByNameOrId("playlist_items")
-	if err != nil {
-		return fmt.Errorf("playlist_items collection not found: %w", err)
-	}
-
-	type piSeed struct {
-		tipo     string
-		cbID     string
-		mmID     string
-		orden    int
-		duracion int
-	}
-	piItems := []piSeed{
-		{tipo: "content_block", cbID: cb.Id, orden: 1, duracion: 10},
-		{tipo: "image", mmID: imgMM.Id, orden: 2, duracion: 8},
-		{tipo: "video", mmID: vidMM.Id, orden: 3, duracion: 30},
-	}
-	for _, it := range piItems {
-		pi := core.NewRecord(piCol)
-		pi.Set("playlist_id", pl.Id)
-		pi.Set("tipo", it.tipo)
-		pi.Set("orden", it.orden)
-		pi.Set("duracion_segundos", it.duracion)
-		if it.cbID != "" {
-			pi.Set("content_block_id", it.cbID)
-		}
-		if it.mmID != "" {
-			pi.Set("multimedia_id", it.mmID)
-		}
-		if err := app.Save(pi); err != nil {
-			log.Printf("⚠️  seed playlist_item (orden %d): %v", it.orden, err)
-		}
-	}
-
-	// ── 6. Devices — all assigned to the same playlist ────────────────────────
-	devCol, err := app.FindCollectionByNameOrId("devices")
-	if err != nil {
-		return fmt.Errorf("devices collection not found: %w", err)
-	}
-
-	type devSeed struct {
-		name      string
-		dtype     string
-		code      string
-		ubicacion string
-	}
-	devItems := []devSeed{
-		{"Web Hero — Landing Pública", "web_hero", "WEB1", "Sitio Web Público"},
-		{"Totem Touch — Entrada Principal", "vertical", "TOTEM1", "Entrada Principal"},
-	}
-	for _, d := range devItems {
-		dev := core.NewRecord(devCol)
-		dev.Set("name", d.name)
-		dev.Set("type", d.dtype)
-		dev.Set("code", d.code)
-		dev.Set("ubicacion", d.ubicacion)
-		dev.Set("playlist_id", pl.Id)
-		dev.Set("status", "activo")
-		if err := app.Save(dev); err != nil {
-			log.Printf("⚠️  seed device %s: %v", d.name, err)
-		}
-	}
-
-	log.Printf("  ✅ SeedDevicesAndPlaylists: %d devices + playlist '%s' + 3 items", len(devItems), pl.GetString("name"))
-	return nil
 }
 
 // seedTiendas inserts demo store listings if collection is empty.
